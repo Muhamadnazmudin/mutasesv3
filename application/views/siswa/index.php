@@ -1,0 +1,202 @@
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h4>Data Siswa</h4>
+  <div>
+    <a href="<?= site_url('siswa/download_template') ?>" class="btn btn-outline-secondary btn-sm">
+  <i class="fas fa-download"></i> Download Template
+</a>
+
+    <a href="<?= site_url('siswa/export_excel') ?>" class="btn btn-success btn-sm">
+      <i class="fas fa-file-excel"></i> Export
+    </a>
+    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#importModal">
+      <i class="fas fa-upload"></i> Import
+    </button>
+    <button class="btn btn-info btn-sm" data-toggle="modal" data-target="#addModal">
+      <i class="fas fa-plus"></i> Tambah
+    </button>
+  </div>
+</div>
+
+<!-- Alert sukses -->
+<?php if ($this->session->flashdata('success')): ?>
+  <div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle"></i> <?= $this->session->flashdata('success'); ?>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+<?php endif; ?>
+<?php if ($this->session->flashdata('error')): ?>
+  <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-triangle"></i>
+    <?= $this->session->flashdata('error'); ?>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+<?php endif; ?>
+
+
+<table class="table table-bordered table-striped table-responsive-sm">
+  <thead class="thead-light">
+    <tr>
+      <th>No</th>
+      <th>NIS</th>
+      <th>Nama</th>
+      <th>Tempat Lahir</th>
+      <th>JK</th>
+<th>Agama</th>
+      <th>Tanggal Lahir</th>
+      <th>Kelas</th>
+      <th>Tahun Ajaran</th>
+      <th>Status</th>
+      <th width="120">Aksi</th>
+    </tr>
+  </thead>
+  <tbody>
+    <?php $no = $start + 1; foreach ($siswa as $s): ?>
+      <tr>
+        <td><?= $no++ ?></td>
+        <td><?= $s->nis ?></td>
+        <td><?= $s->nama ?></td>
+        <td><?= $s->tempat_lahir ?></td>
+        <td><?= $s->jk ?></td>
+<td><?= $s->agama ?></td>
+        <td><?= $s->tgl_lahir ?></td>
+        <td><?= $s->nama_kelas ?></td>
+        <td><?= $s->tahun_ajaran ?></td>
+        <td>
+          <?php if ($s->status == 'aktif'): ?>
+            <span class="badge badge-success">Aktif</span>
+          <?php elseif ($s->status == 'mutasi_keluar'): ?>
+            <span class="badge badge-danger">Mutasi Keluar</span>
+          <?php elseif ($s->status == 'mutasi_masuk'): ?>
+            <span class="badge badge-info">Mutasi Masuk</span>
+          <?php elseif ($s->status == 'lulus'): ?>
+            <span class="badge badge-primary">Lulus</span>
+          <?php else: ?>
+            <span class="badge badge-secondary">Keluar</span>
+          <?php endif; ?>
+        </td>
+        <td>
+          <a href="<?= site_url('siswa/edit/'.$s->id) ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
+          <a href="<?= site_url('siswa/delete/'.$s->id) ?>" onclick="return confirm('Hapus data ini?')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
+        </td>
+      </tr>
+    <?php endforeach; ?>
+  </tbody>
+</table>
+
+<?= $pagination ?>
+
+<!-- Modal Tambah -->
+<div class="modal fade" id="addModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form method="post" action="<?= site_url('siswa/add') ?>">
+        <div class="modal-header"><h5>Tambah Siswa</h5></div>
+        <div class="modal-body">
+          <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" 
+                 value="<?= $this->security->get_csrf_hash(); ?>">
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label>NIS</label>
+              <input type="text" name="nis" class="form-control" required>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Nama</label>
+              <input type="text" name="nama" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label>Tempat Lahir</label>
+              <input type="text" name="tempat_lahir" class="form-control">
+            </div>
+            <div class="form-row">
+  <div class="form-group col-md-6">
+    <label>Jenis Kelamin</label>
+    <select name="jk" class="form-control">
+      <option value="L">Laki-laki</option>
+      <option value="P">Perempuan</option>
+    </select>
+  </div>
+  <div class="form-group col-md-6">
+    <label>Agama</label>
+    <select name="agama" class="form-control">
+      <option value="">-- Pilih Agama --</option>
+      <option value="Islam">Islam</option>
+      <option value="Kristen">Kristen</option>
+      <option value="Katolik">Katolik</option>
+      <option value="Hindu">Hindu</option>
+      <option value="Budha">Budha</option>
+      <option value="Konghucu">Konghucu</option>
+    </select>
+  </div>
+</div>
+
+            <div class="form-group col-md-6">
+              <label>Tanggal Lahir</label>
+              <input type="date" name="tgl_lahir" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Alamat</label>
+            <textarea name="alamat" class="form-control" rows="2"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-md-6">
+              <label>Kelas</label>
+              <select name="id_kelas" class="form-control">
+                <option value="">-- Pilih Kelas --</option>
+                <?php foreach($kelas as $k): ?>
+                  <option value="<?= $k->id ?>"><?= $k->nama ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+            <div class="form-group col-md-6">
+              <label>Tahun Ajaran</label>
+              <select name="tahun_id" class="form-control" required>
+                <?php foreach($tahun as $t): ?>
+                  <option value="<?= $t->id ?>"><?= $t->tahun ?></option>
+                <?php endforeach; ?>
+              </select>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Simpan</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Import -->
+<div class="modal fade" id="importModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form method="post" action="<?= site_url('siswa/import_excel') ?>" enctype="multipart/form-data">
+        <div class="modal-header"><h5>Import Data Siswa</h5></div>
+        <div class="modal-body">
+          <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" 
+                 value="<?= $this->security->get_csrf_hash(); ?>">
+          <div class="form-group">
+            <label>Pilih File Excel</label>
+            <input type="file" name="file" accept=".xls,.xlsx" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Import</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

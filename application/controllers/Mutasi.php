@@ -1,0 +1,329 @@
+<?php
+defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Mutasi extends CI_Controller {
+
+  public function __construct() {
+    parent::__construct();
+    $this->load->model(['Mutasi_model','Siswa_model']);
+    $this->load->library(['pagination','form_validation']);
+    $this->load->helper(['url','form']);
+  }
+
+  public function index($offset = 0) {
+    $config['base_url'] = site_url('mutasi/index');
+    $config['total_rows'] = $this->Mutasi_model->count_all();
+    $config['per_page'] = 10;
+    $this->pagination->initialize($config);
+
+    $data['title'] = 'Data Mutasi Siswa';
+    $data['active'] = 'mutasi';
+    $data['mutasi'] = $this->Mutasi_model->get_all($config['per_page'], $offset);
+    $data['pagination'] = $this->pagination->create_links();
+    $data['siswa'] = $this->Mutasi_model->get_siswa_aktif();
+    $data['kelas'] = $this->Mutasi_model->get_kelas_list();
+    $data['tahun'] = $this->Mutasi_model->get_tahun_list();
+
+    $this->load->view('templates/header', $data);
+    $this->load->view('templates/sidebar', $data);
+    $this->load->view('mutasi/index', $data);
+    $this->load->view('templates/footer');
+  }
+
+ public function add() {
+  if ($this->input->post()) {
+    $jenis = $this->input->post('jenis');
+    $siswa_id = $this->input->post('siswa_id');
+    $file_name = null;
+
+    // ==== CEK SESSION LOGIN ====
+    $created_by = $this->session->userdata('user_id');
+    if (empty($created_by)) {
+      $this->session->set_flashdata('error', 'Session login tidak ditemukan. Silakan login ulang.');
+      redirect('auth/logout');
+      return;
+    }
+
+    // === Upload File (PDF opsional) ===
+    if (!empty($_FILES['berkas']['name'])) {
+      $upload_path = './uploads/mutasi/';
+      if (!is_dir($upload_path)) {
+        mkdir($upload_path, 0777, TRUE);
+      }
+
+      $config['upload_path']   = $upload_path;
+      $config['allowed_types'] = 'pdf';
+      $config['max_size']      = 512; // KB
+      $config['file_name']     = 'mutasi_' . time();
+      $config['encrypt_name']  = TRUE; // biar aman
+      $config['detect_mime']   = TRUE; // aktifkan deteksi MIME bawaan CI
+      $config['remove_spaces'] = TRUE;
+
+      $this->load->library('upload');
+      $this->upload->initialize($config);
+
+      if (!$this->upload->do_upload('berkas')) {
+        $error = strip_tags($this->upload->display_errors());
+        $this->session->set_flashdata('error', 'Upload gagal: '.$error);
+        redirect('mutasi');
+        return;
+      }
+
+      $upload_data = $this->upload->data();
+      $file_name = $upload_data['file_name'];
+
+      // Validasi manual MIME type tambahan (jaga-jaga)
+      $mime = mime_content_type($upload_data['full_path']);
+      if ($mime != 'application/pdf') {
+        unlink($upload_data['full_path']); // hapus file kalau bukan PDF
+        $this->session->set_flashdata('error', 'Upload gagal: File bukan PDF valid (deteksi MIME: '.$mime.').');
+        redirect('mutasi');
+        return;
+      }
+    }
+
+    // === Simpan data ke DB ===
+    $data = [
+      'siswa_id'        => $siswa_id,
+      'jenis'           => $jenis,
+      'tanggal'         => $this->input->post('tanggal'),
+      'alasan'          => $this->input->post('alasan') ?: NULL,
+      'tujuan_kelas_id' => $this->input->post('tujuan_kelas_id') ?: NULL,
+      'tujuan_sekolah'  => $this->input->post('tujuan_sekolah') ?: NULL,
+      'tahun_id'        => $this->input->post('tahun_id'),
+      'berkas'          => $file_name,
+      'created_by'      => $created_by
+    ];
+
+    if (!$this->db->insert('mutasi', $data)) {
+      $error = $this->db->error();
+      $this->session->set_flashdata('error', 'Gagal insert data mutasi: '.$error['message']);
+      redirect('mutasi');
+      return;
+    }
+
+    // === Update status siswa ===
+    if ($jenis == 'keluar') {
+      $alasan = strtolower($this->input->post('alasan_jenis'));
+      if ($alasan == 'mutasi') {
+        $this->db->where('id', $siswa_id)->update('siswa', ['status' => 'mutasi_keluar']);
+      } elseif (in_array($alasan, ['mengundurkan diri', 'meninggal'])) {
+        $this->db->where('id', $siswa_id)->update('siswa', ['status' => 'keluar']);
+      }
+    } elseif ($jenis == 'masuk') {
+      $kelas_tujuan = $this->input->post('tujuan_kelas_id');
+      $this->db->where('id', $siswa_id)->update('siswa', [
+        'id_kelas' => $kelas_tujuan,
+        'status'   => 'aktif'
+      ]);
+    }
+
+    $this->session->set_flashdata('success', 'Data mutasi berhasil disimpan.');
+    redirect('mutasi');
+  }
+}
+public function edit($id)
+{
+    $this->form_validation->set_rules('jenis', 'Jenis', 'required');
+    $this->form_validation->set_rules('tanggal', 'Tanggal', 'required');
+
+    if ($this->form_validation->run() == FALSE) {
+        $this->session->set_flashdata('error', validation_errors());
+        redirect('mutasi');
+    }
+
+    // Ambil data lama untuk cek file lama
+    $mutasi = $this->db->get_where('mutasi', ['id' => $id])->row();
+
+    $data = [
+        'jenis'    => $this->input->post('jenis'),
+        'alasan'   => $this->input->post('alasan'),
+        'tanggal'  => $this->input->post('tanggal'),
+        'tahun_id' => $this->input->post('tahun_id'),
+    ];
+
+    // ==== Upload File (Opsional) ====
+    if (!empty($_FILES['berkas']['name'])) {
+        $upload_path = './uploads/mutasi/';
+        if (!is_dir($upload_path)) {
+            mkdir($upload_path, 0777, TRUE);
+        }
+
+        $config['upload_path']   = $upload_path;
+        $config['allowed_types'] = 'pdf';
+        $config['max_size']      = 512; // KB
+        $config['encrypt_name']  = TRUE;
+        $config['detect_mime']   = TRUE;
+        $config['remove_spaces'] = TRUE;
+
+        $this->load->library('upload');
+        $this->upload->initialize($config);
+
+        if (!$this->upload->do_upload('berkas')) {
+            $error = strip_tags($this->upload->display_errors());
+            $this->session->set_flashdata('error', 'Upload gagal: '.$error);
+            redirect('mutasi');
+            return;
+        }
+
+        $upload_data = $this->upload->data();
+        $file_name = $upload_data['file_name'];
+
+        // Validasi tambahan MIME type
+        $mime = mime_content_type($upload_data['full_path']);
+        if ($mime != 'application/pdf') {
+            unlink($upload_data['full_path']);
+            $this->session->set_flashdata('error', 'Upload gagal: file bukan PDF valid (deteksi MIME: '.$mime.').');
+            redirect('mutasi');
+            return;
+        }
+
+        // Hapus file lama jika ada
+        if (!empty($mutasi->berkas) && file_exists($upload_path.$mutasi->berkas)) {
+            unlink($upload_path.$mutasi->berkas);
+        }
+
+        $data['berkas'] = $file_name;
+    }
+
+    // Update ke database
+    $this->db->where('id', $id)->update('mutasi', $data);
+
+    $this->session->set_flashdata('success', 'Data mutasi berhasil diperbarui.');
+    redirect('mutasi');
+}
+
+
+  public function delete($id) {
+    $this->Mutasi_model->delete($id);
+    redirect('mutasi');
+  }
+  // =======================================================
+// EXPORT EXCEL (pakai PHPExcel_lib)
+// =======================================================
+public function export_excel()
+{
+    $data = $this->Mutasi_model->get_all(10000, 0);
+
+    // gunakan library yang sudah di-load
+    $this->load->library('PHPExcel_lib');
+    $objPHPExcel = new PHPExcel();
+
+    $objPHPExcel->setActiveSheetIndex(0)
+        ->setCellValue('A1', 'No')
+        ->setCellValue('B1', 'Nama Siswa')
+        ->setCellValue('C1', 'Jenis Mutasi')
+        ->setCellValue('D1', 'Tanggal')
+        ->setCellValue('E1', 'Alasan')
+        ->setCellValue('F1', 'Tujuan Kelas')
+        ->setCellValue('G1', 'Tujuan Sekolah')
+        ->setCellValue('H1', 'Tahun Ajaran');
+
+    $no = 1;
+    $row = 2;
+    foreach ($data as $m) {
+        $objPHPExcel->getActiveSheet()
+            ->setCellValue("A$row", $no++)
+            ->setCellValue("B$row", $m->nama_siswa)
+            ->setCellValue("C$row", ucfirst($m->jenis))
+            ->setCellValue("D$row", $m->tanggal)
+            ->setCellValue("E$row", $m->alasan)
+            ->setCellValue("F$row", $m->tujuan_kelas_nama)
+            ->setCellValue("G$row", $m->tujuan_sekolah)
+            ->setCellValue("H$row", $m->tahun_ajaran);
+        $row++;
+    }
+
+    header('Content-Type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment;filename="data_mutasi_siswa.xls"');
+    header('Cache-Control: max-age=0');
+    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+    $objWriter->save('php://output');
+}
+
+public function download_template()
+{
+    $this->load->library('PHPExcel_lib');
+    $objPHPExcel = new PHPExcel();
+
+    $objPHPExcel->setActiveSheetIndex(0)
+        ->setCellValue('A1', 'No')
+        ->setCellValue('B1', 'Nama Siswa')
+        ->setCellValue('C1', 'Jenis (masuk/keluar)')
+        ->setCellValue('D1', 'Tanggal (YYYY-MM-DD)')
+        ->setCellValue('E1', 'Alasan')
+        ->setCellValue('F1', 'Tujuan Kelas (ID)')
+        ->setCellValue('G1', 'Tujuan Sekolah')
+        ->setCellValue('H1', 'Tahun ID');
+
+    header('Content-Type: application/vnd.ms-excel');
+    header('Content-Disposition: attachment;filename="template_import_mutasi.xls"');
+    header('Cache-Control: max-age=0');
+    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+    $objWriter->save('php://output');
+}
+
+public function import_excel()
+{
+    $this->load->library('PHPExcel_lib');
+
+    if (isset($_FILES['file']['name']) && $_FILES['file']['name'] != '') {
+        $path = $_FILES['file']['tmp_name'];
+        $objPHPExcel = PHPExcel_IOFactory::load($path);
+        $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+
+        foreach ($sheetData as $key => $row) {
+            if ($key == 1) continue; // skip header
+            if (empty($row['B'])) continue; // nama siswa kosong → skip
+
+            $data = [
+                'siswa_id'        => $this->Mutasi_model->get_siswa_id_by_name($row['B']),
+                'jenis'           => strtolower($row['C']),
+                'tanggal'         => $row['D'],
+                'alasan'          => $row['E'],
+                'tujuan_kelas_id' => $row['F'] ?: NULL,
+                'tujuan_sekolah'  => $row['G'] ?: NULL,
+                'tahun_id'        => $row['H'] ?: NULL,
+                'created_by'      => $this->session->userdata('user_id')
+            ];
+
+            $this->db->insert('mutasi', $data);
+        }
+    }
+
+    $this->session->set_flashdata('success', 'Data mutasi berhasil diimport.');
+    redirect('mutasi');
+}
+public function search_siswa() {
+    $term  = $this->input->get('term', TRUE);
+    $jenis = $this->input->get('jenis', TRUE);
+
+    // pastikan query LIKE tergrup agar filter status tidak bocor
+    $this->db->group_start()
+             ->like('nama', $term)
+             ->or_like('nis', $term)
+             ->group_end();
+
+    // filter berdasarkan jenis mutasi
+    if ($jenis === 'masuk') {
+        $this->db->where('status', 'mutasi_masuk');
+    } else {
+        $this->db->where('status', 'aktif');
+    }
+
+    $this->db->limit(10);
+    $query = $this->db->get('siswa');
+
+    $result = [];
+    foreach ($query->result() as $row) {
+        $result[] = [
+            'id' => $row->id,
+            'label' => $row->nis . ' - ' . $row->nama,
+            'value' => $row->nama
+        ];
+    }
+
+    echo json_encode($result);
+}
+
+}
