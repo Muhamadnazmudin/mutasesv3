@@ -30,7 +30,9 @@
       <th>NIS</th>
       <th>Nama Siswa</th>
       <th>Jenis</th>
+      <th>Jenis Keluar</th>
       <th>Alasan</th>
+      <th>Kontak Ortu</th>
       <th>Tujuan Sekolah / Kelas</th>
       <th>Tanggal</th>
       <th>Tahun Ajaran</th>
@@ -45,7 +47,9 @@
       <td><?= $m->nis ?></td>
       <td><?= $m->nama_siswa ?></td>
       <td><?= ucfirst($m->jenis) ?></td>
+      <td><?= ($m->jenis == 'keluar') ? ($m->jenis_keluar ?: '-') : '-' ?></td>
       <td><?= $m->alasan ?: '-' ?></td>
+      <td><?= $m->nohp_ortu ?: '-' ?></td>
       <td>
         <?php if($m->jenis == 'keluar'): ?>
           <?= $m->tujuan_sekolah ?: '-' ?>
@@ -104,6 +108,19 @@
                 <option value="masuk" <?= $m->jenis == 'masuk' ? 'selected' : '' ?>>Mutasi Masuk</option>
               </select>
             </div>
+            <!-- 🔧 TAMBAH DI SINI (setelah jenis mutasi) -->
+<div class="form-group">
+  <label>Jenis Keluar</label>
+  <select name="jenis_keluar" class="form-control">
+    <option value="">-- Pilih Jenis Keluar --</option>
+    <option value="mutasi" <?= $m->jenis_keluar == 'mutasi' ? 'selected' : '' ?>>Mutasi ke Sekolah Lain</option>
+    <option value="mengundurkan diri" <?= $m->jenis_keluar == 'mengundurkan diri' ? 'selected' : '' ?>>Mengundurkan Diri</option>
+    <option value="meninggal" <?= $m->jenis_keluar == 'meninggal' ? 'selected' : '' ?>>Meninggal Dunia</option>
+    <option value="dikeluarkan" <?= $m->jenis_keluar == 'dikeluarkan' ? 'selected' : '' ?>>Dikeluarkan Sekolah</option>
+    <option value="lainnya" <?= $m->jenis_keluar == 'lainnya' ? 'selected' : '' ?>>Lain-lain</option>
+  </select>
+</div>
+
             <div class="form-group col-md-6">
               <label>Tanggal</label>
               <input type="date" name="tanggal" value="<?= $m->tanggal ?>" class="form-control" required>
@@ -114,6 +131,10 @@
             <label>Alasan</label>
             <textarea name="alasan" class="form-control" rows="2"><?= $m->alasan ?></textarea>
           </div>
+          <div class="form-group">
+  <label>Nomor HP Orang Tua</label>
+  <input type="text" name="nohp_ortu" value="<?= $m->nohp_ortu ?>" class="form-control" placeholder="Contoh: 081234567890">
+</div>
 
           <div class="form-group">
             <label>Tujuan Sekolah / Kelas</label>
@@ -197,7 +218,9 @@
           <!-- Hanya untuk Mutasi Keluar -->
           <div class="form-group keluar-only">
             <label>Jenis Keluar</label>
-            <select name="alasan_jenis" id="alasan_jenis" class="form-control" onchange="toggleKeluarFields()">
+            <!-- 🔧 GANTI ALASAN_JENIS JADI JENIS_KELUAR -->
+<select name="jenis_keluar" id="jenis_keluar" class="form-control" onchange="toggleKeluarFields()">
+
               <option value="">-- Pilih Jenis Keluar --</option>
               <option value="mutasi">Mutasi ke Sekolah Lain</option>
               <option value="mengundurkan diri">Mengundurkan Diri</option>
@@ -214,6 +237,10 @@
             <label>Alasan</label>
             <textarea name="alasan" class="form-control" rows="2"></textarea>
           </div>
+              <div class="form-group keluar-only" id="nohpOrtuField" style="display:none;">
+  <label>Nomor HP Orang Tua</label>
+  <input type="text" name="nohp_ortu" class="form-control" placeholder="Contoh: 081234567890">
+</div>
 
           <!-- Hanya untuk Mutasi Masuk -->
           <div class="form-group masuk-only" id="tujuanKelasField">
@@ -277,8 +304,6 @@
   </div>
   <small class="text-muted d-block mt-1">Pastikan format sesuai template.</small>
 </div>
-
-
         <div class="modal-footer">
           <button type="submit" class="btn btn-secondary">Import</button>
           <button type="button" class="btn btn-outline-dark" data-dismiss="modal">Batal</button>
@@ -298,9 +323,13 @@ function toggleFields() {
 }
 
 function toggleKeluarFields() {
-  const alasanJenis = document.getElementById('alasan_jenis').value;
-  document.getElementById('tujuanSekolahField').style.display = (alasanJenis === 'mutasi') ? 'block' : 'none';
-  document.getElementById('alasanField').style.display = (alasanJenis === 'mengundurkan diri') ? 'block' : 'none';
+  const jenisKeluar = document.getElementById('jenis_keluar').value;
+  document.getElementById('tujuanSekolahField').style.display = (jenisKeluar === 'mutasi') ? 'block' : 'none';
+document.getElementById('alasanField').style.display = 
+  (jenisKeluar === 'mengundurkan diri' || jenisKeluar === 'dikeluarkan' || jenisKeluar === 'lainnya') ? 'block' : 'none';
+document.getElementById('nohpOrtuField').style.display = 
+  (jenisKeluar !== 'meninggal') ? 'block' : 'none';
+
 }
 
 // ========== Preview File Upload & Validasi ==========

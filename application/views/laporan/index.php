@@ -65,11 +65,13 @@
       <th>No</th>
       <th>Nama Siswa</th>
       <th>NIS</th>
+      <th>NISN</th> <!-- 🆕 TAMBAH -->
       <th>Kelas Asal</th>
       <th>Jenis</th>
+      <th>Jenis Keluar</th> <!-- 🆕 TAMBAH -->
       <th>Tanggal</th>
       <th>Alasan</th>
-      <th>Kelas Tujuan</th>
+      <th>Kelas / Sekolah Tujuan</th>
       <th>Tahun Ajaran</th>
       <th>Dibuat Oleh</th>
     </tr>
@@ -80,16 +82,27 @@
         <td><?= $no++ ?></td>
         <td><?= $m->nama_siswa ?></td>
         <td><?= $m->nis ?></td>
+        <td><?= $m->nisn ?></td> <!-- 🆕 TAMBAH -->
         <td><?= isset($m->kelas_asal) ? $m->kelas_asal : '-' ?></td>
         <td><?= ucfirst($m->jenis) ?></td>
+        <td><?= $m->jenis == 'keluar' ? ($m->jenis_keluar ?: '-') : '-' ?></td> <!-- 🆕 TAMBAH -->
         <td><?= !empty($m->tanggal) ? date('d-m-Y', strtotime($m->tanggal)) : '-' ?></td>
-        <td><?= $m->alasan ?></td>
-        <td><?= isset($m->kelas_tujuan) ? $m->kelas_tujuan : '-' ?></td>
+        <td><?= $m->alasan ?: '-' ?></td>
+        <td>
+          <?php if($m->jenis == 'keluar'): ?>
+            <?= $m->tujuan_sekolah ?: '-' ?>
+          <?php else: ?>
+            <?= isset($m->kelas_tujuan) ? $m->kelas_tujuan : '-' ?>
+          <?php endif; ?>
+        </td>
         <td><?= $m->tahun_ajaran ?></td>
-        <td><?= $m->dibuat_oleh ?></td>
+        <td><?= isset($m->dibuat_oleh) ? $m->dibuat_oleh : '-' ?></td>
       </tr>
     <?php endforeach; else: ?>
-      <tr><td colspan="10" class="text-center text-muted">Tidak ada data ditemukan.</td></tr>
+      <tr>
+        <td colspan="12" class="text-center text-muted">Tidak ada data ditemukan.</td>
+      </tr>
     <?php endif; ?>
   </tbody>
 </table>
+

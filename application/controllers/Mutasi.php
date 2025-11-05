@@ -55,8 +55,8 @@ class Mutasi extends CI_Controller {
       $config['allowed_types'] = 'pdf';
       $config['max_size']      = 512; // KB
       $config['file_name']     = 'mutasi_' . time();
-      $config['encrypt_name']  = TRUE; // biar aman
-      $config['detect_mime']   = TRUE; // aktifkan deteksi MIME bawaan CI
+      $config['encrypt_name']  = TRUE;
+      $config['detect_mime']   = TRUE;
       $config['remove_spaces'] = TRUE;
 
       $this->load->library('upload');
@@ -75,19 +75,25 @@ class Mutasi extends CI_Controller {
       // Validasi manual MIME type tambahan (jaga-jaga)
       $mime = mime_content_type($upload_data['full_path']);
       if ($mime != 'application/pdf') {
-        unlink($upload_data['full_path']); // hapus file kalau bukan PDF
+        unlink($upload_data['full_path']);
         $this->session->set_flashdata('error', 'Upload gagal: File bukan PDF valid (deteksi MIME: '.$mime.').');
         redirect('mutasi');
         return;
       }
     }
 
+    // === Ambil input tambahan ===
+    $nohp_ortu = $this->input->post('nohp_ortu'); // ✅ nomor HP ortu
+    $jenis_keluar = $this->input->post('jenis_keluar'); // ✅ jenis keluar spesifik (mutasi, meninggal, dst)
+
     // === Simpan data ke DB ===
     $data = [
       'siswa_id'        => $siswa_id,
       'jenis'           => $jenis,
+      'jenis_keluar'    => $jenis_keluar, // ✅ kolom baru
       'tanggal'         => $this->input->post('tanggal'),
       'alasan'          => $this->input->post('alasan') ?: NULL,
+      'nohp_ortu'       => $nohp_ortu, // ✅ kolom baru
       'tujuan_kelas_id' => $this->input->post('tujuan_kelas_id') ?: NULL,
       'tujuan_sekolah'  => $this->input->post('tujuan_sekolah') ?: NULL,
       'tahun_id'        => $this->input->post('tahun_id'),
@@ -104,11 +110,13 @@ class Mutasi extends CI_Controller {
 
     // === Update status siswa ===
     if ($jenis == 'keluar') {
-      $alasan = strtolower($this->input->post('alasan_jenis'));
+      $alasan = strtolower($this->input->post('jenis_keluar')); // ✅ pakai jenis_keluar sekarang
       if ($alasan == 'mutasi') {
         $this->db->where('id', $siswa_id)->update('siswa', ['status' => 'mutasi_keluar']);
-      } elseif (in_array($alasan, ['mengundurkan diri', 'meninggal'])) {
+      } elseif (in_array($alasan, ['mengundurkan diri', 'dikeluarkan', 'lainnya'])) {
         $this->db->where('id', $siswa_id)->update('siswa', ['status' => 'keluar']);
+      } elseif ($alasan == 'meninggal') {
+        $this->db->where('id', $siswa_id)->update('siswa', ['status' => 'meninggal']);
       }
     } elseif ($jenis == 'masuk') {
       $kelas_tujuan = $this->input->post('tujuan_kelas_id');
@@ -122,6 +130,7 @@ class Mutasi extends CI_Controller {
     redirect('mutasi');
   }
 }
+
 public function edit($id)
 {
     $this->form_validation->set_rules('jenis', 'Jenis', 'required');
@@ -135,11 +144,18 @@ public function edit($id)
     // Ambil data lama untuk cek file lama
     $mutasi = $this->db->get_where('mutasi', ['id' => $id])->row();
 
+    // === Tambahan input baru ===
+    $jenis_keluar = $this->input->post('jenis_keluar'); // ✅ Jenis keluar spesifik
+    $nohp_ortu    = $this->input->post('nohp_ortu');    // ✅ Nomor HP orang tua
+
+    // Data utama yang akan diupdate
     $data = [
-        'jenis'    => $this->input->post('jenis'),
-        'alasan'   => $this->input->post('alasan'),
-        'tanggal'  => $this->input->post('tanggal'),
-        'tahun_id' => $this->input->post('tahun_id'),
+        'jenis'         => $this->input->post('jenis'),
+        'jenis_keluar'  => $jenis_keluar,  // ✅ Tambahkan kolom ini
+        'alasan'        => $this->input->post('alasan'),
+        'nohp_ortu'     => $nohp_ortu,     // ✅ Pastikan tetap ikut diupdate
+        'tanggal'       => $this->input->post('tanggal'),
+        'tahun_id'      => $this->input->post('tahun_id'),
     ];
 
     // ==== Upload File (Opsional) ====
@@ -186,12 +202,13 @@ public function edit($id)
         $data['berkas'] = $file_name;
     }
 
-    // Update ke database
+    // === Update ke database ===
     $this->db->where('id', $id)->update('mutasi', $data);
 
     $this->session->set_flashdata('success', 'Data mutasi berhasil diperbarui.');
     redirect('mutasi');
 }
+
 
 
   public function delete($id) {

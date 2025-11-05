@@ -18,35 +18,37 @@ class PHPExcel_lib
         $sheet = $excel->getActiveSheet();
         $sheet->setTitle('Laporan Mutasi Siswa');
 
-        // Header kolom
-        $headers = array(
-            'No', 'Nama Siswa', 'NIS', 'Kelas Asal', 'Jenis', 
-            'Tanggal', 'Alasan', 'Kelas Tujuan', 'Tahun Ajaran', 'Dibuat Oleh'
-        );
+        // Header kolom baru
+$headers = [
+    'No', 'Nama Siswa', 'NIS', 'NISN', 'Kelas Asal', 'Jenis', 'Jenis Keluar',
+    'Tanggal', 'Alasan', 'No. HP Ortu', 'Tujuan', 'Tahun Ajaran', 'Dibuat Oleh'
+];
+$col = 'A';
+foreach ($headers as $h) {
+    $sheet->setCellValue($col.'1', $h);
+    $col++;
+}
 
-        // Tulis header ke baris 1
-        $col = 0;
-        foreach ($headers as $header) {
-            $sheet->setCellValueByColumnAndRow($col, 1, $header);
-            $col++;
-        }
+// Isi data
+$rowNum = 2;
+$no = 1;
+foreach ($data as $m) {
+    $sheet->setCellValue('A'.$rowNum, $no++);
+    $sheet->setCellValue('B'.$rowNum, $m->nama_siswa);
+    $sheet->setCellValue('C'.$rowNum, $m->nis);
+    $sheet->setCellValue('D'.$rowNum, $m->nisn);
+    $sheet->setCellValue('E'.$rowNum, $m->kelas_asal);
+    $sheet->setCellValue('F'.$rowNum, ucfirst($m->jenis));
+    $sheet->setCellValue('G'.$rowNum, $m->jenis == 'keluar' ? ($m->jenis_keluar ?: '-') : '-');
+    $sheet->setCellValue('H'.$rowNum, !empty($m->tanggal) ? date('d-m-Y', strtotime($m->tanggal)) : '-');
+    $sheet->setCellValue('I'.$rowNum, $m->alasan);
+    $sheet->setCellValue('J'.$rowNum, $m->nohp_ortu);
+    $sheet->setCellValue('K'.$rowNum, $m->jenis == 'keluar' ? ($m->tujuan_sekolah ?: '-') : ($m->kelas_tujuan ?: '-'));
+    $sheet->setCellValue('L'.$rowNum, $m->tahun_ajaran);
+    $sheet->setCellValue('M'.$rowNum, $m->dibuat_oleh);
+    $rowNum++;
+}
 
-        // Tulis data mulai dari baris ke-2
-        $row = 2;
-        $no = 1;
-        foreach ($data as $m) {
-            $sheet->setCellValueByColumnAndRow(0, $row, $no++);
-            $sheet->setCellValueByColumnAndRow(1, $row, $m->nama_siswa);
-            $sheet->setCellValueByColumnAndRow(2, $row, $m->nis);
-            $sheet->setCellValueByColumnAndRow(3, $row, isset($m->kelas_asal) ? $m->kelas_asal : '-');
-            $sheet->setCellValueByColumnAndRow(4, $row, ucfirst($m->jenis));
-            $sheet->setCellValueByColumnAndRow(5, $row, !empty($m->tanggal) ? date('d-m-Y', strtotime($m->tanggal)) : '-');
-            $sheet->setCellValueByColumnAndRow(6, $row, $m->alasan);
-            $sheet->setCellValueByColumnAndRow(7, $row, isset($m->kelas_tujuan) ? $m->kelas_tujuan : '-');
-            $sheet->setCellValueByColumnAndRow(8, $row, $m->tahun_ajaran);
-            $sheet->setCellValueByColumnAndRow(9, $row, $m->dibuat_oleh);
-            $row++;
-        }
 
         // Styling header
         $headerStyle = array(
