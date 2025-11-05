@@ -133,6 +133,14 @@ body.dark-mode .table-striped tbody tr:nth-of-type(odd) {
 body.dark-mode .table-hover tbody tr:hover {
 	background-color: #3a3a52;
 }
+body.dark-mode .table-secondary.fw-bold td {
+	color: #000 !important; /* hitam, biar kontras */
+	font-weight: 700;
+}
+body.dark-mode .table-secondary td,
+body.dark-mode .table-secondary th {
+	color: #000 !important;
+}
 
 /* --- BUTTONS --- */
 .btn {

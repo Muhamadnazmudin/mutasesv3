@@ -13,7 +13,6 @@ class Siswa extends CI_Controller {
   public function index($offset = 0) {
     $this->load->library('pagination');
 
-    // Hitung total siswa aktif saja
     $this->db->where('status', 'aktif');
     $config['base_url'] = site_url('siswa/index');
     $config['total_rows'] = $this->db->count_all_results('siswa');
@@ -31,7 +30,6 @@ class Siswa extends CI_Controller {
 
     $this->pagination->initialize($config);
 
-    // Ambil data siswa aktif dengan limit & offset
     $this->db->select('siswa.*, kelas.nama AS nama_kelas, tahun_ajaran.tahun AS tahun_ajaran');
     $this->db->join('kelas', 'kelas.id = siswa.id_kelas', 'left');
     $this->db->join('tahun_ajaran', 'tahun_ajaran.id = siswa.tahun_id', 'left');
@@ -50,45 +48,67 @@ class Siswa extends CI_Controller {
     $this->load->view('templates/sidebar', $data);
     $this->load->view('siswa/index', $data);
     $this->load->view('templates/footer');
-}
-
-
-  public function add() {
-    if ($this->input->post()) {
-      $data = [
-  'nis' => $this->input->post('nis', TRUE),
-  'nama' => $this->input->post('nama', TRUE),
-  'jk' => $this->input->post('jk', TRUE),
-  'agama' => $this->input->post('agama', TRUE),
-  'tempat_lahir' => $this->input->post('tempat_lahir', TRUE),
-  'tgl_lahir' => $this->input->post('tgl_lahir', TRUE),
-  'alamat' => $this->input->post('alamat', TRUE),
-  'id_kelas' => $this->input->post('id_kelas', TRUE),
-  'tahun_id' => $this->input->post('tahun_id', TRUE),
-  'status' => 'aktif'
-];
-      $this->Siswa_model->insert($data);
-      redirect('siswa');
-    }
   }
 
+  // ========================================
+  // TAMBAH SISWA
+  // ========================================
+  public function add() {
+  if ($this->input->post()) {
+    $nisn = $this->input->post('nisn', TRUE);
+
+    // 🔹 Cek apakah NISN sudah ada
+    $cek = $this->db->get_where('siswa', ['nisn' => $nisn])->row();
+
+    if ($cek) {
+      $this->session->set_flashdata('error', 
+        'NISN <strong>' . $nisn . '</strong> sudah terdaftar atas nama <strong>' . $cek->nama . '</strong>.');
+      redirect('siswa');
+      return;
+    }
+
+    // 🔹 Data baru
+    $data = [
+      'nis'          => $this->input->post('nis', TRUE),
+      'nisn'         => $nisn,
+      'nama'         => $this->input->post('nama', TRUE),
+      'jk'           => $this->input->post('jk', TRUE),
+      'agama'        => $this->input->post('agama', TRUE),
+      'tempat_lahir' => $this->input->post('tempat_lahir', TRUE),
+      'tgl_lahir'    => $this->input->post('tgl_lahir', TRUE),
+      'alamat'       => $this->input->post('alamat', TRUE),
+      'id_kelas'     => $this->input->post('id_kelas', TRUE),
+      'tahun_id'     => $this->input->post('tahun_id', TRUE),
+      'status'       => 'aktif'
+    ];
+
+    $this->Siswa_model->insert($data);
+    $this->session->set_flashdata('success', 'Data siswa berhasil ditambahkan.');
+    redirect('siswa');
+  }
+}
+
+  // ========================================
+  // EDIT SISWA
+  // ========================================
   public function edit($id) {
     if ($this->input->post()) {
-     // di function edit()
-$data = [
-  'nis' => $this->input->post('nis', TRUE),
-  'nama' => $this->input->post('nama', TRUE),
-  'jk' => $this->input->post('jk', TRUE),
-  'agama' => $this->input->post('agama', TRUE),
-  'tempat_lahir' => $this->input->post('tempat_lahir', TRUE),
-  'tgl_lahir' => $this->input->post('tgl_lahir', TRUE),
-  'alamat' => $this->input->post('alamat', TRUE),
-  'id_kelas' => $this->input->post('id_kelas', TRUE),
-  'tahun_id' => $this->input->post('tahun_id', TRUE),
-  'status' => $this->input->post('status', TRUE)
-];
+      $data = [
+        'nis' => $this->input->post('nis', TRUE),
+        'nisn' => $this->input->post('nisn', TRUE),
+        'nama' => $this->input->post('nama', TRUE),
+        'jk' => $this->input->post('jk', TRUE),
+        'agama' => $this->input->post('agama', TRUE),
+        'tempat_lahir' => $this->input->post('tempat_lahir', TRUE),
+        'tgl_lahir' => $this->input->post('tgl_lahir', TRUE),
+        'alamat' => $this->input->post('alamat', TRUE),
+        'id_kelas' => $this->input->post('id_kelas', TRUE),
+        'tahun_id' => $this->input->post('tahun_id', TRUE),
+        'status' => $this->input->post('status', TRUE)
+      ];
 
       $this->Siswa_model->update($id, $data);
+      $this->session->set_flashdata('success', 'Data siswa berhasil diperbarui.');
       redirect('siswa');
     } else {
       $data['siswa'] = $this->Siswa_model->get_by_id($id);
@@ -103,8 +123,17 @@ $data = [
     }
   }
 
+  // ========================================
+  // HAPUS SISWA (cek mutasi dulu)
+  // ========================================
   public function delete($id) {
-    $this->Siswa_model->delete($id);
+    $ada_mutasi = $this->db->where('siswa_id', $id)->count_all_results('mutasi');
+    if ($ada_mutasi > 0) {
+      $this->session->set_flashdata('error', 'Siswa ini sudah memiliki data mutasi dan tidak dapat dihapus.');
+    } else {
+      $this->Siswa_model->delete($id);
+      $this->session->set_flashdata('success', 'Data siswa berhasil dihapus.');
+    }
     redirect('siswa');
   }
 
@@ -154,19 +183,20 @@ public function download_template() {
     $sheet = $objPHPExcel->setActiveSheetIndex(0);
     $sheet->setTitle('Template Siswa');
 
-    // HEADER
+    // === HEADER BARU (dengan NISN di kolom B) ===
     $sheet->setCellValue('A1', 'NIS')
-          ->setCellValue('B1', 'Nama')
-          ->setCellValue('C1', 'JK (L/P)')
-          ->setCellValue('D1', 'Agama')
-          ->setCellValue('E1', 'Tempat Lahir')
-          ->setCellValue('F1', 'Tanggal Lahir (YYYY-MM-DD)')
-          ->setCellValue('G1', 'Alamat')
-          ->setCellValue('H1', 'Kelas')
-          ->setCellValue('I1', 'Tahun Ajaran')
-          ->setCellValue('J1', 'Status');
+          ->setCellValue('B1', 'NISN')
+          ->setCellValue('C1', 'Nama')
+          ->setCellValue('D1', 'JK (L/P)')
+          ->setCellValue('E1', 'Agama')
+          ->setCellValue('F1', 'Tempat Lahir')
+          ->setCellValue('G1', 'Tanggal Lahir (YYYY-MM-DD)')
+          ->setCellValue('H1', 'Alamat')
+          ->setCellValue('I1', 'Kelas')
+          ->setCellValue('J1', 'Tahun Ajaran')
+          ->setCellValue('K1', 'Status');
 
-    // SHEET REFERENSI
+    // === SHEET REFERENSI ===
     $objPHPExcel->createSheet();
     $refSheet = $objPHPExcel->setActiveSheetIndex(1);
     $refSheet->setTitle('Referensi');
@@ -199,66 +229,66 @@ public function download_template() {
     // Kembali ke sheet utama
     $sheet = $objPHPExcel->setActiveSheetIndex(0);
 
-    // Ranges referensi
+    // === Ranges referensi ===
     $kelasRange  = 'Referensi!$A$1:$A$' . count($kelas);
     $tahunRange  = 'Referensi!$B$1:$B$' . count($tahun);
     $statusRange = 'Referensi!$C$1:$C$' . count($status);
     $agamaRange  = 'Referensi!$D$1:$D$' . count($agama_list);
 
-    // Dropdown: JK, Agama, Kelas, Tahun, Status
+    // === Dropdown: JK, Agama, Kelas, Tahun, Status ===
     for ($i = 2; $i <= 100; $i++) {
         // JK
-        $validJK = $sheet->getCell("C$i")->getDataValidation();
+        $validJK = $sheet->getCell("D$i")->getDataValidation();
         $validJK->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
         $validJK->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_STOP);
         $validJK->setAllowBlank(true);
         $validJK->setShowDropDown(true);
         $validJK->setFormula1('"L,P"');
-        $sheet->getCell("C$i")->setDataValidation($validJK);
+        $sheet->getCell("D$i")->setDataValidation($validJK);
 
         // Agama
-        $validAgama = $sheet->getCell("D$i")->getDataValidation();
+        $validAgama = $sheet->getCell("E$i")->getDataValidation();
         $validAgama->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
         $validAgama->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_STOP);
         $validAgama->setAllowBlank(true);
         $validAgama->setShowDropDown(true);
         $validAgama->setFormula1($agamaRange);
-        $sheet->getCell("D$i")->setDataValidation($validAgama);
+        $sheet->getCell("E$i")->setDataValidation($validAgama);
 
         // Kelas
-        $validKelas = $sheet->getCell("H$i")->getDataValidation();
+        $validKelas = $sheet->getCell("I$i")->getDataValidation();
         $validKelas->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
         $validKelas->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_STOP);
         $validKelas->setAllowBlank(true);
         $validKelas->setShowDropDown(true);
         $validKelas->setFormula1($kelasRange);
-        $sheet->getCell("H$i")->setDataValidation($validKelas);
+        $sheet->getCell("I$i")->setDataValidation($validKelas);
 
         // Tahun
-        $validTahun = $sheet->getCell("I$i")->getDataValidation();
+        $validTahun = $sheet->getCell("J$i")->getDataValidation();
         $validTahun->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
         $validTahun->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_STOP);
         $validTahun->setAllowBlank(true);
         $validTahun->setShowDropDown(true);
         $validTahun->setFormula1($tahunRange);
-        $sheet->getCell("I$i")->setDataValidation($validTahun);
+        $sheet->getCell("J$i")->setDataValidation($validTahun);
 
         // Status
-        $validStatus = $sheet->getCell("J$i")->getDataValidation();
+        $validStatus = $sheet->getCell("K$i")->getDataValidation();
         $validStatus->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
         $validStatus->setErrorStyle(PHPExcel_Cell_DataValidation::STYLE_STOP);
         $validStatus->setAllowBlank(true);
         $validStatus->setShowDropDown(true);
         $validStatus->setFormula1($statusRange);
-        $sheet->getCell("J$i")->setDataValidation($validStatus);
+        $sheet->getCell("K$i")->setDataValidation($validStatus);
     }
 
-    // Auto width
-    foreach (range('A','J') as $col) {
+    // === Auto width semua kolom ===
+    foreach (range('A','K') as $col) {
         $sheet->getColumnDimension($col)->setAutoSize(true);
     }
 
-    // Set aktif ke sheet pertama
+    // Set aktif ke sheet utama
     $objPHPExcel->setActiveSheetIndex(0);
 
     // Output file
@@ -269,6 +299,7 @@ public function download_template() {
     $objWriter->save('php://output');
 }
 
+
   // IMPORT EXCEL
   public function import_excel() {
     if (isset($_FILES['file']['name'])) {
@@ -277,46 +308,86 @@ public function download_template() {
         $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
 
         $gagal = [];
+        $berhasil_update = 0;
+        $berhasil_insert = 0;
+
         foreach ($sheetData as $key => $row) {
             if ($key == 1) continue; // skip header
 
-            // Normalisasi dan cari kelas & tahun
-            $kelas_nama = trim(strtolower($row['F']));
-            $tahun_nama = trim($row['G']);
+            // --- Kolom sesuai urutan template baru ---
+            $nis        = trim($row['A']);
+            $nisn       = trim($row['B']);
+            $nama       = trim($row['C']);
+            $jk         = strtoupper(trim($row['D']));
+            $agama      = trim($row['E']);
+            $tempat     = trim($row['F']);
+            $tgl_lahir  = trim($row['G']);
+            $alamat     = trim($row['H']);
+            $kelas_nama = trim(strtolower($row['I']));
+            $tahun_nama = trim($row['J']);
+            $status     = strtolower(trim($row['K'])) ?: 'aktif';
 
+            // --- Validasi wajib minimal NISN dan Nama ---
+            if (empty($nisn) || empty($nama)) {
+                $gagal[] = "Baris $key: NISN dan Nama wajib diisi.";
+                continue;
+            }
+
+            // --- Cari kelas dan tahun ajaran berdasarkan nama ---
             $kelas = $this->db->where('LOWER(nama)', $kelas_nama)->get('kelas')->row();
             $tahun = $this->db->where('tahun', $tahun_nama)->get('tahun_ajaran')->row();
 
             if (!$kelas || !$tahun) {
-                $gagal[] = $row['B'] . ' (' . $row['F'] . ', ' . $row['G'] . ')';
+                $gagal[] = "Baris $key: Kelas atau Tahun Ajaran tidak valid ($kelas_nama / $tahun_nama)";
                 continue;
             }
 
+            // --- Cek apakah NISN sudah ada ---
+            $existing = $this->db->get_where('siswa', ['nisn' => $nisn])->row();
+
             $data = [
-                'nis' => trim($row['A']),
-                'nama' => trim($row['B']),
-                'tempat_lahir' => trim($row['C']),
-                'tgl_lahir' => trim($row['D']),
-                'alamat' => trim($row['E']),
-                'id_kelas' => $kelas->id,
-                'tahun_id' => $tahun->id,
-                'status' => strtolower(trim($row['H'])) ?: 'aktif'
+                'nis'          => $nis,
+                'nisn'         => $nisn,
+                'nama'         => $nama,
+                'jk'           => in_array($jk, ['L','P']) ? $jk : 'L',
+                'agama'        => $agama,
+                'tempat_lahir' => $tempat,
+                'tgl_lahir'    => $tgl_lahir,
+                'alamat'       => $alamat,
+                'id_kelas'     => $kelas->id,
+                'tahun_id'     => $tahun->id,
+                'status'       => $status
             ];
 
-            $this->Siswa_model->insert($data);
+            if ($existing) {
+                // Jika siswa dengan NISN ini sudah ada → update datanya
+                $this->db->where('nisn', $nisn)->update('siswa', $data);
+                $berhasil_update++;
+            } else {
+                // Jika belum ada → insert baru
+                $this->db->insert('siswa', $data);
+                $berhasil_insert++;
+            }
         }
 
+        // --- Flash message hasil import ---
         if (!empty($gagal)) {
-            $msg = 'Import selesai, tetapi beberapa data gagal: <br><ul>';
+            $msg = "<b>Import selesai dengan beberapa catatan:</b><br>";
+            $msg .= "🟢 Insert baru: <strong>$berhasil_insert</strong><br>";
+            $msg .= "🟡 Update data lama: <strong>$berhasil_update</strong><br>";
+            $msg .= "<br><b>Gagal:</b><ul>";
             foreach ($gagal as $g) $msg .= "<li>$g</li>";
-            $msg .= '</ul>';
+            $msg .= "</ul>";
             $this->session->set_flashdata('error', $msg);
         } else {
-            $this->session->set_flashdata('success', 'Semua data siswa berhasil diimport.');
+            $this->session->set_flashdata('success', 
+                "Import selesai. Insert baru: <b>$berhasil_insert</b>, update data lama: <b>$berhasil_update</b>."
+            );
         }
     }
 
     redirect('siswa');
 }
+
 
 }

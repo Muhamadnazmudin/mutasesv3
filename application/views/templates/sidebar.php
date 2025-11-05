@@ -27,6 +27,10 @@
     <li class="nav-item"><a class="nav-link" href="<?= site_url('kelas') ?>"><i class="fas fa-school"></i> Data Kelas</a></li>
     <li class="nav-item"><a class="nav-link" href="<?= site_url('siswa') ?>"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
     <li class="nav-item"><a class="nav-link" href="<?= site_url('mutasi') ?>"><i class="fas fa-random"></i> Mutasi Siswa</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?= site_url('kenaikan') ?>"><i class="fas fa-level-up-alt"></i> Kenaikan Kelas</a></li>
+    <li class="nav-item"><a class="nav-link" href="<?= site_url('siswa_keluar') ?>"><i class="fas fa-door-open"></i> Siswa Keluar</a></li>
+      <li class="nav-item"><a class="nav-link" href="<?= site_url('siswa_lulus') ?>"><i class="fas fa-graduation-cap"></i> Siswa Lulus</a></li>
+    
     <li class="nav-item"><a class="nav-link" href="<?= site_url('laporan') ?>"><i class="fas fa-file-alt"></i> Laporan</a></li>
     <li class="nav-item"><a class="nav-link" href="<?= site_url('tahun') ?>"><i class="fas fa-calendar"></i> Tahun Ajaran</a></li>
     <li class="nav-item"><a class="nav-link" href="<?= site_url('users') ?>"><i class="fas fa-users-cog"></i> Manajemen User</a></li>

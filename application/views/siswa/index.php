@@ -2,9 +2,8 @@
   <h4>Data Siswa</h4>
   <div>
     <a href="<?= site_url('siswa/download_template') ?>" class="btn btn-outline-secondary btn-sm">
-  <i class="fas fa-download"></i> Download Template
-</a>
-
+      <i class="fas fa-download"></i> Download Template
+    </a>
     <a href="<?= site_url('siswa/export_excel') ?>" class="btn btn-success btn-sm">
       <i class="fas fa-file-excel"></i> Export
     </a>
@@ -17,24 +16,21 @@
   </div>
 </div>
 
-<!-- Alert sukses -->
+<!-- Alert sukses / error -->
 <?php if ($this->session->flashdata('success')): ?>
   <div class="alert alert-success alert-dismissible fade show" role="alert">
     <i class="fas fa-check-circle"></i> <?= $this->session->flashdata('success'); ?>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
   </div>
 <?php endif; ?>
+
 <?php if ($this->session->flashdata('error')): ?>
-  <div class="alert alert-warning alert-dismissible fade show" role="alert">
-    <i class="fas fa-exclamation-triangle"></i>
-    <?= $this->session->flashdata('error'); ?>
-    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-      <span aria-hidden="true">&times;</span>
-    </button>
+  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-triangle"></i> <?= $this->session->flashdata('error'); ?>
+    <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
   </div>
 <?php endif; ?>
+
 
 
 <table class="table table-bordered table-striped table-responsive-sm">
@@ -42,10 +38,11 @@
     <tr>
       <th>No</th>
       <th>NIS</th>
+      <th>NISN</th>
       <th>Nama</th>
       <th>Tempat Lahir</th>
       <th>JK</th>
-<th>Agama</th>
+      <th>Agama</th>
       <th>Tanggal Lahir</th>
       <th>Kelas</th>
       <th>Tahun Ajaran</th>
@@ -58,10 +55,11 @@
       <tr>
         <td><?= $no++ ?></td>
         <td><?= $s->nis ?></td>
+        <td><?= $s->nisn ?></td>
         <td><?= $s->nama ?></td>
         <td><?= $s->tempat_lahir ?></td>
         <td><?= $s->jk ?></td>
-<td><?= $s->agama ?></td>
+        <td><?= $s->agama ?></td>
         <td><?= $s->tgl_lahir ?></td>
         <td><?= $s->nama_kelas ?></td>
         <td><?= $s->tahun_ajaran ?></td>
@@ -79,8 +77,12 @@
           <?php endif; ?>
         </td>
         <td>
-          <a href="<?= site_url('siswa/edit/'.$s->id) ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit"></i></a>
-          <a href="<?= site_url('siswa/delete/'.$s->id) ?>" onclick="return confirm('Hapus data ini?')" class="btn btn-danger btn-sm"><i class="fas fa-trash"></i></a>
+          <a href="<?= site_url('siswa/edit/'.$s->id) ?>" class="btn btn-warning btn-sm">
+            <i class="fas fa-edit"></i>
+          </a>
+          <a href="<?= site_url('siswa/delete/'.$s->id) ?>" onclick="return confirm('Hapus data ini?')" class="btn btn-danger btn-sm">
+            <i class="fas fa-trash"></i>
+          </a>
         </td>
       </tr>
     <?php endforeach; ?>
@@ -89,12 +91,13 @@
 
 <?= $pagination ?>
 
+
 <!-- Modal Tambah -->
 <div class="modal fade" id="addModal">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <form method="post" action="<?= site_url('siswa/add') ?>">
-        <div class="modal-header"><h5>Tambah Siswa</h5></div>
+        <div class="modal-header"><h5 class="modal-title">Tambah Siswa</h5></div>
         <div class="modal-body">
           <input type="hidden" name="<?= $this->security->get_csrf_token_name(); ?>" 
                  value="<?= $this->security->get_csrf_hash(); ?>">
@@ -105,42 +108,47 @@
               <input type="text" name="nis" class="form-control" required>
             </div>
             <div class="form-group col-md-6">
-              <label>Nama</label>
-              <input type="text" name="nama" class="form-control" required>
+              <label>NISN</label>
+              <input type="text" name="nisn" class="form-control" required>
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group col-md-6">
+              <label>Nama</label>
+              <input type="text" name="nama" class="form-control" required>
+            </div>
+            <div class="form-group col-md-6">
               <label>Tempat Lahir</label>
               <input type="text" name="tempat_lahir" class="form-control">
             </div>
-            <div class="form-row">
-  <div class="form-group col-md-6">
-    <label>Jenis Kelamin</label>
-    <select name="jk" class="form-control">
-      <option value="L">Laki-laki</option>
-      <option value="P">Perempuan</option>
-    </select>
-  </div>
-  <div class="form-group col-md-6">
-    <label>Agama</label>
-    <select name="agama" class="form-control">
-      <option value="">-- Pilih Agama --</option>
-      <option value="Islam">Islam</option>
-      <option value="Kristen">Kristen</option>
-      <option value="Katolik">Katolik</option>
-      <option value="Hindu">Hindu</option>
-      <option value="Budha">Budha</option>
-      <option value="Konghucu">Konghucu</option>
-    </select>
-  </div>
-</div>
+          </div>
 
+          <div class="form-row">
             <div class="form-group col-md-6">
-              <label>Tanggal Lahir</label>
-              <input type="date" name="tgl_lahir" class="form-control">
+              <label>Jenis Kelamin</label>
+              <select name="jk" class="form-control">
+                <option value="L">Laki-laki</option>
+                <option value="P">Perempuan</option>
+              </select>
             </div>
+            <div class="form-group col-md-6">
+              <label>Agama</label>
+              <select name="agama" class="form-control">
+                <option value="">-- Pilih Agama --</option>
+                <option value="Islam">Islam</option>
+                <option value="Kristen">Kristen</option>
+                <option value="Katolik">Katolik</option>
+                <option value="Hindu">Hindu</option>
+                <option value="Budha">Budha</option>
+                <option value="Konghucu">Konghucu</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Tanggal Lahir</label>
+            <input type="date" name="tgl_lahir" class="form-control">
           </div>
 
           <div class="form-group">
@@ -178,6 +186,7 @@
   </div>
 </div>
 
+
 <!-- Modal Import -->
 <div class="modal fade" id="importModal">
   <div class="modal-dialog">
@@ -199,4 +208,55 @@
       </form>
     </div>
   </div>
+  <style>
+/* === Fix tampilan modal tambah siswa agar teks lebih jelas === */
+
+/* Warna label & teks form */
+#addModal label,
+#addModal .form-control,
+#addModal select,
+#addModal textarea {
+  color: #212529 !important;          /* teks hitam pekat */
+  background-color: #ffffff !important; /* background putih */
+  border-color: #ced4da !important;
+  font-weight: 500;
+}
+
+/* Placeholder terlihat jelas */
+#addModal input::placeholder,
+#addModal textarea::placeholder {
+  color: #6c757d !important;
+  opacity: 1;
+}
+
+/* Header modal lebih tegas */
+#addModal .modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+#addModal .modal-title {
+  color: #212529 !important;
+  font-weight: 700;
+}
+
+/* Tombol bawah tetap kontras */
+#addModal .modal-footer .btn-primary {
+  background-color: #3b82f6;
+  border-color: #3b82f6;
+  font-weight: 600;
+}
+
+#addModal .modal-footer .btn-primary:hover {
+  background-color: #2563eb;
+  border-color: #2563eb;
+}
+
+#addModal .modal-footer .btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  font-weight: 600;
+}
+</style>
+
 </div>

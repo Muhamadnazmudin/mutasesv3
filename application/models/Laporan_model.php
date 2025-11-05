@@ -11,7 +11,7 @@ class Laporan_model extends CI_Model {
       $this->db->where('id_kelas', $kelas);
     }
     if ($jenis) {
-      $this->db->where('jenis_mutasi', $jenis);
+      $this->db->where('jenis', $jenis);
     }
     if ($search) {
       $this->db->like('nama_siswa', $search);
