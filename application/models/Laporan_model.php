@@ -7,16 +7,24 @@ class Laporan_model extends CI_Model {
     $this->db->from('v_mutasi_detail');
     $this->db->where('YEAR(tanggal)', $tahun);
 
-    if ($kelas) {
+    // Hanya ambil mutasi terakhir per siswa yang status_mutasi aktif
+    $this->db->where('(status_mutasi IS NULL OR status_mutasi = "aktif")');
+
+    if (!empty($kelas)) {
       $this->db->where('kelas_asal_id', $kelas);
     }
-    if ($jenis) {
-      $this->db->where('jenis', $jenis);
+    if (!empty($jenis)) {
+      $this->db->where('jenis', strtolower($jenis));
     }
-    if ($search) {
-      $this->db->like('nama_siswa', $search);
+    if (!empty($search)) {
+      $this->db->group_start()
+               ->like('nama_siswa', $search)
+               ->or_like('nis', $search)
+               ->or_like('nisn', $search)
+               ->group_end();
     }
 
+    $this->db->order_by('tanggal', 'DESC');
     return $this->db->get()->result();
   }
 

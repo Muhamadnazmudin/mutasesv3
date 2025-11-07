@@ -87,8 +87,12 @@ class Mutasi extends CI_Controller {
     $jenis_keluar = $this->input->post('jenis_keluar'); // ✅ jenis keluar spesifik (mutasi, meninggal, dst)
 
     // === Simpan data ke DB ===
+    // Ambil kelas asal siswa
+$siswa = $this->db->get_where('siswa', ['id' => $siswa_id])->row();
+$kelas_asal_id = $siswa ? $siswa->id_kelas : null;
     $data = [
       'siswa_id'        => $siswa_id,
+      'kelas_asal_id'   => $kelas_asal_id,
       'jenis'           => $jenis,
       'jenis_keluar'    => $jenis_keluar, // ✅ kolom baru
       'tanggal'         => $this->input->post('tanggal'),
@@ -342,5 +346,25 @@ public function search_siswa() {
 
     echo json_encode($result);
 }
+public function batalkan($id) {
+    $mutasi = $this->db->get_where('mutasi', ['id' => $id])->row();
+    if (!$mutasi) {
+      $this->session->set_flashdata('error', 'Data mutasi tidak ditemukan.');
+      redirect('mutasi');
+    }
 
+    // Update mutasi jadi dibatalkan
+    $this->db->where('id', $id)->update('mutasi', ['status_mutasi' => 'dibatalkan']);
+
+    // Kembalikan siswa ke aktif dan restore kelas_asal_id (kalau ada)
+    $updateData = ['status' => 'aktif'];
+    if (!empty($mutasi->kelas_asal_id)) {
+      $updateData['id_kelas'] = $mutasi->kelas_asal_id;
+    }
+
+    $this->db->where('id', $mutasi->siswa_id)->update('siswa', $updateData);
+
+    $this->session->set_flashdata('success', 'Mutasi siswa berhasil dibatalkan.');
+    redirect('mutasi');
+  }
 }

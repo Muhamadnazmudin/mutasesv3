@@ -85,18 +85,27 @@ class Siswa_model extends CI_Model {
   // 🔹 Tambahan untuk filter siswa berdasarkan status
   // ==========================================================
   public function get_by_status($status = ['aktif']) {
-    $this->db->select('siswa.*, kelas.nama AS nama_kelas, tahun_ajaran.tahun AS tahun_ajaran');
-    $this->db->join('kelas', 'kelas.id = siswa.id_kelas', 'left');
-    $this->db->join('tahun_ajaran', 'tahun_ajaran.id = siswa.tahun_id', 'left');
+  $this->db->select('siswa.*, kelas.nama AS nama_kelas, tahun_ajaran.tahun AS tahun_ajaran');
+  $this->db->join('kelas', 'kelas.id = siswa.id_kelas', 'left');
+  $this->db->join('tahun_ajaran', 'tahun_ajaran.id = siswa.tahun_id', 'left');
 
-    if (is_array($status)) {
-      $this->db->where_in('siswa.status', $status);
-    } else {
-      $this->db->where('siswa.status', $status);
-    }
-
-    $this->db->order_by('siswa.nama', 'ASC');
-    return $this->db->get('siswa')->result();
+  if (is_array($status)) {
+    $this->db->where_in('siswa.status', $status);
+  } else {
+    $this->db->where('siswa.status', $status);
   }
+
+  // ⛔ Filter: sembunyikan siswa yang mutasinya sudah dibatalkan
+  $this->db->where('(siswa.id NOT IN (
+      SELECT siswa_id FROM mutasi WHERE status_mutasi = "dibatalkan"
+  ))');
+
+  // ⛔ Filter tambahan: hanya tampilkan siswa yang masih punya data di tabel siswa
+  $this->db->where('siswa.id IS NOT NULL');
+
+  $this->db->order_by('siswa.nama', 'ASC');
+  return $this->db->get('siswa')->result();
+}
+
 
 }

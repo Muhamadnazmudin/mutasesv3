@@ -5,36 +5,29 @@ class Mutasi_model extends CI_Model {
 
   private $table = 'mutasi';
 
+  // Ambil semua data mutasi aktif (yang belum dibatalkan)
   public function get_all($limit, $offset) {
-    $this->db->select('mutasi.*, siswa.nama AS nama_siswa, siswa.nis, kelas.nama AS tujuan_kelas, tahun_ajaran.tahun AS tahun_ajaran');
+    $this->db->select('
+      mutasi.*, 
+      siswa.nama AS nama_siswa, 
+      siswa.nis, 
+      kelas.nama AS tujuan_kelas, 
+      tahun_ajaran.tahun AS tahun_ajaran
+    ');
     $this->db->join('siswa', 'siswa.id = mutasi.siswa_id', 'left');
     $this->db->join('kelas', 'kelas.id = mutasi.tujuan_kelas_id', 'left');
     $this->db->join('tahun_ajaran', 'tahun_ajaran.id = mutasi.tahun_id', 'left');
+
+    // Hanya ambil mutasi aktif
+    $this->db->where('mutasi.status_mutasi', 'aktif');
+
     $this->db->order_by('mutasi.id', 'DESC');
     return $this->db->get($this->table, $limit, $offset)->result();
   }
 
   public function count_all() {
-    return $this->db->count_all($this->table);
-  }
-
-  public function insert($data) {
-    $this->db->insert($this->table, $data);
-    return $this->db->insert_id();
-  }
-
-  public function get_by_id($id) {
-    return $this->db->get_where($this->table, ['id' => $id])->row();
-  }
-
-  public function update($id, $data) {
-    $this->db->where('id', $id);
-    return $this->db->update($this->table, $data);
-  }
-
-  public function delete($id) {
-    $this->db->where('id', $id);
-    return $this->db->delete($this->table);
+    $this->db->where('status_mutasi', 'aktif');
+    return $this->db->count_all_results($this->table);
   }
 
   public function get_siswa_aktif() {

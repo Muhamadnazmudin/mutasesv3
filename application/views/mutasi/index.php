@@ -82,7 +82,17 @@
      class="btn btn-danger btn-sm">
     <i class="fas fa-trash"></i>
   </a>
+
+  <!-- Tombol Batalkan Mutasi -->
+  <?php if ($m->jenis == 'keluar'): ?>
+    <a href="<?= site_url('mutasi/batalkan/'.$m->id) ?>" 
+       onclick="return confirm('Yakin ingin membatalkan mutasi siswa ini dan mengaktifkan kembali?')" 
+       class="btn btn-success btn-sm">
+      <i class="fas fa-undo"></i> Batalkan
+    </a>
+  <?php endif; ?>
 </td>
+
 
     </tr>
     <!-- =================== MODAL EDIT MUTASI =================== -->

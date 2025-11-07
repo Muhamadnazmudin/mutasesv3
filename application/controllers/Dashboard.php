@@ -78,24 +78,25 @@ class Dashboard extends MY_Controller {
     if (is_array($status)) $this->db->where_in('siswa.status', $status);
     else $this->db->where('siswa.status', $status);
     $this->db->where("(kelas.nama REGEXP '(^X($|[^I])|^10)')");
-    $result['x'] = $this->db->count_all_results('siswa');
+    $result['x'] = $this->db->count_all_results('siswa', TRUE); // 🔥 reset query builder
 
     // Kelas XI
     $this->db->join('kelas', 'kelas.id = siswa.id_kelas', 'left');
     if (is_array($status)) $this->db->where_in('siswa.status', $status);
     else $this->db->where('siswa.status', $status);
     $this->db->where("(kelas.nama REGEXP '(^XI($|[^I])|^11)')");
-    $result['xi'] = $this->db->count_all_results('siswa');
+    $result['xi'] = $this->db->count_all_results('siswa', TRUE); // 🔥 reset
 
     // Kelas XII
     $this->db->join('kelas', 'kelas.id = siswa.id_kelas', 'left');
     if (is_array($status)) $this->db->where_in('siswa.status', $status);
     else $this->db->where('siswa.status', $status);
     $this->db->where("(kelas.nama REGEXP '(^XII|^12)')");
-    $result['xii'] = $this->db->count_all_results('siswa');
+    $result['xii'] = $this->db->count_all_results('siswa', TRUE); // 🔥 reset
 
     $result['total'] = $result['x'] + $result['xi'] + $result['xii'];
     return $result;
 }
+
 
 }
