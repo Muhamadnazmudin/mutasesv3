@@ -227,17 +227,22 @@ body:not(.dark-mode) header .btn-toggle i.fa-moon {
         <tbody>
   <?php 
     $no = 1; 
-    $grand_total = 0; 
+    $sumL = 0;
+    $sumP = 0;
+    $sumTotal = 0;
+    
     if (!empty($per_rombel)):
       foreach($per_rombel as $r):
-        $grand_total += $r->total;
+        $sumL += $r->laki;
+        $sumP += $r->perempuan;
+        $sumTotal += $r->total;
+
         // Ambil ID kelas berdasarkan nama (supaya bisa link ke controller)
         $kelas = $this->db->get_where('kelas', ['nama' => $r->nama_kelas])->row();
         $kelas_id = $kelas ? $kelas->id : 0;
 
-        // ambil jumlah download dari record kelas (safe)
-        $kelas_data = $kelas ? $kelas : null;
-        $count = ($kelas_data && isset($kelas_data->download_count)) ? (int)$kelas_data->download_count : 0;
+        // Ambil jumlah download (kalau ada kolom download_count)
+        $count = isset($kelas->download_count) ? (int)$kelas->download_count : 0;
   ?>
     <tr>
       <td><?= $no++; ?></td>
@@ -245,8 +250,6 @@ body:not(.dark-mode) header .btn-toggle i.fa-moon {
       <td><?= $r->laki; ?></td>
       <td><?= $r->perempuan; ?></td>
       <td class="fw-bold"><?= $r->total; ?></td>
-
-      <!-- tombol download -->
       <td>
         <?php if ($kelas_id): ?>
           <a href="<?= base_url('index.php/dashboard/download_excel/'.$kelas_id) ?>" 
@@ -257,29 +260,26 @@ body:not(.dark-mode) header .btn-toggle i.fa-moon {
           <span class="text-muted">-</span>
         <?php endif; ?>
       </td>
-
-      <!-- jumlah download -->
-      <td>
-        <?= $count > 0 ? $count . 'x download' : '-' ?>
-      </td>
+      <td><?= $count > 0 ? $count . 'x download' : '-' ?></td>
     </tr>
   <?php 
       endforeach;
-    else:
   ?>
+    <!-- 🔹 Baris Total Keseluruhan -->
+    <tr class="table-secondary fw-bold">
+      <td colspan="2" class="text-end">Jumlah Keseluruhan</td>
+      <td><?= $sumL; ?></td>
+      <td><?= $sumP; ?></td>
+      <td><?= $sumTotal; ?></td>
+      <td colspan="2"></td>
+    </tr>
+  <?php else: ?>
     <tr>
       <td colspan="7" class="text-center text-muted">Belum ada data siswa aktif.</td>
     </tr>
   <?php endif; ?>
-
-  <?php if(!empty($per_rombel)): ?>
-    <tr class="table-secondary fw-bold">
-      <td colspan="5" class="text-end">Jumlah Keseluruhan</td>
-      <td><?= $grand_total; ?></td>
-      <td></td> <!-- kosongkan sel terakhir agar kolom tetap rapi -->
-    </tr>
-  <?php endif; ?>
 </tbody>
+
 
       </table>
     </div>
