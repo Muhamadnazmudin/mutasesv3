@@ -1,5 +1,6 @@
 <!-- ================= SIDEBAR.PHP ================= -->
 <?php $role = $this->session->userdata('role_name'); ?>
+<?php if (!isset($active)) $active = ''; ?>
 
 <!-- Sidebar -->
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -81,6 +82,28 @@ $group_setting = in_array($active, ['hari_libur','tahun']);
     </div>
 </li>
 
+<!-- Absensi QR -->
+<li class="nav-item <?= ($active=='absensi_qr' || $active=='laporan_absensi_qr') ? 'active' : '' ?>">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mAbsensiQR">
+        <i class="fas fa-qrcode"></i>
+        <span>Absensi QR</span>
+    </a>
+    <div id="mAbsensiQR" class="collapse <?= ($active=='absensi_qr' || $active=='laporan_absensi_qr') ? 'show' : '' ?>">
+        <div class="bg-white py-2 collapse-inner rounded">
+
+            <a class="collapse-item <?= $active=='absensi_qr'?'active':'' ?>" 
+               href="<?= base_url('index.php/AbsensiQRAdmin') ?>">Absensi QR Siswa</a>
+
+            <a class="collapse-item <?= $active=='laporan_absensi_qr'?'active':'' ?>" 
+               href="<?= base_url('index.php/AbsensiQRAdmin/laporan') ?>">
+               Laporan Absensi QR
+            </a>
+
+        </div>
+    </div>
+</li>
+
+
 <!-- Izin -->
 <li class="nav-item <?= $group_izin ? 'active' : '' ?>">
     <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mIzin">
@@ -111,6 +134,10 @@ $group_setting = in_array($active, ['hari_libur','tahun']);
 
             <a class="collapse-item <?= $active=='tahun'?'active':'' ?>" 
                 href="<?= site_url('tahun') ?>">Tahun Ajaran</a>
+            <a class="collapse-item <?= $active=='jadwal_absensi'?'active':'' ?>" 
+                href="<?= base_url('index.php/jadwalabsensi') ?>">
+                Pengaturan Jam Absensi
+            </a>
         </div>
     </div>
 </li>

@@ -123,5 +123,8 @@ public function get_all_simple() {
                     ->get()
                     ->result();
 }
+public function getAll() {
+    return $this->db->order_by('nama', 'ASC')->get('siswa')->result();
+}
 
 }

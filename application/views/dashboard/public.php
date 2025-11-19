@@ -180,6 +180,9 @@ body:not(.dark-mode) header .btn-toggle i.fa-moon {
   <a href="<?= base_url('index.php/izin/scan') ?>" class="btn btn-outline-warning btn-sm me-2">
   <i class="fas fa-qrcode"></i> Izin Keluar
 </a>
+<a href="<?= base_url('index.php/AbsensiQR/scan') ?>" class="btn btn-outline-success btn-sm me-2">
+        <i class="fas fa-qrcode"></i> Absensi QR
+      </a>
 
   <button class="btn-toggle" id="toggleDark" title="Ganti Tema">
   <i class="fas fa-moon"></i>
