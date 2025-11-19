@@ -270,6 +270,151 @@ public function scan_process()
         echo base_url("index.php/izin/scan/" . $token);
     }
 }
+// save pdf thermal
+public function pdf($id)
+{
+    $this->load->library('Pdf_thermal');
+
+    $izin = $this->Izin_model->get_by_id($id);
+
+    if (!$izin) {
+        echo "Data tidak ditemukan";
+        return;
+    }
+
+    // ambil guru
+    $guru_mapel   = $this->Guru_model->get($izin->id_guru_mapel);
+    $piket        = $this->Guru_model->get($izin->id_piket);
+    $walikelas    = $this->Guru_model->get($izin->id_walikelas);
+
+    // QR Kembali
+    $qr_url = base_url("index.php/izin/kembali/" . $izin->token_kembali);
+    $qr_img = $this->qr_png_path($qr_url);
+
+
+    // data ke view
+    $data = [
+        'izin'        => $izin,
+        'guru_mapel'  => $guru_mapel,
+        'piket'       => $piket,
+        'walikelas'   => $walikelas,
+        'qr_image'    => $qr_img,
+        'logo'        => FCPATH . "assets/img/logobonti.png"
+    ];
+
+    if ($izin->jenis_izin == 'pulang') {
+        $html = $this->load->view('izin/cetak_pulang_pdf', $data, TRUE);
+    } else {
+        $html = $this->load->view('izin/cetak_keluar_pdf', $data, TRUE);
+    }
+
+    $pdf = new Pdf_thermal();
+    $pdf->render($html, "izin_" . $izin->id);
+}
+
+private function qr_base64($text)
+{
+    $url = "https://quickchart.io/qr?text=" . rawurlencode($text) . "&size=170";
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $data = curl_exec($ch);
+    $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    // Jika QR gagal didownload, pakai QR dummy
+    if ($http !== 200 || !$data) {
+        $dummy = FCPATH . "assets/img/noqr.png";
+        $data = file_get_contents($dummy);
+    }
+
+    return "data:image/png;base64," . base64_encode($data);
+}
+private function qr_png_path($text)
+{
+    $url = "https://quickchart.io/qr?text=" . urlencode($text) . "&size=200";
+
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    $data = curl_exec($ch);
+    curl_close($ch);
+
+    if (!$data) {
+        // fallback
+        return FCPATH . "assets/img/noqr.png";
+    }
+
+    // simpan file QR sementara
+    $filename = "qr_" . time() . "_" . rand(1000,9999) . ".png";
+    $path = FCPATH . "uploads/" . $filename;
+
+    file_put_contents($path, $data);
+
+    return $path;
+}
+
+public function edit($id)
+{
+    $izin = $this->Izin_model->get_by_id($id);
+    if (!$izin) { show_404(); }
+
+    $data = [
+        'izin'   => $izin,
+        'active' => 'izin'   // <<< WAJIB!
+    ];
+
+    $this->load->view('templates/header', $data);
+    $this->load->view('templates/sidebar', $data);
+    $this->load->view('izin/edit', $data);
+    $this->load->view('templates/footer');
+}
+
+
+public function update()
+{
+    $id = $this->input->post('id');
+
+    // ambil data izin lama
+    $izin = $this->Izin_model->get_by_id($id);
+    if (!$izin) { show_404(); }
+
+    // data baru
+    $data_update = [
+        'jam_masuk' => $this->input->post('jam_masuk') ?: null,
+        'status'    => $this->input->post('status')
+        
+    ];
+
+    // update database
+    $this->db->where('id', $id);
+    $this->db->update('izin_keluar', $data_update);
+
+    // redirect ke index izin
+    $this->session->set_flashdata('success', 'Data izin berhasil diperbarui.');
+    redirect('izin');
+}
+
+
+public function delete($id)
+{
+    // cek apakah ID valid
+    $izin = $this->Izin_model->get_by_id($id);
+
+    if (!$izin) {
+        $this->session->set_flashdata('error', 'Data tidak ditemukan.');
+        redirect('izin');
+        return;
+    }
+
+    // hapus data
+    $this->Izin_model->delete($id);
+    $this->session->set_flashdata('success', 'Data izin berhasil dihapus.');
+    redirect('izin');
+}
 
 
 }

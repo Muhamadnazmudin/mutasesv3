@@ -46,4 +46,9 @@ class Izin_model extends CI_Model {
     {
         return $this->db->order_by('id', 'DESC')->get('izin_keluar')->result();
     }
+    public function delete($id)
+{
+    return $this->db->delete('izin_keluar', ['id' => $id]);
+}
+
 }

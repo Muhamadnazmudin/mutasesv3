@@ -5,10 +5,15 @@ class Guru_model extends CI_Model {
 
   private $table = 'guru';
 
-  public function get_all($limit, $offset) {
-    $this->db->order_by('id', 'DESC');
-    return $this->db->get($this->table, $limit, $offset)->result();
-  }
+  public function get_all($limit = null, $offset = null)
+{
+    if ($limit !== null) {
+        $this->db->limit($limit, $offset);
+    }
+
+    return $this->db->get('guru')->result();
+}
+
 
   public function count_all() {
     return $this->db->count_all($this->table);

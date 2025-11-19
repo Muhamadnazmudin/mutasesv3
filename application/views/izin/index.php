@@ -1,6 +1,20 @@
 <div class="container mt-4">
 
 <h3 class="mb-3">Data Izin Siswa</h3>
+<?php if ($this->session->flashdata('success')): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <?= $this->session->flashdata('success'); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<?php if ($this->session->flashdata('error')): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <?= $this->session->flashdata('error'); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
 <hr>
 
 <div class="table-responsive shadow-sm rounded">
@@ -15,6 +29,7 @@
             <th>Keluar</th>
             <th>Kembali</th>
             <th>Status</th>
+            <th>Aksi</th>
         </tr>
     </thead>
 
@@ -51,15 +66,53 @@
                     <span class="badge bg-success">Kembali</span>
                 <?php endif; ?>
             </td>
+
+            <td class="text-center">
+
+                <!-- CETAK -->
+                <a href="<?= base_url('index.php/izin/cetak/' . $i->id) ?>" 
+                   target="_blank"
+                   class="btn btn-sm btn-success mb-1">
+                    Cetak
+                </a>
+
+                <!-- EDIT -->
+                <a href="<?= base_url('index.php/izin/edit/' . $i->id) ?>" 
+                   class="btn btn-sm btn-warning mb-1">
+                    Edit
+                </a>
+
+                <!-- DELETE -->
+                <a href="<?= base_url('index.php/izin/delete/' . $i->id) ?>" 
+   class="btn btn-danger btn-sm"
+   onclick="return confirm('Yakin ingin menghapus data ini?')">
+   Hapus
+</a>
+
+                <a href="<?= base_url('index.php/izin/pdf/' . $i->id) ?>" 
+   target="_blank"
+   class="btn btn-sm btn-info mb-1">
+   PDF
+</a>
+
+            </td>
         </tr>
     <?php endforeach; ?>
     </tbody>
 </table>
 </div>
 
-<!-- PAGINATION -->
 <div class="mt-3 d-flex justify-content-center">
     <?= $pagination ?>
 </div>
 
 </div>
+<script>
+    setTimeout(function() {
+        let alertNode = document.querySelector('.alert');
+        if (alertNode) {
+            var alert = new bootstrap.Alert(alertNode);
+            alert.close();
+        }
+    }, 3000);
+</script>

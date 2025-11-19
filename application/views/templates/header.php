@@ -84,6 +84,116 @@ body.light-mode td,
 body.light-mode th {
     color: #1a1a1a !important;
 }
+/* ==== FIX SIDEBAR SCROLL BARENG CONTENT ==== */
+html, body {
+    height: 100%;
+    overflow: hidden; /* kunci body agar tidak scroll */
+}
+
+/* Sidebar SB Admin 2 */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh !important;   /* full tinggi layar */
+    overflow-y: auto;           /* sidebar scroll sendiri */
+    z-index: 1000;
+}
+
+/* Geser content-wrapper agar tidak ketutup sidebar */
+#content-wrapper {
+    margin-left: 224px; /* lebar default sidebar SB Admin 2 */
+    height: 100vh;
+    overflow-y: auto;   /* hanya konten yang scroll */
+}
+
+/* Ketika sidebar collapsed */
+.sidebar.toggled {
+    width: 80px !important;
+}
+
+.sidebar.toggled + #content-wrapper {
+    margin-left: 80px !important;
+}
+/* ==== KUNCI BODY ==== */
+html, body {
+    height: 100%;
+    overflow: hidden; /* jangan scroll body */
+}
+
+/* ==== SIDEBAR FIX ==== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 1030;
+}
+
+/* ==== TOPBAR FIX ==== */
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 224px; /* lebar default sidebar */
+    right: 0;
+    z-index: 1031;
+}
+
+/* ==== KONTEN YANG SCROLL ==== */
+#content-wrapper {
+    margin-left: 224px; /* ikut lebar sidebar */
+    padding-top: 72px;  /* beri ruang untuk topbar */
+    height: 100vh;
+    overflow-y: auto;   /* hanya konten yang scroll */
+}
+
+/* ==== MODE SIDEBAR TOGGLE ==== */
+.sidebar.toggled {
+    width: 80px !important;
+}
+
+.sidebar.toggled + #content-wrapper,
+.sidebar.toggled ~ #content-wrapper {
+    margin-left: 80px !important;
+}
+
+.topbar.sidebar-toggled {
+    left: 80px !important;
+}
+/* ==== SIDEBAR FIX ==== */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 224px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Bagian brand SIDEBAR (MUTASES) dibikin fix di atas */
+.sidebar .sidebar-brand {
+    position: sticky;
+    top: 0;
+    z-index: 1040;
+    background: inherit;   /* ikuti warna sidebar */
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+/* Isi sidebar yang scroll */
+.sidebar .nav-item,
+.sidebar .sidebar-heading,
+.sidebar hr {
+    flex-shrink: 0;
+}
+
+#accordionSidebar {
+    overflow-y: auto;
+    overflow-x: hidden;
+    flex-grow: 1; /* area menu yang bisa scroll */
+}
 
 </style>
 

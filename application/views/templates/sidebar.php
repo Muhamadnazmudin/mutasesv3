@@ -18,49 +18,105 @@
       <span>Dashboard</span>
     </a>
   </li>
+<?php
+$group_data   = in_array($active, ['guru','kelas','siswa']);
+$group_mutasi = in_array($active, ['mutasi','kenaikan','siswa_keluar','siswa_lulus','laporan']);
+$group_absen  = in_array($active, ['absensi','laporan_absensi']);
+$group_izin   = in_array($active, ['izin','laporan_izin']);
+$group_setting = in_array($active, ['hari_libur','tahun']);
+?>
 
   <hr class="sidebar-divider">
 
   <?php if ($role == 'admin'): ?>
-    <div class="sidebar-heading">Manajemen Data</div>
-    <li class="nav-item"><a class="nav-link" href="<?= site_url('guru') ?>"><i class="fas fa-user-tie"></i> Data Guru</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?= site_url('kelas') ?>"><i class="fas fa-school"></i> Data Kelas</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?= site_url('siswa') ?>"><i class="fas fa-user-graduate"></i> Data Siswa</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?= site_url('mutasi') ?>"><i class="fas fa-random"></i> Mutasi Siswa</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?= site_url('kenaikan') ?>"><i class="fas fa-level-up-alt"></i> Kenaikan Kelas</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?= site_url('siswa_keluar') ?>"><i class="fas fa-door-open"></i> Siswa Keluar</a></li>
-      <li class="nav-item"><a class="nav-link" href="<?= site_url('siswa_lulus') ?>"><i class="fas fa-graduation-cap"></i> Siswa Lulus</a></li>
-    
-    <li class="nav-item"><a class="nav-link" href="<?= site_url('laporan') ?>"><i class="fas fa-file-alt"></i> Laporan</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?= site_url('tahun') ?>"><i class="fas fa-calendar"></i> Tahun Ajaran</a></li>
-    <li class="nav-item"><a class="nav-link" href="<?= site_url('users') ?>"><i class="fas fa-users-cog"></i> Manajemen User</a></li>
- <li class="nav-item <?= ($active == 'absensi') ? 'active' : '' ?>">
-    <a class="nav-link" href="<?= base_url('index.php/Absensi/Absensi') ?>">
+
+<div class="sidebar-heading">Manajemen Data</div>
+
+<!-- Manajemen Data -->
+<li class="nav-item <?= $group_data ? 'active' : '' ?>">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mData">
+        <i class="fas fa-database"></i>
+        <span>Manajemen Data</span>
+    </a>
+    <div id="mData" class="collapse <?= $group_data ? 'show' : '' ?>">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item <?= $active=='guru'?'active':'' ?>" href="<?= site_url('guru') ?>">Data Guru</a>
+            <a class="collapse-item <?= $active=='kelas'?'active':'' ?>" href="<?= site_url('kelas') ?>">Data Kelas</a>
+            <a class="collapse-item <?= $active=='siswa'?'active':'' ?>" href="<?= site_url('siswa') ?>">Data Siswa</a>
+        </div>
+    </div>
+</li>
+
+<!-- Mutasi -->
+<li class="nav-item <?= $group_mutasi ? 'active' : '' ?>">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mMutasi">
+        <i class="fas fa-random"></i>
+        <span>Mutasi</span>
+    </a>
+    <div id="mMutasi" class="collapse <?= $group_mutasi ? 'show' : '' ?>">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item <?= $active=='mutasi'?'active':'' ?>" href="<?= site_url('mutasi') ?>">Mutasi Siswa</a>
+            <a class="collapse-item <?= $active=='kenaikan'?'active':'' ?>" href="<?= site_url('kenaikan') ?>">Kenaikan Kelas</a>
+            <a class="collapse-item <?= $active=='siswa_keluar'?'active':'' ?>" href="<?= site_url('siswa_keluar') ?>">Siswa Keluar</a>
+            <a class="collapse-item <?= $active=='siswa_lulus'?'active':'' ?>" href="<?= site_url('siswa_lulus') ?>">Siswa Lulus</a>
+            <a class="collapse-item <?= $active=='laporan'?'active':'' ?>" href="<?= site_url('laporan') ?>">Laporan Mutasi</a>
+        </div>
+    </div>
+</li>
+
+<!-- Absensi -->
+<li class="nav-item <?= $group_absen ? 'active' : '' ?>">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mAbsensi">
         <i class="fas fa-user-check"></i>
-        <span>Absensi Siswa</span>
+        <span>Absensi</span>
     </a>
+    <div id="mAbsensi" class="collapse <?= $group_absen ? 'show' : '' ?>">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item <?= $active=='absensi'?'active':'' ?>" 
+                href="<?= base_url('index.php/Absensi/Absensi') ?>">Absensi Siswa</a>
+
+            <a class="collapse-item <?= $active=='laporan_absensi'?'active':'' ?>" 
+                href="<?= site_url('Absensi/Laporan') ?>">Laporan Absensi</a>
+        </div>
+    </div>
 </li>
-<li class="nav-item <?= ($active == 'laporan_absensi') ? 'active' : '' ?>">
-    <a class="nav-link" href="<?= site_url('Absensi/Laporan') ?>">
-        <i class="fas fa-file-alt"></i>
-        <span>Laporan Absensi</span>
-    </a>
-</li>
-<li class="nav-item <?= ($active == 'hari_libur') ? 'active' : '' ?>">
-    <a class="nav-link" href="<?= base_url('index.php/HariLibur') ?>">
-        <i class="fas fa-calendar-times"></i>
-        <span>Hari Libur</span>
-    </a>
-</li>
-<li class="nav-item <?= ($active == 'izin') ? 'active' : '' ?>">
-    <a class="nav-link" href="<?= site_url('izin') ?>">
+
+<!-- Izin -->
+<li class="nav-item <?= $group_izin ? 'active' : '' ?>">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mIzin">
         <i class="fas fa-door-open"></i>
-        <span>Izin Keluar Siswa</span>
+        <span>Izin Siswa</span>
     </a>
+    <div id="mIzin" class="collapse <?= $group_izin ? 'show' : '' ?>">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item <?= $active=='izin'?'active':'' ?>" 
+                href="<?= site_url('izin') ?>">Izin Keluar Siswa</a>
+
+            <a class="collapse-item <?= $active=='laporan_izin'?'active':'' ?>" 
+                href="<?= site_url('izin/laporan') ?>">Laporan Izin Keluar</a>
+        </div>
+    </div>
 </li>
 
+<!-- Pengaturan -->
+<li class="nav-item <?= $group_setting ? 'active' : '' ?>">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mSetting">
+        <i class="fas fa-cog"></i>
+        <span>Pengaturan</span>
+    </a>
+    <div id="mSetting" class="collapse <?= $group_setting ? 'show' : '' ?>">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item <?= $active=='hari_libur'?'active':'' ?>" 
+                href="<?= base_url('index.php/HariLibur') ?>">Hari Libur</a>
 
-    <?php endif; ?>
+            <a class="collapse-item <?= $active=='tahun'?'active':'' ?>" 
+                href="<?= site_url('tahun') ?>">Tahun Ajaran</a>
+        </div>
+    </div>
+</li>
+
+<?php endif; ?>
+
 
   <hr class="sidebar-divider d-none d-md-block">
 
