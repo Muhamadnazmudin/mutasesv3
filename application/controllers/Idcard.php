@@ -123,7 +123,16 @@ class Idcard extends CI_Controller {
         }
 
         $qrFile = $qrFolder.$siswa->token_qr.".png";
-        if (!file_exists($qrFile)) QRcode::png($siswa->token_qr, $qrFile, QR_ECLEVEL_M, 6);
+        if (!file_exists($qrFile)) {
+    QRcode::png(
+        $siswa->token_qr,
+        $qrFile,
+        QR_ECLEVEL_H,   // error correction terbaik
+        10,             // ukuran besar → scan cepat
+        2               // margin
+    );
+}
+
 
         /* ---- Canvas ---- */
         $W = 700;

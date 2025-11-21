@@ -1,6 +1,22 @@
 
 
 <div class="container-fluid">
+    <?php if ($this->session->flashdata('success')): ?>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="fas fa-check-circle"></i>
+        <?= $this->session->flashdata('success'); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
+<?php if ($this->session->flashdata('error')): ?>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="fas fa-exclamation-circle"></i>
+        <?= $this->session->flashdata('error'); ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
+
 
     <!-- Judul Halaman -->
     <div class="text-center mb-4">
@@ -156,11 +172,25 @@
                 <tr><td class="bio-label">Status</td><td class="bio-value"><?= ucfirst($siswa->status) ?></td></tr>
             </table>
         </div>
-            <a href="<?= site_url('SiswaDashboard/cetak') ?>" class="btn btn-primary mt-3">
-                <i class="fas fa-file-pdf"></i> Cetak Biodata PDF
-            </a>
+           <a href="<?= site_url('siswa/cetak/'.$siswa->id) ?>" class="btn btn-primary mt-3">
+    <i class="fas fa-eye"></i> Cetak Biodata PDF
+</a>
+
+<a href="<?= site_url('siswa/cetak/'.$siswa->id.'?download=1') ?>" class="btn btn-success mt-3 ms-2">
+    <i class="fas fa-download"></i> Download Biodata
+</a>
+
 
         </div>
     </div>
 
 </div>
+<script>
+    setTimeout(function() {
+        let alert = document.querySelector('.alert');
+        if (alert) {
+            let bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }
+    }, 3000);
+</script>

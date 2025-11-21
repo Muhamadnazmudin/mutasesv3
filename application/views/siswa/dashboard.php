@@ -75,4 +75,3 @@
 </div>
 <!-- End Page Content -->
 
-<?php $this->load->view('siswa/layout/footer'); ?>

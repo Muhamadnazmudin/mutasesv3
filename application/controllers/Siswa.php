@@ -87,7 +87,7 @@ $config['reuse_query_string'] = true;
                  ->or_like('siswa.nisn', $search)
                  ->group_end();
     }
-    $this->db->order_by('siswa.id', 'DESC');
+    $this->db->order_by('siswa.id', 'ASC');
     $data['siswa'] = $this->db->get('siswa', $limit, $offset)->result();
 
     // 🔹 Data tambahan untuk tampilan
@@ -157,10 +157,15 @@ if (!file_exists($qr_folder)) {
 $token = 'qr_' . $id_siswa;   // QR tetap seumur hidup
 $qr_file = $qr_folder . $token . '.png';
 
-if (!file_exists($qr_file)) {  // hanya generate sekali
-    QRcode::png($token, $qr_file, QR_ECLEVEL_M, 6);
+if (!file_exists($qr_file)) {
+    QRcode::png(
+        $token,
+        $qr_file,
+        QR_ECLEVEL_H,   // 🔥 Tingkat akurasi tinggi → scan super cepat
+        10,             // 🔥 Size besar → gampang dibaca kamera
+        2               // 🔥 Margin minimal aman
+    );
 }
-
 // update token siswa
 $id_siswa = $this->db->insert_id();
 $this->db->where('id', $id_siswa)->update('siswa', ['token_qr' => $token]);
@@ -721,8 +726,14 @@ if (!$exist || empty($exist->token_qr)) { // hanya jika belum punya token
     $qr_file = $qr_folder . $token . '.png';
 
     if (!file_exists($qr_file)) {
-        QRcode::png($token, $qr_file, QR_ECLEVEL_M, 6);
-    }
+    QRcode::png(
+        $token,
+        $qr_file,
+        QR_ECLEVEL_H,   // 🔥 Tingkat akurasi tinggi → scan super cepat
+        10,             // 🔥 Size besar → gampang dibaca kamera
+        2               // 🔥 Margin minimal aman
+    );
+}
 
     $this->db->where('id', $siswa_id)->update('siswa', ['token_qr' => $token]);
 }
@@ -823,7 +834,9 @@ public function cetak($id)
     $fileName = 'Data_Siswa_' . str_replace(' ', '_', $data['siswa']->nama) . '.pdf';
 
     // Output PDF ke browser
-    $pdf->Output($fileName, 'I'); // I = inline, D = download
+    $mode = $this->input->get('download') ? 'D' : 'I';
+$pdf->Output($fileName, $mode);
+
 }
 public function cetak_semua()
 {

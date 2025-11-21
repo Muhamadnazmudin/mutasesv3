@@ -67,6 +67,12 @@
 </head>
 
 <body>
+<div style="text-align:right; margin-bottom:15px;">
+    <a href="<?= base_url('siswa/cetak/' . $siswa->id . '?download=1') ?>" 
+       style="padding:8px 14px; background:#007bff; color:#fff; text-decoration:none; border-radius:5px; font-size:12pt;">
+       📄 Download PDF
+    </a>
+</div>
 
 <h2>DATA LENGKAP PESERTA DIDIK<br>SMKN 1 Cilimus</h2>
 
