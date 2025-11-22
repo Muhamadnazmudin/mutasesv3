@@ -10,9 +10,9 @@ class Pdf extends TCPDF
     public function __construct()
     {
         parent::__construct('L', PDF_UNIT, 'A4', true, 'UTF-8', false);
-        $this->SetCreator('Sipelakor');
+        $this->SetCreator('Mutases');
         $this->SetAuthor('Admin');
-        $this->SetTitle('Rekap Pembelanjaan Sekolah');
+        $this->SetTitle('Rekap Absensi Siswa');
         $this->SetMargins(10, 10, 10);
         $this->SetAutoPageBreak(TRUE, 10);
         $this->setCellHeightRatio(1.2);

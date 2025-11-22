@@ -7,10 +7,13 @@
 -- Server version: 5.7.33
 -- PHP Version: 5.6.40
 
+
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
+
+
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -18,15 +21,19 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+
 --
 -- Database: `mutases_db`
 --
 
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `absensi`
 --
+
 
 CREATE TABLE `absensi` (
   `id_absensi` int(11) NOT NULL,
@@ -37,16 +44,21 @@ CREATE TABLE `absensi` (
   `dibuat_pada` datetime DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 --
 -- Dumping data for table `absensi`
 --
 
 
+
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `absensi_detail`
 --
+
 
 CREATE TABLE `absensi_detail` (
   `id_detail` int(11) NOT NULL,
@@ -56,16 +68,21 @@ CREATE TABLE `absensi_detail` (
   `keterangan` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 --
 -- Dumping data for table `absensi_detail`
 --
 
 
+
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `absensi_jadwal`
 --
+
 
 CREATE TABLE `absensi_jadwal` (
   `id` int(11) NOT NULL,
@@ -74,9 +91,11 @@ CREATE TABLE `absensi_jadwal` (
   `jam_pulang` time NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 --
 -- Dumping data for table `absensi_jadwal`
 --
+
 
 INSERT INTO `absensi_jadwal` (`id`, `hari`, `jam_masuk`, `jam_pulang`) VALUES
 (1, 'Senin', '06:40:00', '15:00:00'),
@@ -85,11 +104,14 @@ INSERT INTO `absensi_jadwal` (`id`, `hari`, `jam_masuk`, `jam_pulang`) VALUES
 (4, 'Kamis', '06:30:00', '14:30:00'),
 (5, 'Jumat', '06:30:00', '14:30:00');
 
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `absensi_qr`
 --
+
 
 CREATE TABLE `absensi_qr` (
   `id` int(11) NOT NULL,
@@ -102,16 +124,21 @@ CREATE TABLE `absensi_qr` (
   `sumber` varchar(50) DEFAULT 'scan_qr'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 --
 -- Dumping data for table `absensi_qr`
 --
 
 
+
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `guru`
 --
+
 
 CREATE TABLE `guru` (
   `id` int(11) NOT NULL,
@@ -122,16 +149,21 @@ CREATE TABLE `guru` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 --
 -- Dumping data for table `guru`
 --
 
 
+
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `hari_libur`
 --
+
 
 CREATE TABLE `hari_libur` (
   `id` int(11) NOT NULL,
@@ -139,20 +171,25 @@ CREATE TABLE `hari_libur` (
   `start` date NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+
 --
 -- Dumping data for table `hari_libur`
 --
+
 
 INSERT INTO `hari_libur` (`id`, `nama`, `start`) VALUES
 (1, 'Tahun Baru 2025', '2025-01-01'),
 (2, 'Libur Sekolah', '2025-06-05'),
 (3, 'liburrrrr', '2025-11-06');
 
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `izin_keluar`
 --
+
 
 CREATE TABLE `izin_keluar` (
   `id` int(11) NOT NULL,
@@ -176,15 +213,19 @@ CREATE TABLE `izin_keluar` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 --
 -- Dumping data for table `izin_keluar`
 --
 
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `kelas`
 --
+
 
 CREATE TABLE `kelas` (
   `id` int(11) NOT NULL,
@@ -195,16 +236,21 @@ CREATE TABLE `kelas` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 --
 -- Dumping data for table `kelas`
 --
 
 
+
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `mutasi`
 --
+
 
 CREATE TABLE `mutasi` (
   `id` int(11) NOT NULL,
@@ -224,11 +270,14 @@ CREATE TABLE `mutasi` (
   `status_mutasi` enum('aktif','dibatalkan') DEFAULT 'aktif'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `roles`
 --
+
 
 CREATE TABLE `roles` (
   `id` int(11) NOT NULL,
@@ -237,19 +286,24 @@ CREATE TABLE `roles` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 --
 -- Dumping data for table `roles`
 --
+
 
 INSERT INTO `roles` (`id`, `name`, `description`, `created_at`) VALUES
 (1, 'admin', 'Administrator Sekolah', '2025-11-04 08:14:57'),
 (2, 'kesiswaan', 'Guru / Staf Kesiswaan', '2025-11-04 08:14:57');
 
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `siswa`
 --
+
 
 CREATE TABLE `siswa` (
   `id` int(11) NOT NULL,
@@ -311,15 +365,19 @@ CREATE TABLE `siswa` (
   `foto` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 --
 -- Dumping data for table `siswa`
 --
 
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `siswa_history`
 --
+
 
 CREATE TABLE `siswa_history` (
   `id` int(11) NOT NULL,
@@ -329,11 +387,14 @@ CREATE TABLE `siswa_history` (
   `status` enum('aktif','mutasi_masuk','mutasi_keluar','lulus') COLLATE utf8mb4_unicode_ci DEFAULT 'aktif'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `siswa_tahun`
 --
+
 
 CREATE TABLE `siswa_tahun` (
   `id` int(11) NOT NULL,
@@ -343,17 +404,23 @@ CREATE TABLE `siswa_tahun` (
   `status` enum('aktif','lulus','mutasi_keluar','mutasi_masuk') DEFAULT 'aktif'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 --
 -- Dumping data for table `siswa_tahun`
 --
 
 
 
+
+
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `system_config`
 --
+
 
 CREATE TABLE `system_config` (
   `id` int(11) NOT NULL,
@@ -361,17 +428,23 @@ CREATE TABLE `system_config` (
   `config_value` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+
 --
 -- Dumping data for table `system_config`
 --
 
 
 
+
+
+
 -- --------------------------------------------------------
+
 
 --
 -- Table structure for table `tahun_ajaran`
 --
+
 
 CREATE TABLE `tahun_ajaran` (
   `id` int(11) NOT NULL,
@@ -380,16 +453,23 @@ CREATE TABLE `tahun_ajaran` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 --
 -- Dumping data for table `tahun_ajaran`
 --
+INSERT INTO `tahun_ajaran` (`id`, `tahun`, `aktif`, `created_at`) VALUES
+(1, '2024/2025', 0, '2025-11-04 08:14:57'),
+(2, '2025/2026', 1, '2025-11-04 08:14:57'),
+(3, '2026/2027', 0, '2025-11-13 01:48:11');
 
 
 -- --------------------------------------------------------
 
+
 --
 -- Table structure for table `users`
 --
+
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
@@ -401,15 +481,19 @@ CREATE TABLE `users` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
 --
 -- Dumping data for table `users`
 --
+
 
 INSERT INTO `users` (`id`, `username`, `password`, `nama`, `email`, `role_id`, `created_at`) VALUES
 (1, 'admin', '$2y$10$1XDEFn8/aM7A2bx.0NYJj./FhdERVwcu8RQi8pQ2xF8CthdauZofS', 'Administrator', 'admin@mutases.local', 1, '2025-11-04 08:14:57'),
 (2, 'kesiswaan', '$2y$10$wF3mOG0C9p7.SFZuh4TSOOYdAbdRrfqKteA1E2ShQJSul8s1VmO8C', 'Staf Kesiswaan', 'kesiswaan@mutases.local', 2, '2025-11-04 08:14:57');
 
+
 -- --------------------------------------------------------
+
 
 --
 -- Stand-in structure for view `v_mutasi_detail`
@@ -437,18 +521,49 @@ CREATE TABLE `v_mutasi_detail` (
 ,`dibuat_oleh` varchar(150)
 );
 
+
 -- --------------------------------------------------------
+
 
 --
 -- Structure for view `v_mutasi_detail`
 --
 DROP TABLE IF EXISTS `v_mutasi_detail`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `v_mutasi_detail`  AS  select `m`.`id` AS `id`,`m`.`siswa_id` AS `siswa_id`,`s`.`nis` AS `nis`,`s`.`nisn` AS `nisn`,`s`.`nama` AS `nama_siswa`,`s`.`id_kelas` AS `kelas_asal_id`,`k1`.`nama` AS `kelas_asal`,`m`.`tujuan_kelas_id` AS `tujuan_kelas_id`,`k2`.`nama` AS `kelas_tujuan`,`m`.`jenis` AS `jenis`,`m`.`jenis_keluar` AS `jenis_keluar`,`m`.`alasan` AS `alasan`,`m`.`nohp_ortu` AS `nohp_ortu`,`m`.`tujuan_sekolah` AS `tujuan_sekolah`,`m`.`tanggal` AS `tanggal`,`t`.`tahun` AS `tahun_ajaran`,`m`.`berkas` AS `berkas`,`m`.`status_mutasi` AS `status_mutasi`,`u`.`nama` AS `dibuat_oleh` from (((((`mutasi` `m` join `siswa` `s` on((`s`.`id` = `m`.`siswa_id`))) left join `kelas` `k1` on((`k1`.`id` = `s`.`id_kelas`))) left join `kelas` `k2` on((`k2`.`id` = `m`.`tujuan_kelas_id`))) left join `tahun_ajaran` `t` on((`t`.`id` = `m`.`tahun_id`))) left join `users` `u` on((`u`.`id` = `m`.`created_by`))) ;
+
+CREATE VIEW `v_mutasi_detail` AS
+SELECT 
+    m.id AS id,
+    m.siswa_id AS siswa_id,
+    s.nis AS nis,
+    s.nisn AS nisn,
+    s.nama AS nama_siswa,
+    s.id_kelas AS kelas_asal_id,
+    k1.nama AS kelas_asal,
+    m.tujuan_kelas_id AS tujuan_kelas_id,
+    k2.nama AS kelas_tujuan,
+    m.jenis AS jenis,
+    m.jenis_keluar AS jenis_keluar,
+    m.alasan AS alasan,
+    m.nohp_ortu AS nohp_ortu,
+    m.tujuan_sekolah AS tujuan_sekolah,
+    m.tanggal AS tanggal,
+    t.tahun AS tahun_ajaran,
+    m.berkas AS berkas,
+    m.status_mutasi AS status_mutasi,
+    u.nama AS dibuat_oleh
+FROM mutasi m
+JOIN siswa s ON s.id = m.siswa_id
+LEFT JOIN kelas k1 ON k1.id = s.id_kelas
+LEFT JOIN kelas k2 ON k2.id = m.tujuan_kelas_id
+LEFT JOIN tahun_ajaran t ON t.id = m.tahun_id
+LEFT JOIN users u ON u.id = m.created_by;
+
 
 --
 -- Indexes for dumped tables
 --
+
 
 --
 -- Indexes for table `absensi`
@@ -456,17 +571,20 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 ALTER TABLE `absensi`
   ADD PRIMARY KEY (`id_absensi`);
 
+
 --
 -- Indexes for table `absensi_detail`
 --
 ALTER TABLE `absensi_detail`
   ADD PRIMARY KEY (`id_detail`);
 
+
 --
 -- Indexes for table `absensi_jadwal`
 --
 ALTER TABLE `absensi_jadwal`
   ADD PRIMARY KEY (`id`);
+
 
 --
 -- Indexes for table `absensi_qr`
@@ -475,11 +593,13 @@ ALTER TABLE `absensi_qr`
   ADD PRIMARY KEY (`id`),
   ADD KEY `nis` (`nis`);
 
+
 --
 -- Indexes for table `guru`
 --
 ALTER TABLE `guru`
   ADD PRIMARY KEY (`id`);
+
 
 --
 -- Indexes for table `hari_libur`
@@ -487,11 +607,13 @@ ALTER TABLE `guru`
 ALTER TABLE `hari_libur`
   ADD PRIMARY KEY (`id`);
 
+
 --
 -- Indexes for table `izin_keluar`
 --
 ALTER TABLE `izin_keluar`
   ADD PRIMARY KEY (`id`);
+
 
 --
 -- Indexes for table `kelas`
@@ -499,6 +621,7 @@ ALTER TABLE `izin_keluar`
 ALTER TABLE `kelas`
   ADD PRIMARY KEY (`id`),
   ADD KEY `wali_kelas_id` (`wali_kelas_id`);
+
 
 --
 -- Indexes for table `mutasi`
@@ -510,12 +633,14 @@ ALTER TABLE `mutasi`
   ADD KEY `tahun_id` (`tahun_id`),
   ADD KEY `created_by` (`created_by`);
 
+
 --
 -- Indexes for table `roles`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
+
 
 --
 -- Indexes for table `siswa`
@@ -527,11 +652,13 @@ ALTER TABLE `siswa`
   ADD KEY `id_kelas` (`id_kelas`),
   ADD KEY `tahun_id` (`tahun_id`);
 
+
 --
 -- Indexes for table `siswa_history`
 --
 ALTER TABLE `siswa_history`
   ADD PRIMARY KEY (`id`);
+
 
 --
 -- Indexes for table `siswa_tahun`
@@ -539,17 +666,20 @@ ALTER TABLE `siswa_history`
 ALTER TABLE `siswa_tahun`
   ADD PRIMARY KEY (`id`);
 
+
 --
 -- Indexes for table `system_config`
 --
 ALTER TABLE `system_config`
   ADD PRIMARY KEY (`id`);
 
+
 --
 -- Indexes for table `tahun_ajaran`
 --
 ALTER TABLE `tahun_ajaran`
   ADD PRIMARY KEY (`id`);
+
 
 --
 -- Indexes for table `users`
@@ -559,9 +689,11 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `username` (`username`),
   ADD KEY `role_id` (`role_id`);
 
+
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
 
 --
 -- AUTO_INCREMENT for table `absensi`
@@ -569,11 +701,13 @@ ALTER TABLE `users`
 ALTER TABLE `absensi`
   MODIFY `id_absensi` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
+
 --
 -- AUTO_INCREMENT for table `absensi_detail`
 --
 ALTER TABLE `absensi_detail`
   MODIFY `id_detail` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
 
 --
 -- AUTO_INCREMENT for table `absensi_jadwal`
@@ -581,11 +715,13 @@ ALTER TABLE `absensi_detail`
 ALTER TABLE `absensi_jadwal`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
+
 --
 -- AUTO_INCREMENT for table `absensi_qr`
 --
 ALTER TABLE `absensi_qr`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+
 
 --
 -- AUTO_INCREMENT for table `guru`
@@ -593,11 +729,13 @@ ALTER TABLE `absensi_qr`
 ALTER TABLE `guru`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
+
 --
 -- AUTO_INCREMENT for table `hari_libur`
 --
 ALTER TABLE `hari_libur`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
 
 --
 -- AUTO_INCREMENT for table `izin_keluar`
@@ -605,11 +743,13 @@ ALTER TABLE `hari_libur`
 ALTER TABLE `izin_keluar`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
+
 --
 -- AUTO_INCREMENT for table `kelas`
 --
 ALTER TABLE `kelas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+
 
 --
 -- AUTO_INCREMENT for table `mutasi`
@@ -617,11 +757,13 @@ ALTER TABLE `kelas`
 ALTER TABLE `mutasi`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+
 --
 -- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
 
 --
 -- AUTO_INCREMENT for table `siswa`
@@ -629,11 +771,13 @@ ALTER TABLE `roles`
 ALTER TABLE `siswa`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1540;
 
+
 --
 -- AUTO_INCREMENT for table `siswa_history`
 --
 ALTER TABLE `siswa_history`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 
 --
 -- AUTO_INCREMENT for table `siswa_tahun`
@@ -641,11 +785,13 @@ ALTER TABLE `siswa_history`
 ALTER TABLE `siswa_tahun`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1540;
 
+
 --
 -- AUTO_INCREMENT for table `system_config`
 --
 ALTER TABLE `system_config`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
 
 --
 -- AUTO_INCREMENT for table `tahun_ajaran`
@@ -653,21 +799,25 @@ ALTER TABLE `system_config`
 ALTER TABLE `tahun_ajaran`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
+
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
+
 --
 -- Constraints for dumped tables
 --
+
 
 --
 -- Constraints for table `kelas`
 --
 ALTER TABLE `kelas`
   ADD CONSTRAINT `kelas_ibfk_1` FOREIGN KEY (`wali_kelas_id`) REFERENCES `guru` (`id`) ON DELETE SET NULL;
+
 
 --
 -- Constraints for table `mutasi`
@@ -678,12 +828,14 @@ ALTER TABLE `mutasi`
   ADD CONSTRAINT `mutasi_ibfk_3` FOREIGN KEY (`tahun_id`) REFERENCES `tahun_ajaran` (`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `mutasi_ibfk_4` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`) ON DELETE SET NULL;
 
+
 --
 -- Constraints for table `siswa`
 --
 ALTER TABLE `siswa`
   ADD CONSTRAINT `siswa_ibfk_1` FOREIGN KEY (`id_kelas`) REFERENCES `kelas` (`id`) ON DELETE SET NULL,
   ADD CONSTRAINT `siswa_ibfk_2` FOREIGN KEY (`tahun_id`) REFERENCES `tahun_ajaran` (`id`) ON DELETE CASCADE;
+
 
 --
 -- Constraints for table `users`
@@ -692,6 +844,10 @@ ALTER TABLE `users`
   ADD CONSTRAINT `users_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`);
 COMMIT;
 
+
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+
+
