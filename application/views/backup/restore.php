@@ -23,20 +23,22 @@
                 </p>
             </div>
 
-            <form method="post" action="<?= base_url('backup/do_restore') ?>" enctype="multipart/form-data">
+            <?= form_open_multipart('backup/do_restore'); ?>
 
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Pilih File SQL</label>
-                    <input type="file" name="file_sql" class="form-control" required>
-                </div>
+<div class="mb-3">
+    <label class="form-label fw-bold">Pilih File SQL</label>
+    <input type="file" class="form-control" name="file_sql" required>
+</div>
 
-                <div class="text-center mt-4">
-                    <button class="btn btn-danger btn-lg px-4">
-                        <i class="fas fa-exclamation-triangle me-1"></i> Restore Sekarang
-                    </button>
-                </div>
+<div class="text-center mt-4">
+    <button class="btn btn-danger btn-lg px-4">
+        <i class="fas fa-exclamation-triangle me-1"></i> Restore Sekarang
+    </button>
+</div>
 
-            </form>
+<?= form_close(); ?>
+
+
 
         </div>
     </div>

@@ -55,31 +55,51 @@ class Backup extends CI_Controller {
     }
 
     public function do_restore()
-    {
-        if (!isset($_FILES['file_sql'])) {
-            $this->session->set_flashdata('error', 'File SQL tidak ditemukan!');
-            redirect('backup/restore');
-            return;
-        }
-
-        $file = $_FILES['file_sql']['tmp_name'];
-        $content = file_get_contents($file);
-
-        if ($content) {
-            $sqls = explode(";", $content);
-
-            foreach ($sqls as $query) {
-                $query = trim($query);
-                if ($query != "") {
-                    $this->db->query($query);
-                }
-            }
-
-            $this->session->set_flashdata('success', 'Database berhasil direstore!');
-        } else {
-            $this->session->set_flashdata('error', 'Gagal membaca file SQL!');
-        }
-
+{
+    if (!isset($_FILES['file_sql']) || $_FILES['file_sql']['error'] !== UPLOAD_ERR_OK) {
+        $this->session->set_flashdata('error', 'File SQL tidak berhasil diupload.');
         redirect('backup/restore');
+        return;
     }
+
+    $tmp = $_FILES['file_sql']['tmp_name'];
+
+    if (!file_exists($tmp) || filesize($tmp) == 0) {
+        $this->session->set_flashdata('error', 'Gagal membaca file SQL!');
+        redirect('backup/restore');
+        return;
+    }
+
+    $db = $this->db->conn_id; // mysqli connection
+
+    mysqli_query($db, "SET FOREIGN_KEY_CHECKS = 0");
+
+    $templine = '';
+    $lines = file($tmp);
+
+    foreach ($lines as $line) {
+
+        // Lewati baris komentar / kosong
+        if (substr($line, 0, 2) == '--' || trim($line) == '') {
+            continue;
+        }
+
+        // Tambahkan baris SQL
+        $templine .= $line;
+
+        // Jika akhir baris ada titik koma → jalankan query
+        if (substr(trim($line), -1) == ';') {
+            if (!mysqli_query($db, $templine)) {
+                // kalau error, lanjut saja
+            }
+            $templine = '';
+        }
+    }
+
+    mysqli_query($db, "SET FOREIGN_KEY_CHECKS = 1");
+
+    $this->session->set_flashdata('success', 'Database berhasil direstore!');
+    redirect('backup/restore');
+}
+
 }

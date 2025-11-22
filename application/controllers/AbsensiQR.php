@@ -26,6 +26,30 @@ class AbsensiQR extends CI_Controller {
             7 => 'Minggu'
         ];
         $hariNama = $hariNamaMap[$hariIndex];
+        // ============================
+// CEK LIBUR NASIONAL / CUSTOM
+// ============================
+$tanggalHariIni = date('Y-m-d');
+
+// cek di tabel hari_libur
+$cekLibur = $this->db->get_where('hari_libur', [
+    'start' => $tanggalHariIni
+])->row();
+
+// cek weekend
+$isWeekend = ($hariNama == 'Sabtu' || $hariNama == 'Minggu');
+
+if ($cekLibur || $isWeekend) {
+    // Kirim ke view bahwa hari ini libur
+    $data = [
+        'hari_nama' => $hariNama,
+        'libur'     => true,
+        'keterangan_libur' => $cekLibur ? $cekLibur->nama : "Hari " . $hariNama
+    ];
+    $this->load->view('absensiqr/scan', $data);
+    return;
+}
+
 
         // ambil jadwal hari ini
         $jadwal = $this->db->get_where('absensi_jadwal', ['hari' => $hariNama])->row();

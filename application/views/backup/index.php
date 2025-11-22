@@ -16,7 +16,7 @@
             </div>
 
             <div class="text-center">
-                <a href="<?= base_url('backup/do_backup') ?>" class="btn btn-primary btn-lg px-4">
+                <a href="<?= base_url('index.php/backup/do_backup') ?>" class="btn btn-primary btn-lg px-4">
                     <i class="fas fa-download me-1"></i> Download Backup
                 </a>
             </div>
