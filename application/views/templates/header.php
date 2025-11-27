@@ -194,6 +194,139 @@ html, body {
     overflow-x: hidden;
     flex-grow: 1; /* area menu yang bisa scroll */
 }
+/* ===============================
+   FIX RESPONSIVE KHUSUS HP
+   =============================== */
+@media (max-width: 767px) {
+
+    /* Body boleh scroll */
+    html, body {
+        overflow: auto !important;
+        height: auto !important;
+    }
+
+    /* Sidebar mode overlay */
+    .sidebar {
+        position: fixed !important;
+        left: -260px !important;
+        width: 260px !important;
+        height: 100vh !important;
+        transition: all 0.3s ease !important;
+        z-index: 2000 !important;
+    }
+
+    /* Sidebar ketika toggle */
+    .sidebar.toggled {
+        left: 0 !important;
+    }
+
+    /* Topbar normal */
+    .topbar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 2500 !important;
+    }
+
+    /* Konten turun karena ada topbar */
+    #content-wrapper {
+        margin-left: 0 !important;
+        padding-top: 70px !important;
+        height: auto !important;
+        overflow: auto !important;
+    }
+
+    /* Tampilkan tombol toggle HP */
+    #sidebarToggleTop {
+        display: inline-block !important;
+    }
+}
+/* ===============================
+   FIX RESPONSIVE KHUSUS HP
+   =============================== */
+@media (max-width: 767px) {
+
+    /* Body boleh scroll */
+    html, body {
+        overflow: auto !important;
+        height: auto !important;
+    }
+
+    /* Sidebar mode overlay */
+    .sidebar {
+        position: fixed !important;
+        left: -260px !important;
+        width: 260px !important;
+        height: 100vh !important;
+        transition: all 0.3s ease !important;
+        z-index: 2000 !important;
+    }
+
+    /* Sidebar ketika toggle */
+    .sidebar.toggled {
+        left: 0 !important;
+    }
+
+    /* Topbar normal */
+    .topbar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 2500 !important;
+    }
+
+    /* Konten turun karena ada topbar */
+    #content-wrapper {
+        margin-left: 0 !important;
+        padding-top: 70px !important;
+        height: auto !important;
+        overflow: auto !important;
+    }
+
+    /* Tampilkan tombol toggle HP */
+    #sidebarToggleTop {
+        display: inline-block !important;
+    }
+}
+/* ===============================
+   FIX SUBMENU TERTUTUP DI HP
+   =============================== */
+@media (max-width: 767px) {
+
+    /* Sidebar harus paling depan */
+    .sidebar {
+        z-index: 3000 !important;
+        overflow-y: visible !important;
+    }
+
+    /* Container accordion (SBAdmin2) harus tampil penuh */
+    #accordionSidebar {
+        overflow-y: visible !important;
+    }
+
+    /* Dropdown submenu muncul di depan */
+    .collapse,
+    .collapse.show,
+    .sidebar .collapse-inner {
+        position: relative;
+        z-index: 3500 !important;
+        background-color: #2d2f38 !important; /* biar kelihatan */
+    }
+
+    /* Biar sub-menu tidak terpotong */
+    .sidebar .nav-item {
+        overflow: visible !important;
+    }
+
+    /* Konten pindah ke belakang sidebar */
+    #content-wrapper,
+    #content {
+        position: relative;
+        z-index: 1 !important;
+    }
+}
 
 </style>
 

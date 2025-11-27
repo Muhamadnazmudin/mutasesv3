@@ -1,0 +1,24 @@
+KIRIM KE: 6285651414221 | Pesan: Assalamualaikum, Orang tua/wali dari *ABI ABDILAH KUSUMA PUTRA*.
+
+Ananda telah *HADIR* melalui *RFID*.
+⏰ Jam: *13:51:03*
+📅 Tanggal: *2025-11-27*
+📌 Status: *Terlambat*
+HASIL CURL: BERHASIL | ERROR: 
+
+KIRIM KE: 6285651414221 | Pesan: Assalamualaikum, Orang tua/wali dari *ABI ABDILAH KUSUMA PUTRA*.
+
+Ananda telah *HADIR* melalui *RFID*.
+⏰ Jam: *13:57:00*
+📅 Tanggal: *2025-11-27*
+📌 Status: *Terlambat*
+HASIL CURL: BERHASIL | ERROR: 
+
+KIRIM KE: 6282216793486 | Pesan: Assalamualaikum, Orang tua/wali dari *ABI ABDILAH KUSUMA PUTRA*.
+
+Ananda telah *HADIR* melalui *RFID*.
+⏰ Jam: *14:02:28*
+📅 Tanggal: *2025-11-27*
+📌 Status: *Terlambat*
+HASIL CURL: GAGAL | ERROR: 
+

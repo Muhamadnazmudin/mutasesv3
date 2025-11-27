@@ -112,6 +112,40 @@ if ($cekLibur || $isWeekend) {
 ];
 
             $this->qr->insert_absen_masuk($insert);
+            // ===========================
+// KIRIM NOTIFIKASI WHATSAPP
+// ===========================
+
+// 1. Ambil nomor HP orang tua dari tabel siswa
+$ortu = $this->db->get_where('siswa', ['nis' => $nis])->row();
+$nohp = isset($ortu->no_hp_ortu) ? $ortu->no_hp_ortu : null;
+
+// 2. Format nomor
+if ($nohp) {
+    // Hilangkan spasi, tanda +, titik
+    $nohp = preg_replace('/[^0-9]/', '', $nohp);
+
+    // Jika formatnya 08xxxx → ubah jadi 628xxxx
+    if (substr($nohp, 0, 1) == '0') {
+        $nohp = '62' . substr($nohp, 1);
+    }
+}
+
+// 3. Jika nomor valid, kirim WA
+if ($nohp && strlen($nohp) >= 10) {
+    $jam = date("H:i");
+
+    $pesan = 
+        "📢 *Pemberitahuan Kehadiran Siswa*\n\n" .
+        "Ananda *" . $siswa->nama . "* telah melakukan absensi masuk pada pukul *" . $jam . "*.\n\n" .
+        "Status: *" . $status . "*\n" .
+        ($keterangan_telat ? "Keterlambatan: _".$keterangan_telat."_\n" : "") .
+        "\nTerima kasih.";
+
+    // kirim
+    send_wa($nohp, $pesan);
+}
+
 
             $this->load->view('absensiqr/hasil', [
                 'type'             => 'masuk',
