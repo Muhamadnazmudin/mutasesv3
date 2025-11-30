@@ -54,6 +54,7 @@ $group_qr      = in_array($active, ['absensiqr_siswa','laporan_absensiqr']);
             <a class="collapse-item <?= $active=='guru'?'active':'' ?>" href="<?= site_url('guru') ?>">Data Guru</a>
             <a class="collapse-item <?= $active=='kelas'?'active':'' ?>" href="<?= site_url('kelas') ?>">Data Kelas</a>
             <a class="collapse-item <?= $active=='siswa'?'active':'' ?>" href="<?= site_url('siswa') ?>">Data Siswa</a>
+            <a class="collapse-item <?= $active=='kartu_osis'?'active':'' ?>" href="<?= site_url('kartu_osis') ?>">Kartu OSIS</a>
         </div>
     </div>
 </li>

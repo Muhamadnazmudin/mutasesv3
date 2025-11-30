@@ -489,7 +489,8 @@ $config['csrf_expire'] = 7200;
 $config['csrf_regenerate'] = FALSE;
 $config['csrf_exclude_uris'] = array(
     'izin/ajukan/.*',
-    'izin/kembali/.*'
+    'izin/kembali/.*',
+    'RfidAbsensi/scan'
 );
 $config['sess_save_path'] = sys_get_temp_dir(); // penting!
 

@@ -7,18 +7,18 @@
     <style>
         body {
             background: #f4f6f9;
-            font-size: 16px;             /* lebih kecil */
+            font-size: 16px;
             padding-top: 25px;
         }
 
         .scan-container {
-            max-width: 550px;            /* lebih ramping */
+            max-width: 550px;
             margin: auto;
         }
 
         .card-scan {
             border-radius: 14px;
-            padding: 25px;               /* diperkecil */
+            padding: 25px;
             box-shadow: 0 6px 14px rgba(0,0,0,0.15);
             background: white;
             animation: fadeIn .3s ease;
@@ -30,20 +30,20 @@
         }
 
         #uid_box {
-            font-size: 32px;             /* lebih kecil */
+            font-size: 32px;
             font-weight: 700;
             color: #007bff;
         }
 
         .scan-title {
-            font-size: 26px;             /* lebih kecil */
+            font-size: 26px;
             font-weight: 800;
             text-align: center;
             margin-bottom: 18px;
         }
 
         .card-result {
-            padding: 22px;               /* box lebih kecil */
+            padding: 22px;
             border-radius: 14px;
             color: white;
             text-align: center;
@@ -78,10 +78,9 @@
         .shake { animation: shake 0.35s ease; }
 
         .icon-x {
-            font-size: 48px;        /* icon diperkecil */
+            font-size: 48px;
             margin-bottom: 8px;
         }
-
     </style>
 </head>
 
@@ -112,6 +111,10 @@ let buffer = "";
 let timer = null;
 let lockScan = false;
 
+// CSRF GLOBAL
+let csrfName = "<?= $this->security->get_csrf_token_name(); ?>";
+let csrfHash = "<?= $this->security->get_csrf_hash(); ?>";
+
 document.getElementById("reader").addEventListener("keypress", function (e) {
 
     if (lockScan) return;
@@ -128,6 +131,7 @@ document.getElementById("reader").addEventListener("keypress", function (e) {
     timer = setTimeout(() => buffer = "", 300);
 });
 
+
 function resetScanUI() {
     lockScan = false;
 
@@ -142,6 +146,7 @@ function resetScanUI() {
     document.getElementById("reader").focus();
 }
 
+
 function prosesUID(uid) {
 
     lockScan = true;
@@ -155,9 +160,6 @@ function prosesUID(uid) {
     resultBox.innerHTML = "Memproses<span class='loading-dot'></span>";
     resultBox.className = "card-result bg-info-custom text-center";
 
-    let csrfName = "<?= $this->security->get_csrf_token_name(); ?>";
-    let csrfHash = "<?= $this->security->get_csrf_hash(); ?>";
-
     fetch("<?= site_url('RfidAbsensi/scan'); ?>", {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -166,26 +168,54 @@ function prosesUID(uid) {
     .then(response => response.json())
     .then(data => {
 
+        // UPDATE CSRF SETIAP RESPONSE
+        if (data.csrfHash) {
+            csrfHash = data.csrfHash;
+        }
+
         resultBox.className = "card-result text-center";
 
-        /* ===== FAIL ===== */
+        /* === ERROR === */
         if (data.status === false) {
 
             scanTitle.innerText = "SCAN GAGAL";
             resultBox.classList.add("bg-danger-custom", "shake");
             setTimeout(()=>resultBox.classList.remove("shake"), 500);
 
+            // 1️⃣ LIBUR
+            if (data.error === "libur") {
+                resultBox.innerHTML = `
+                    <div class="icon-x">✖</div>
+                    <h4 class="fw-bold mb-1">Hari Ini Libur</h4>
+                    <p class="m-0" style="font-size:14px;">${data.msg}</p>
+                `;
+                setTimeout(resetScanUI, 2500);
+                return;
+            }
+
+            // 2️⃣ KARTU TIDAK TERDAFTAR
+            if (data.error === "unknown_uid") {
+                resultBox.innerHTML = `
+                    <div class="icon-x">✖</div>
+                    <h4 class="fw-bold mb-1">Kartu Tidak Terdaftar</h4>
+                    <p class="m-0" style="font-size:14px;">Pastikan kartu sudah diregistrasi.</p>
+                `;
+                setTimeout(resetScanUI, 2500);
+                return;
+            }
+
+            // 3️⃣ ERROR LAIN
             resultBox.innerHTML = `
                 <div class="icon-x">✖</div>
-                <h4 class="fw-bold mb-1">Kartu Tidak Terdaftar</h4>
-                <p class="m-0" style="font-size:14px;">Silakan cek kembali kartu siswa.</p>
+                <h4 class="fw-bold mb-1">Terjadi Kesalahan</h4>
+                <p class="m-0" style="font-size:14px;">${data.msg ?? "Silakan coba lagi."}</p>
             `;
-
-            setTimeout(resetScanUI, 2200);
+            setTimeout(resetScanUI, 2500);
             return;
         }
 
-        /* ===== SUDAH PULANG ===== */
+
+        /* === SUDAH PULANG === */
         if (data.type === "sudah_pulang") {
             resultBox.classList.add("bg-info-custom");
             resultBox.innerHTML = `
@@ -196,7 +226,7 @@ function prosesUID(uid) {
             return;
         }
 
-        /* ===== BELUM WAKTU PULANG ===== */
+        /* === BELUM WAKTU PULANG === */
         if (data.type === "belum_waktu") {
 
             resultBox.classList.add("bg-danger-custom", "shake");
@@ -213,7 +243,7 @@ function prosesUID(uid) {
             return;
         }
 
-        /* ===== PULANG ===== */
+        /* === PULANG === */
         if (data.type === "pulang") {
             resultBox.classList.add("bg-info-custom");
             resultBox.innerHTML = `
@@ -224,7 +254,7 @@ function prosesUID(uid) {
             return;
         }
 
-        /* ===== TERLAMBAT ===== */
+        /* === TERLAMBAT === */
         if (data.status === "Terlambat") {
             resultBox.classList.add("bg-late-custom");
             resultBox.innerHTML = `
@@ -235,7 +265,7 @@ function prosesUID(uid) {
             return;
         }
 
-        /* ===== MASUK ===== */
+        /* === MASUK === */
         if (data.type === "masuk") {
             resultBox.classList.add("bg-success-custom");
             resultBox.innerHTML = `

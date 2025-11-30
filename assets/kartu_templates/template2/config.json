@@ -1,0 +1,74 @@
+{
+	"front": {
+		"foto": { "x": 65, "y": 231, "w": 171, "h": 210 },
+
+		"text": {
+			"label_x": 270,
+			"colon_x": 350,
+			"value_x": 380,
+			"start_y": 310,
+			"gap": 28,
+			"size_label": 12,
+			"size_value": 12,
+			"color_label": "#000000",
+			"color_value": "#000000"
+		},
+
+		"name": {
+			"y": 260,
+			"size": 26,
+			"color": "#0A3B91",
+			"bold": true
+		},
+
+		"fields": [
+			{ "key": "nis", "label": "NIS" },
+			{ "key": "nisn", "label": "NISN" },
+			{ "key": "ttl", "label": "T.T.L" },
+			{ "key": "agama", "label": "Agama" },
+			{ "key": "alamat", "label": "Alamat" }
+		],
+
+		"qr": {
+			"x": 580,
+			"y": 460,
+			"w": 100,
+			"h": 100
+		},
+
+		"kepsek_label": {
+			"x": 760,
+			"y": 390,
+			"size": 16,
+			"color": "#000000",
+			"bold": false,
+			"text": "Kepala Sekolah"
+		},
+
+		"kepsek_cap": { "x": 700, "y": 380, "w": 120, "h": 120 },
+		"kepsek_ttd": { "x": 720, "y": 440, "w": 190, "h": 68 },
+
+		"kepsek_nama": {
+			"x": 760,
+			"y": 510,
+			"size": 16,
+			"color": "#000000",
+			"bold": true
+		},
+		"kepsek_nip": {
+			"x": 760,
+			"y": 545,
+			"size": 14,
+			"color": "#000000"
+		}
+	},
+
+	"back": {
+		"qr": {
+			"x": 870,
+			"y": 480,
+			"w": 110,
+			"h": 110
+		}
+	}
+}
