@@ -180,7 +180,7 @@ function prosesUID(uid) {
 
             scanTitle.innerText = "SCAN GAGAL";
             resultBox.classList.add("bg-danger-custom", "shake");
-            setTimeout(()=>resultBox.classList.remove("shake"), 500);
+            setTimeout(()=>resultBox.classList.remove("shake"), 200);
 
             // 1️⃣ LIBUR
             if (data.error === "libur") {
@@ -189,7 +189,7 @@ function prosesUID(uid) {
                     <h4 class="fw-bold mb-1">Hari Ini Libur</h4>
                     <p class="m-0" style="font-size:14px;">${data.msg}</p>
                 `;
-                setTimeout(resetScanUI, 2500);
+                setTimeout(resetScanUI, 500);
                 return;
             }
 
@@ -200,7 +200,7 @@ function prosesUID(uid) {
                     <h4 class="fw-bold mb-1">Kartu Tidak Terdaftar</h4>
                     <p class="m-0" style="font-size:14px;">Pastikan kartu sudah diregistrasi.</p>
                 `;
-                setTimeout(resetScanUI, 2500);
+                setTimeout(resetScanUI, 500);
                 return;
             }
 
@@ -210,7 +210,7 @@ function prosesUID(uid) {
                 <h4 class="fw-bold mb-1">Terjadi Kesalahan</h4>
                 <p class="m-0" style="font-size:14px;">${data.msg ?? "Silakan coba lagi."}</p>
             `;
-            setTimeout(resetScanUI, 2500);
+            setTimeout(resetScanUI, 500);
             return;
         }
 
@@ -222,7 +222,7 @@ function prosesUID(uid) {
                 <h4 class="fw-bold">${data.nama}</h4>
                 <p class="m-0">Anda sudah absen pulang hari ini.</p>
             `;
-            setTimeout(resetScanUI, 2200);
+            setTimeout(resetScanUI, 500);
             return;
         }
 
@@ -239,7 +239,7 @@ function prosesUID(uid) {
                 <p class="m-0" style="font-size:14px;">Sekarang: <b>${data.jam_now}</b></p>
                 <p class="m-0" style="font-size:14px;">Pulang: <b>${data.waktu_pulang}</b></p>
             `;
-            setTimeout(resetScanUI, 2500);
+            setTimeout(resetScanUI, 500);
             return;
         }
 
@@ -250,7 +250,7 @@ function prosesUID(uid) {
                 <h4 class="fw-bold">${data.nama}</h4>
                 <p class="m-0">Pulang: ${data.jam_pulang}</p>
             `;
-            setTimeout(resetScanUI, 2200);
+            setTimeout(resetScanUI, 500);
             return;
         }
 
@@ -261,7 +261,7 @@ function prosesUID(uid) {
                 <h4 class="fw-bold">${data.nama}</h4>
                 <p class="m-0">Terlambat — ${data.jam}</p>
             `;
-            setTimeout(resetScanUI, 2200);
+            setTimeout(resetScanUI, 500);
             return;
         }
 
@@ -272,7 +272,7 @@ function prosesUID(uid) {
                 <h4 class="fw-bold">${data.nama}</h4>
                 <p class="m-0">Masuk: ${data.jam}</p>
             `;
-            setTimeout(resetScanUI, 2200);
+            setTimeout(resetScanUI, 500);
             return;
         }
 
@@ -280,7 +280,7 @@ function prosesUID(uid) {
     .catch(err => {
         resultBox.className = "card-result bg-danger-custom text-center";
         resultBox.innerHTML = "Error: " + err;
-        setTimeout(resetScanUI, 2500);
+        setTimeout(resetScanUI, 500);
     });
 }
 </script>

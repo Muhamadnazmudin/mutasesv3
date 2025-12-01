@@ -125,7 +125,7 @@ if (is_dir($base)) {
             </table>
 
             <!-- PAGINATION -->
-            <div class="mt-3">
+            <div class="mt-3" center>
                 <?= $pagination ?>
             </div>
 

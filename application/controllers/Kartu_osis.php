@@ -54,21 +54,66 @@ class Kartu_osis extends CI_Controller {
         // -------------------------
         // Pagination Generator
         // -------------------------
-        $base_url = site_url("kartu_osis?kelas=".$kelas_id."&limit=".$limit."&page=");
+        // -------------------------
+// Pagination Generator (smart pagination)
+// -------------------------
+$base_url = site_url("kartu_osis?kelas=".$kelas_id."&limit=".$limit."&page=");
+$total_pages = ceil($total_rows / $limit);
+$pagination = "<nav class='d-flex justify-content-center'>
+<ul class='pagination'>";
 
-        $pagination = "<nav><ul class='pagination'>";
 
-        $total_pages = ceil($total_rows / $limit);
+// Prev
+$prev_page = max(1, $page - 1);
+$pagination .= "
+    <li class='page-item ".($page == 1 ? "disabled" : "")."'>
+        <a class='page-link' href='".$base_url.$prev_page."'>&laquo;</a>
+    </li>
+";
 
-        for ($i = 1; $i <= $total_pages; $i++) {
-            $active = ($i == $page) ? "active" : "";
-            $pagination .= "
-                <li class='page-item $active'>
-                    <a class='page-link' href='".$base_url.$i."'>$i</a>
-                </li>";
-        }
+// Function kecil untuk item halaman
+function page_btn($i, $page, $base_url) {
+    $active = ($i == $page) ? "active" : "";
+    return "<li class='page-item $active'><a class='page-link' href='".$base_url.$i."'>$i</a></li>";
+}
 
-        $pagination .= "</ul></nav>";
+// Tampilkan halaman 1–3
+$pagination .= page_btn(1, $page, $base_url);
+if ($total_pages > 1) $pagination .= page_btn(2, $page, $base_url);
+if ($total_pages > 2) $pagination .= page_btn(3, $page, $base_url);
+
+// Ellipsis kiri
+if ($page > 6) {
+    $pagination .= "<li class='page-item disabled'><span class='page-link'>...</span></li>";
+}
+
+// Halaman tengah dinamis
+$start = max(4, $page - 2);
+$end   = min($total_pages - 3, $page + 2);
+
+for ($i = $start; $i <= $end; $i++) {
+    $pagination .= page_btn($i, $page, $base_url);
+}
+
+// Ellipsis kanan
+if ($page < $total_pages - 5) {
+    $pagination .= "<li class='page-item disabled'><span class='page-link'>...</span></li>";
+}
+
+// Tampilkan halaman akhir (last 3 pages)
+if ($total_pages > 3) $pagination .= page_btn($total_pages - 2, $page, $base_url);
+if ($total_pages > 2) $pagination .= page_btn($total_pages - 1, $page, $base_url);
+if ($total_pages > 1) $pagination .= page_btn($total_pages, $page, $base_url);
+
+// Next
+$next_page = min($total_pages, $page + 1);
+$pagination .= "
+    <li class='page-item ".($page == $total_pages ? "disabled" : "")."'>
+        <a class='page-link' href='".$base_url.$next_page."'>&raquo;</a>
+    </li>
+";
+
+$pagination .= "</ul></nav>";
 
         // -------------------------
         // Data kelas (dropdown)

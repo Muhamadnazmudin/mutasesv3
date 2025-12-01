@@ -1,10 +1,10 @@
 {
 	"front": {
-		"foto": { "x": 65, "y": 231, "w": 171, "h": 210 },
+		"foto": { "x": 65, "y": 190, "w": 220, "h": 350 },
 
 		"text": {
-			"label_x": 270,
-			"colon_x": 350,
+			"label_x": 300,
+			"colon_x": 360,
 			"value_x": 380,
 			"start_y": 310,
 			"gap": 28,
@@ -26,7 +26,7 @@
 			{ "key": "nisn", "label": "NISN" },
 			{ "key": "ttl", "label": "T.T.L" },
 			{ "key": "agama", "label": "Agama" },
-			{ "key": "alamat", "label": "Alamat" }
+			{ "key": "alamat", "label": "Desa" }
 		],
 
 		"qr": {
