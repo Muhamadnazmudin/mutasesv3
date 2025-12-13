@@ -41,7 +41,7 @@
     </tr>
   </thead>
   <tbody>
-    <?php $no=1; foreach($mutasi as $m): ?>
+    <?php $no = 1 + $offset; foreach($mutasi as $m): ?>
     <tr>
       <td><?= $no++ ?></td>
       <td><?= $m->nis ?></td>

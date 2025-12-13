@@ -56,6 +56,20 @@
     .card { background: var(--card); border: none; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
     table th { background: var(--table-header); color: var(--table-header-text); }
     footer { padding: 2rem 0; background: var(--card); border-top: 1px solid #ddd; margin-top: 3rem; color: var(--text); font-size: .9rem; }
+  /* Pagination Styling */
+.pagination .page-item .page-link {
+    border-radius: 6px;
+    margin: 0 3px;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+    color: #fff !important;
+    font-weight: bold;
+}
+
+  
   </style>
 </head>
 
@@ -178,7 +192,14 @@
         </tbody>
       </table>
     </div>
+   <!-- PAGINATION -->
+    
+<nav aria-label="Page navigation" class="d-flex justify-content-center mt-3">
     <?= $pagination ?>
+</nav>
+
+
+
   </div>
 </main>
 

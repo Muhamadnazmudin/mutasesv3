@@ -1,9 +1,7 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-if (!class_exists('TCPDF')) {
-    require_once(APPPATH . 'third_party/tcpdf/tcpdf.php');
-}
+require_once(APPPATH . 'third_party/tcpdf/tcpdf.php');
 
 class Pdf extends TCPDF
 {
@@ -25,14 +23,17 @@ class Pdf extends TCPDF
     public function createPDF($html, $filename = 'laporan', $stream = true)
     {
         $this->AddPage('L');
-        // Nonaktifkan spasi vertikal ekstra antar elemen HTML
-        $this->setHtmlVSpace(array(
-            'table' => array(array('h' => 0, 'n' => 0), array('h' => 0, 'n' => 0))
-        ));
 
-        // Mode strict agar table sejajar sempurna
+        $this->setHtmlVSpace([
+            'table' => [
+                ['h' => 0, 'n' => 0],
+                ['h' => 0, 'n' => 0]
+            ]
+        ]);
+
         $this->setCellPaddings(1, 1, 1, 1);
         $this->setCellMargins(0, 0, 0, 0);
+
         $this->writeHTMLCell(0, 0, '', '', $html, 0, 1, 0, true, '', true);
 
         if ($stream) {

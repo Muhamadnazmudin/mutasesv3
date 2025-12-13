@@ -90,6 +90,34 @@
     <div class="card card-scan">
 
         <h3 class="text-center mb-3 fw-bold">Scan RFID Absensi</h3>
+        <!-- HEADER INFORMASI HARI & JAM -->
+<div class="text-center mb-3 p-2" 
+     style="background:#f1faff; border-radius:12px; border:1px solid #d9eaff;">
+
+    <div style="font-size:18px; font-weight:600;">
+        <span id="tanggal_hari_ini"><?= date('l, d F Y') ?></span>
+    </div>
+
+    <div style="font-size:26px; font-weight:bold; color:#007bff;">
+        <span id="jam_sekarang"><?= date('H:i:s') ?></span> <span style="font-size:16px;">WIB</span>
+    </div>
+
+    <div style="font-size:15px; margin-top:5px; color:#333;">
+        <?php if ($keterangan !== "Masuk"): ?>
+    <div style="font-size:15px; margin-top:5px; color:red; font-weight:bold;">
+        <?= $keterangan ?>
+    </div>
+<?php else: ?>
+    <div style="font-size:15px; margin-top:5px; color:#333;">
+        Jam Masuk: <b><?= $jam_masuk ?></b> &nbsp; | &nbsp;
+        Jam Pulang: <b><?= $jam_pulang ?></b>
+    </div>
+<?php endif; ?>
+
+    </div>
+
+</div>
+
         <p class="text-center text-muted mb-3">Tempelkan kartu pada reader...</p>
 
         <div id="uid_box" class="text-center mb-2">UID: -</div>
@@ -283,6 +311,26 @@ function prosesUID(uid) {
         setTimeout(resetScanUI, 500);
     });
 }
+// =========================
+// Update jam setiap detik
+// =========================
+function updateClock() {
+    const now = new Date();
+
+    const options = { 
+        weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+    };
+    
+    document.getElementById("tanggal_hari_ini").innerText =
+        now.toLocaleDateString("id-ID", options);
+
+    document.getElementById("jam_sekarang").innerText =
+        now.toLocaleTimeString("id-ID", { hour12:false });
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
 </script>
 
 </body>

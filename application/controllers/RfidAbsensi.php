@@ -7,12 +7,12 @@ class RfidAbsensi extends CI_Controller {
         parent::__construct();
         $this->load->model('AbsensiQR_model', 'qr');
         $this->load->database();
-        $this->load->helper('wa_helper'); // pastikan helper WA diload
+        $this->load->helper('wa_helper');
     }
 
-    /* ------------------------------
-        Helper untuk kirim CSRF
-    ------------------------------ */
+    /* -----------------------------------------------
+        Helper CSRF return
+    ------------------------------------------------- */
     private function csrf()
     {
         return [
@@ -21,232 +21,305 @@ class RfidAbsensi extends CI_Controller {
         ];
     }
 
-    public function register()
-    {
-        $data['siswa'] = $this->db->get_where('siswa', ['status' => 'aktif'])->result();
-        $this->load->view('rfid/register', $data);
-    }
+    /* ------------------------------------------------
+        Scan HTM
+    -------------------------------------------------- */
+//     public function scan_real()
+// {
+//     // Ambil hari saat ini
+//     $hariIndex = date('N');
+//     $hariNamaMap = [
+//         1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu',
+//         4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
+//     ];
+//     $hariNama = $hariNamaMap[$hariIndex];
 
-    // ✔ Halaman tes manual RFID
-    public function scan_test()
-    {
-        $this->load->view('rfid/scan_test');
-    }
+//     // Ambil jadwal hari ini
+//     $jadwal = $this->db->get_where('absensi_jadwal', ['hari' => $hariNama])->row();
 
-    // ========================================
-    //             SCAN RFID
-    // ========================================
-    public function scan()
+//     $data['jam_masuk']  = $jadwal ? $jadwal->jam_masuk  : "07:00:00";
+//     $data['jam_pulang'] = $jadwal ? $jadwal->jam_pulang : "14:00:00";
+//     $data['hari'] = $hariNama;
+
+//     $this->load->view('rfid/scan_real', $data);
+// }
+
+public function scan_real()
 {
-    $uid = $this->input->post('uid');
+    date_default_timezone_set('Asia/Jakarta');
 
-    if (!$uid) {
-        echo json_encode(array_merge([
-            'status' => false,
-            'error'  => 'empty_uid',
-            'msg'    => 'UID kosong'
-        ], $this->csrf()));
-        return;
-    }
-
-    // ==============================
-    // 1️⃣ CEK HARI LIBUR PALING AWAL
-    // ==============================
-    $hariIndex = date('N'); // 1=Senin .. 7=Minggu
+    // Hari index: 1=Senin, 7=Minggu
+    $hariIndex = date('N');
     $hariNamaMap = [
         1 => 'Senin', 2 => 'Selasa', 3 => 'Rabu',
         4 => 'Kamis', 5 => 'Jumat', 6 => 'Sabtu', 7 => 'Minggu'
     ];
     $hariNama = $hariNamaMap[$hariIndex];
+
     $tanggal = date('Y-m-d');
 
-    // Cek weekend
-    if ($hariNama === 'Sabtu' || $hariNama === 'Minggu') {
-        echo json_encode(array_merge([
-            'status' => false,
-            'error'  => 'libur',
-            'msg'    => "Hari ini hari {$hariNama}, tidak ada absensi."
-        ], $this->csrf()));
+    /* =============================================
+        CEK WEEKEND (Sabtu/Minggu)
+    ============================================== */
+    if ($hariIndex >= 6) {
+
+        $data['hari']        = $hariNama;
+        $data['jam_masuk']   = "-";
+        $data['jam_pulang']  = "-";
+        $data['keterangan']  = "LIBUR (Weekend)";
+
+        $this->load->view('rfid/scan_real', $data);
         return;
     }
 
-    // Cek libur nasional (tabel hari_libur)
+    /* =============================================
+        CEK LIBUR NASIONAL DARI TABLE hari_libur
+    ============================================== */
     $cekLibur = $this->db->get_where('hari_libur', ['start' => $tanggal])->row();
+
     if ($cekLibur) {
-        echo json_encode(array_merge([
-            'status' => false,
-            'error'  => 'libur',
-            'msg'    => "Hari ini libur: {$cekLibur->keterangan}"
-        ], $this->csrf()));
+
+        $data['hari']        = $hariNama;
+        $data['jam_masuk']   = "-";
+        $data['jam_pulang']  = "-";
+        $data['keterangan']  = "LIBUR: " . $cekLibur->keterangan;
+
+        $this->load->view('rfid/scan_real', $data);
         return;
     }
 
-    // ==============================
-    // 2️⃣ BARU CEK UID SISWA
-    // ==============================
-    $siswa = $this->db->get_where('siswa', ['rfid_uid' => $uid])->row();
+    /* =============================================
+        HARI NORMAL → AMBIL JAM DARI JADWAL
+    ============================================== */
+    $jadwal = $this->db->get_where('absensi_jadwal', [
+        'hari' => $hariNama
+    ])->row();
 
-    if (!$siswa) {
-        echo json_encode(array_merge([
-            'status' => false,
-            'error'  => 'unknown_uid',
-            'msg'    => 'Kartu tidak terdaftar pada data siswa.'
-        ], $this->csrf()));
-        return;
-    }
+    $data['hari']        = $hariNama;
+    $data['jam_masuk']   = $jadwal ? $jadwal->jam_masuk   : "07:00:00";
+    $data['jam_pulang']  = $jadwal ? $jadwal->jam_pulang  : "14:00:00";
+    $data['keterangan']  = "Masuk";
 
-    // ============================================
-    // DATA DASAR
-    // ============================================
-    $nis = $siswa->nis;
-    $jamNow = date('H:i:s');
-
-    // Ambil jadwal hari ini
-    $jadwal = $this->db->get_where('absensi_jadwal', ['hari' => $hariNama])->row();
-    $jamMasukResmi  = $jadwal ? $jadwal->jam_masuk  : "07:00:00";
-    $jamPulangResmi = $jadwal ? $jadwal->jam_pulang : "14:00:00";
-
-    $absen = $this->qr->get_absen_hari_ini($nis, $tanggal);
-
-    // ===================================================
-    // 3️⃣ ABSEN MASUK
-    // ===================================================
-    if (!$absen) {
-
-        if (strtotime($jamNow) <= strtotime($jamMasukResmi)) {
-            $status = "Tepat";
-            $keterangan_telat = null;
-        } else {
-            $status = "Terlambat";
-            $telat_detik = strtotime($jamNow) - strtotime($jamMasukResmi);
-            $keterangan_telat = $this->format_telat($telat_detik);
-        }
-
-        $insert = [
-            'nis'               => $nis,
-            'tanggal'           => $tanggal,
-            'jam_masuk'         => $jamNow,
-            'status'            => $status,
-            'kehadiran'         => 'H',
-            'keterangan_telat'  => $keterangan_telat,
-            'sumber'            => 'scan_rfid'
-        ];
-
-        $this->qr->insert_absen_masuk($insert);
-
-        $this->kirim_wa_rfid($siswa, "masuk", $jamNow, $tanggal, $status, $keterangan_telat);
-
-        echo json_encode(array_merge([
-            'type'    => 'masuk',
-            'nama'    => $siswa->nama,
-            'jam'     => $jamNow,
-            'status'  => $status
-        ], $this->csrf()));
-        return;
-    }
-
-    // ============================================
-    // 4️⃣ SUDAH PULANG
-    // ============================================
-    if ($absen->jam_pulang != null) {
-        echo json_encode(array_merge([
-            'type' => 'sudah_pulang',
-            'nama' => $siswa->nama
-        ], $this->csrf()));
-        return;
-    }
-
-    // ============================================
-    // 5️⃣ BELUM WAKTU PULANG
-    // ============================================
-    if (strtotime($jamNow) < strtotime($jamPulangResmi)) {
-        echo json_encode(array_merge([
-            'type' => 'belum_waktu',
-            'nama' => $siswa->nama,
-            'jam_now' => $jamNow,
-            'waktu_pulang' => $jamPulangResmi
-        ], $this->csrf()));
-        return;
-    }
-
-    // ============================================
-    // 6️⃣ ABSEN PULANG
-    // ============================================
-    $this->qr->update_absen_pulang($absen->id, $jamNow);
-
-    $this->kirim_wa_rfid($siswa, "pulang", $jamNow, $tanggal, null);
-
-    echo json_encode(array_merge([
-        'type' => 'pulang',
-        'nama' => $siswa->nama,
-        'jam_pulang' => $jamNow
-    ], $this->csrf()));
+    $this->load->view('rfid/scan_real', $data);
 }
 
-
-    /* -------------------------------------------------
-        FUNGSI KIRIM WA UNTUK RFID
-    --------------------------------------------------- */
-    private function kirim_wa_rfid($siswa, $tipe, $jam, $tanggal, $status, $keterangan_telat = null)
-{
-    if (empty($siswa->no_hp_ortu)) return;
-
-    // normalisasi nomor
-    $no = preg_replace('/\D/', '', $siswa->no_hp_ortu);
-    if (substr($no, 0, 1) == '0') $no = '62' . substr($no, 1);
-
-    if ($tipe == "masuk") {
-
-        $pesan = 
-        "Assalamualaikum, Orang tua/wali dari *{$siswa->nama}*.\n\n" .
-        "Ananda telah *HADIR* melalui *RFID*.\n" .
-        "⏰ Jam: *{$jam}*\n" .
-        "📅 Tanggal: *{$tanggal}*\n" .
-        "📌 Status: *{$status}*\n";
-
-        if ($status == "Terlambat" && !empty($keterangan_telat)) {
-            $pesan .= "⏱️ Keterlambatan: _{$keterangan_telat}_\n";
-        }
-
-        $pesan .= "\nTerima kasih.";
-
-    } else {
-        // pulang
-        $pesan =
-        "Assalamualaikum, Orang tua/wali dari *{$siswa->nama}*.\n\n" .
-        "Ananda telah *PULANG* melalui *RFID*.\n" .
-        "⏰ Jam Pulang: *{$jam}*\n" .
-        "📅 Tanggal: *{$tanggal}*\n\n" .
-        "Terima kasih.";
-    }
-
-    send_wa($no, $pesan);
-}
-
-
-    /* -------------------------------------------------
-        Format telat
-    --------------------------------------------------- */
-    private function format_telat($total_detik)
+    /* ------------------------------------------------
+        SCAN RFID (MAIN LOGIC)
+    -------------------------------------------------- */
+    public function scan()
     {
-        $jam = floor($total_detik / 3600);
-        $menit = floor(($total_detik % 3600) / 60);
-        $detik = $total_detik % 60;
+        $uid = $this->input->post('uid');
+        if (!$uid) {
+            echo json_encode(array_merge([
+                "status" => false,
+                "error"  => "empty_uid",
+                "msg"    => "UID kosong."
+            ], $this->csrf()));
+            return;
+        }
+
+        /* =============================================
+           1️⃣ CEK LIBUR / WEEKEND
+        ==============================================*/
+        $hariIndex = date('N'); // 1=Senin, 7=Minggu
+        $hariNamaMap = [
+            1=>'Senin',2=>'Selasa',3=>'Rabu',4=>'Kamis',
+            5=>'Jumat',6=>'Sabtu',7=>'Minggu'
+        ];
+        $hariNama = $hariNamaMap[$hariIndex];
+        $tanggal = date('Y-m-d');
+
+        // Weekend
+        if ($hariIndex >= 6) {
+            echo json_encode(array_merge([
+                "status" => false,
+                "error"  => "libur",
+                "msg"    => "Hari ini hari {$hariNama}, absensi libur."
+            ], $this->csrf()));
+            return;
+        }
+
+        // Libur nasional di DB
+       // Libur nasional di DB
+$cekLibur = $this->db
+    ->where('tanggal', $tanggal)
+    ->or_where('start', $tanggal)
+    ->or_where('mulai', $tanggal)
+    ->get('hari_libur')
+    ->row();
+
+if ($cekLibur) {
+    echo json_encode(array_merge([
+        "status" => false,
+        "error"  => "libur",
+        "msg"    => "Hari ini libur: {$cekLibur->keterangan}"
+    ], $this->csrf()));
+    return;
+}
+
+
+        /* =============================================
+           2️⃣ CEK SISWA BY UID
+        ==============================================*/
+        $siswa = $this->db->get_where("siswa", ["rfid_uid" => $uid])->row();
+
+        if (!$siswa) {
+            echo json_encode(array_merge([
+                "status" => false,
+                "error"  => "unknown_uid",
+                "msg"    => "Kartu tidak terdaftar."
+            ], $this->csrf()));
+            return;
+        }
+
+        $nis = $siswa->nis;
+        $jamNow = date("H:i:s");
+
+        /* =============================================
+           3️⃣ AMBIL JADWAL HARI INI
+        ==============================================*/
+        $jadwal = $this->db->get_where("absensi_jadwal", ["hari" => $hariNama])->row();
+        $jamMasukResmi  = $jadwal ? $jadwal->jam_masuk  : "07:00:00";
+        $jamPulangResmi = $jadwal ? $jadwal->jam_pulang : "14:00:00";
+
+        /* =============================================
+           4️⃣ CEK ABSEN HARI INI (FIX BUG TANGGAL)
+        ==============================================*/
+        $absen = $this->qr->get_absen_hari_ini($nis, $tanggal);
+
+        // FIX UTAMA: Jangan pernah pakai data absen kemarin!
+        if ($absen && $absen->tanggal !== $tanggal) {
+            $absen = null;
+        }
+
+        /* =============================================
+           5️⃣ ABSEN MASUK
+        ==============================================*/
+        if (!$absen) {
+
+            if (strtotime($jamNow) <= strtotime($jamMasukResmi)) {
+                $status = "Tepat";
+                $keterangan_telat = null;
+            } else {
+                $status = "Terlambat";
+                $telat_detik = strtotime($jamNow) - strtotime($jamMasukResmi);
+                $keterangan_telat = $this->format_telat($telat_detik);
+            }
+
+            $insert = [
+                "nis"              => $nis,
+                "tanggal"          => $tanggal,
+                "jam_masuk"        => $jamNow,
+                "status"           => $status,
+                "kehadiran"        => "H",
+                "keterangan_telat" => $keterangan_telat,
+                "sumber"           => "scan_rfid"
+            ];
+
+            $this->qr->insert_absen_masuk($insert);
+
+            // Kirim WA
+            $this->kirim_wa_rfid($siswa, "masuk", $jamNow, $tanggal, $status, $keterangan_telat);
+
+            echo json_encode(array_merge([
+                "type"   => "masuk",
+                "nama"   => $siswa->nama,
+                "jam"    => $jamNow,
+                "status" => $status
+            ], $this->csrf()));
+            return;
+        }
+
+        /* =============================================
+           6️⃣ SUDAH PULANG (HARI INI)
+        ==============================================*/
+        if ($absen && $absen->jam_pulang != null) {
+            echo json_encode(array_merge([
+                "type" => "sudah_pulang",
+                "nama" => $siswa->nama
+            ], $this->csrf()));
+            return;
+        }
+
+        /* =============================================
+           7️⃣ BELUM WAKTU PULANG
+        ==============================================*/
+        if (strtotime($jamNow) < strtotime($jamPulangResmi)) {
+            echo json_encode(array_merge([
+                "type"          => "belum_waktu",
+                "nama"          => $siswa->nama,
+                "jam_now"       => $jamNow,
+                "waktu_pulang"  => $jamPulangResmi
+            ], $this->csrf()));
+            return;
+        }
+
+        /* =============================================
+           8️⃣ ABSEN PULANG
+        ==============================================*/
+        $this->qr->update_absen_pulang($absen->id, $jamNow);
+
+        $this->kirim_wa_rfid($siswa, "pulang", $jamNow, $tanggal, null);
+
+        echo json_encode(array_merge([
+            "type"       => "pulang",
+            "nama"       => $siswa->nama,
+            "jam_pulang" => $jamNow
+        ], $this->csrf()));
+    }
+
+    /* ==========================================================================
+        Fungsi Kirim WA
+    ========================================================================== */
+    private function kirim_wa_rfid($siswa, $tipe, $jam, $tanggal, $status, $telat = null)
+    {
+        if (empty($siswa->no_hp_ortu)) return;
+
+        $no = preg_replace('/\D/', '', $siswa->no_hp_ortu);
+        if (substr($no,0,1) == "0") $no = "62".substr($no,1);
+
+        if ($tipe == "masuk") {
+
+            $pesan = 
+            "Assalamualaikum, Orang tua/wali dari *{$siswa->nama}*.\n\n".
+            "Ananda telah *HADIR* melalui *RFID*.\n".
+            "⏰ Jam: *{$jam}*\n".
+            "📅 Tanggal: *{$tanggal}*\n".
+            "📌 Status: *{$status}*\n";
+
+            if ($status == "Terlambat" && $telat) {
+                $pesan .= "⏱️ Keterlambatan: _{$telat}_\n";
+            }
+
+            $pesan .= "\nTerima kasih.";
+
+        } else {
+
+            $pesan = 
+            "Assalamualaikum, Orang tua/wali dari *{$siswa->nama}*.\n\n".
+            "Ananda telah *PULANG* melalui *RFID*.\n".
+            "⏰ Jam Pulang: *{$jam}*\n".
+            "📅 Tanggal: *{$tanggal}*\n\n".
+            "Terima kasih.";
+        }
+
+        send_wa($no, $pesan);
+    }
+
+    /* ==========================================================================
+        Format telat
+    ========================================================================== */
+    private function format_telat($detik)
+    {
+        $jam = floor($detik / 3600);
+        $menit = floor(($detik % 3600)/60);
+        $sisa = $detik % 60;
 
         $hasil = [];
-        if ($jam > 0)   $hasil[] = $jam . ' jam';
-        if ($menit > 0) $hasil[] = $menit . ' menit';
-        if ($detik > 0) $hasil[] = $detik . ' detik';
+        if ($jam > 0)   $hasil[] = $jam." jam";
+        if ($menit > 0) $hasil[] = $menit." menit";
+        if ($sisa > 0)  $hasil[] = $sisa." detik";
 
-        return implode(' ', $hasil);
+        return implode(" ", $hasil);
     }
-    public function scan_real()
-{
-    $this->load->view('rfid/scan_real');
-}
-public function test_reader()
-{
-    $this->load->view('rfid/test_reader');
-}
-
 }

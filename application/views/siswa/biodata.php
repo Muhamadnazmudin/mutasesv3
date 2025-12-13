@@ -172,6 +172,14 @@
                 <tr><td class="bio-label">Status</td><td class="bio-value"><?= ucfirst($siswa->status) ?></td></tr>
             </table>
         </div>
+
+        <div class="section-title">I. NOMOR WHATSAPP ORANG TUA/WALI</div>
+            <div class="table-responsive">
+    <table class="table table-bordered bio-table">
+                <tr><td class="bio-label">Nomor Whatsapp</td><td class="bio-value"><?= $siswa->no_hp_ortu ?></td></tr>
+                 </table>
+        </div>
+
            <a href="<?= site_url('siswa/cetak/'.$siswa->id) ?>" class="btn btn-primary mt-3">
     <i class="fas fa-eye"></i> Cetak Biodata PDF
 </a>

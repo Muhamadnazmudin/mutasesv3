@@ -1,5 +1,9 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+
 
 class Mutasi extends CI_Controller {
 
@@ -10,12 +14,52 @@ class Mutasi extends CI_Controller {
     $this->load->helper(['url','form']);
   }
 
-  public function index($offset = 0) {
+ public function index($offset = 0)
+{
+    $this->load->library('pagination');
+    $data['offset'] = $offset;
+
+    // =============================
+    // KONFIGURASI PAGINATION
+    // =============================
     $config['base_url'] = site_url('mutasi/index');
     $config['total_rows'] = $this->Mutasi_model->count_all();
     $config['per_page'] = 10;
+    $config['uri_segment'] = 3;
+    $config['reuse_query_string'] = true;
+
+    // ===== Bootstrap 5 Pagination =====
+    $config['full_tag_open']   = '<ul class="pagination justify-content-center">';
+$config['full_tag_close']  = '</ul>';
+
+$config['first_link']      = '&laquo;';
+$config['first_tag_open']  = '<li class="page-item">';
+$config['first_tag_close'] = '</li>';
+
+$config['last_link']       = '&raquo;';
+$config['last_tag_open']   = '<li class="page-item">';
+$config['last_tag_close']  = '</li>';
+
+$config['next_link']       = '&rsaquo;';
+$config['next_tag_open']   = '<li class="page-item">';
+$config['next_tag_close']  = '</li>';
+
+$config['prev_link']       = '&lsaquo;';
+$config['prev_tag_open']   = '<li class="page-item">';
+$config['prev_tag_close']  = '</li>';
+
+$config['cur_tag_open']    = '<li class="page-item active"><span class="page-link">';
+$config['cur_tag_close']   = '</span></li>';
+
+$config['num_tag_open']    = '<li class="page-item">';
+$config['num_tag_close']   = '</li>';
+
+$config['attributes']      = ['class' => 'page-link'];
+
+    // =============================
     $this->pagination->initialize($config);
 
+    // DATA
     $data['title'] = 'Data Mutasi Siswa';
     $data['active'] = 'mutasi';
     $data['mutasi'] = $this->Mutasi_model->get_all($config['per_page'], $offset);
@@ -28,7 +72,8 @@ class Mutasi extends CI_Controller {
     $this->load->view('templates/sidebar', $data);
     $this->load->view('mutasi/index', $data);
     $this->load->view('templates/footer');
-  }
+}
+
 
  public function add()
 {
@@ -315,54 +360,79 @@ if ($this->input->post('jenis') == 'keluar') {
     redirect('mutasi');
   }
   // =======================================================
-// EXPORT EXCEL (pakai PHPExcel_lib)
+// EXPORT EXCEL (pakai Spreadsheet_Lib)
 // =======================================================
 public function export_excel()
 {
+    // ambil data mutasi
     $data = $this->Mutasi_model->get_all(10000, 0);
 
-    // gunakan library yang sudah di-load
-    $this->load->library('PHPExcel_lib');
-    $objPHPExcel = new PHPExcel();
+    // gunakan PhpSpreadsheet
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->setActiveSheetIndex(0);
+    $sheet->setTitle('Data Mutasi');
 
-    $objPHPExcel->setActiveSheetIndex(0)
-        ->setCellValue('A1', 'No')
-        ->setCellValue('B1', 'Nama Siswa')
-        ->setCellValue('C1', 'Jenis Mutasi')
-        ->setCellValue('D1', 'Tanggal')
-        ->setCellValue('E1', 'Alasan')
-        ->setCellValue('F1', 'Tujuan Kelas')
-        ->setCellValue('G1', 'Tujuan Sekolah')
-        ->setCellValue('H1', 'Tahun Ajaran');
+    // HEADER
+    $sheet->setCellValue('A1', 'No');
+    $sheet->setCellValue('B1', 'Nama Siswa');
+    $sheet->setCellValue('C1', 'Jenis Mutasi');
+    $sheet->setCellValue('D1', 'Tanggal');
+    $sheet->setCellValue('E1', 'Alasan');
+    $sheet->setCellValue('F1', 'Tujuan Kelas');
+    $sheet->setCellValue('G1', 'Tujuan Sekolah');
+    $sheet->setCellValue('H1', 'Tahun Ajaran');
 
+    // STYLE HEADER
+    $sheet->getStyle('A1:H1')->applyFromArray([
+        'font' => ['bold' => true],
+        'alignment' => [
+            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+        ],
+        'borders' => [
+            'allBorders' => [
+                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+            ]
+        ]
+    ]);
+
+    // DATA
     $no = 1;
     $row = 2;
     foreach ($data as $m) {
-        $objPHPExcel->getActiveSheet()
-            ->setCellValue("A$row", $no++)
-            ->setCellValue("B$row", $m->nama_siswa)
-            ->setCellValue("C$row", ucfirst($m->jenis))
-            ->setCellValue("D$row", $m->tanggal)
-            ->setCellValue("E$row", $m->alasan)
-            ->setCellValue("F$row", $m->tujuan_kelas_nama)
-            ->setCellValue("G$row", $m->tujuan_sekolah)
-            ->setCellValue("H$row", $m->tahun_ajaran);
+
+        $sheet->setCellValue("A$row", $no++);
+        $sheet->setCellValue("B$row", $m->nama_siswa);
+        $sheet->setCellValue("C$row", ucfirst($m->jenis));
+        $sheet->setCellValue("D$row", $m->tanggal);
+        $sheet->setCellValue("E$row", $m->alasan);
+        $sheet->setCellValue("F$row", $m->tujuan_kelas_nama);
+        $sheet->setCellValue("G$row", $m->tujuan_sekolah);
+        $sheet->setCellValue("H$row", $m->tahun_ajaran);
+
         $row++;
     }
 
-    header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment;filename="data_mutasi_siswa.xls"');
+    // AUTOSIZE
+    foreach (range('A', 'H') as $col) {
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
+
+    // OUTPUT XLSX
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="data_mutasi_siswa.xlsx"');
     header('Cache-Control: max-age=0');
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-    $objWriter->save('php://output');
+
+    $writer = new Xlsx($spreadsheet);
+    $writer->save('php://output');
 }
+
 
 public function download_template()
 {
-    $this->load->library('PHPExcel_lib');
-    $objPHPExcel = new PHPExcel();
+    $this->load->library('Spreadsheet_Lib');
+    $objSpreadsheet = new Spreadsheet();
 
-    $objPHPExcel->setActiveSheetIndex(0)
+    $objSpreadsheet->setActiveSheetIndex(0)
         ->setCellValue('A1', 'No')
         ->setCellValue('B1', 'Nama Siswa')
         ->setCellValue('C1', 'Jenis (masuk/keluar)')
@@ -375,18 +445,18 @@ public function download_template()
     header('Content-Type: application/vnd.ms-excel');
     header('Content-Disposition: attachment;filename="template_import_mutasi.xls"');
     header('Cache-Control: max-age=0');
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+    $objWriter = Spreadsheet_IOFactory::createWriter($objSpreadsheet, 'Excel5');
     $objWriter->save('php://output');
 }
 
 public function import_excel()
 {
-    $this->load->library('PHPExcel_lib');
+    $this->load->library('Spreadsheet_Lib');
 
     if (isset($_FILES['file']['name']) && $_FILES['file']['name'] != '') {
         $path = $_FILES['file']['tmp_name'];
-        $objPHPExcel = PHPExcel_IOFactory::load($path);
-        $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+        $objSpreadsheet = Spreadsheet_IOFactory::load($path);
+        $sheetData = $objSpreadsheet->getActiveSheet()->toArray(null, true, true, true);
 
         foreach ($sheetData as $key => $row) {
             if ($key == 1) continue; // skip header

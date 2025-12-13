@@ -1,12 +1,18 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
+use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 
 class Siswa extends CI_Controller {
 
   public function __construct() {
     parent::__construct();
     $this->load->model('Siswa_model');
-    $this->load->library(['form_validation', 'pagination', 'PHPExcel_lib']);
+    $this->load->library(['form_validation', 'pagination', 'Spreadsheet_Lib']);
     $this->load->helper(['url', 'form']);
     $this->load->library('idcard_lib');
   }
@@ -268,185 +274,250 @@ $this->db->where('id', $id_siswa)->update('siswa', ['token_qr' => $token]);
     redirect('siswa');
   }
 
-  // EXPORT EXCEL
-  public function export_excel()
+ // ========================================================
+// EXPORT EXCEL ANTI SCIENTIFIC NOTATION
+// ========================================================
+public function export_excel()
 {
-    $data = $this->db->get('siswa')->result();
+    @ob_end_clean();
+    ob_start();
+
+    $this->load->database();
+    $this->load->model("Siswa_model");
+
+    error_reporting(0);
+
+    $data   = $this->db->get('siswa')->result();
     $fields = $this->db->list_fields('siswa');
 
-    $objPHPExcel = new PHPExcel();
-    $sheet = $objPHPExcel->setActiveSheetIndex(0);
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+    $sheet = $spreadsheet->setActiveSheetIndex(0);
     $sheet->setTitle('Data Siswa');
 
-    // Header
-    $col = 'A';
+    // ======================== HEADER ========================
+    $colIndex = 1;
     foreach ($fields as $f) {
-        $sheet->setCellValue($col . '1', strtoupper($f));
-        $col++;
+        $sheet->setCellValueByColumnAndRow($colIndex, 1, strtoupper($f));
+        $colIndex++;
     }
 
-    // Rows
+    // Style header
+    $lastCol = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($fields));
+    $sheet->getStyle("A1:{$lastCol}1")->applyFromArray([
+        'font' => ['bold' => true],
+        'alignment' => [
+            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER
+        ],
+        'borders' => [
+            'allBorders' => [
+                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN
+            ]
+        ]
+    ]);
+
+    // ======================== DEFINISI FIELD TEXT ========================
+    // semua nomor identitas HARUS dipaksa jadi TEXT
+    $textFields = [
+        'nis', 'nisn', 'nomor_kk', 'nik',
+        'nik_ayah', 'nik_ibu', 'nik_wali',
+        'no_hp_ortu', 'hp', 'telp'
+    ];
+
+    // ======================== DATA ROWS ========================
     $row = 2;
     foreach ($data as $d) {
-        $col = 'A';
+        $colIndex = 1;
         foreach ($fields as $f) {
-            $sheet->setCellValue($col . $row, $d->$f);
-            $col++;
+
+            $value = $d->$f;
+            $cell  = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex) . $row;
+
+            // detect otomatis jika angka panjang
+            $isLongNumber = is_numeric($value) && strlen((string)$value) >= 12;
+
+            if (in_array($f, $textFields) || $isLongNumber) {
+
+                // Set sebagai string explicit
+                $sheet->setCellValueExplicit(
+                    $cell,
+                    (string)$value,
+                    \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+                );
+
+                // Paksa Excel tidak mengubah format
+                $sheet->getStyle($cell)->getNumberFormat()
+                        ->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_TEXT);
+
+            } else {
+                // Normal data
+                $sheet->setCellValueByColumnAndRow($colIndex, $row, $value);
+            }
+
+            $colIndex++;
         }
         $row++;
     }
 
+    // ======================== AUTOSIZE ========================
+    for ($i = 1; $i <= count($fields); $i++) {
+        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($i);
+        $sheet->getColumnDimension($colLetter)->setAutoSize(true);
+    }
+
+    // ======================== OUTPUT ========================
     header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment;filename="data_siswa_full.xls"');
+    header('Content-Disposition: attachment; filename="data_siswa_full.xls"');
     header('Cache-Control: max-age=0');
 
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-    $objWriter->save('php://output');
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xls($spreadsheet);
+    $writer->save('php://output');
+
+    ob_end_flush();
+    exit;
 }
 
-public function download_template() {
 
-    // Ambil referensi dropdown
-    $kelas = $this->db->select('nama')->get('kelas')->result_array();
-    $tahun = $this->db->select('tahun')->get('tahun_ajaran')->result_array();
-    $status = ['aktif', 'mutasi_keluar', 'mutasi_masuk', 'lulus', 'keluar'];
-    $agama_list = ['Islam','Kristen','Katolik','Hindu','Budha','Konghucu'];
+public function download_template()
+{
+    // ambil referensi data
+    $kelas       = $this->db->select('nama')->get('kelas')->result_array();
+    $tahun       = $this->db->select('tahun')->get('tahun_ajaran')->result_array();
+    $status      = ['aktif','mutasi_keluar','mutasi_masuk','lulus','keluar'];
+    $agama_list  = ['Islam','Kristen','Katolik','Hindu','Budha','Konghucu'];
 
-    // === Semua kolom tabel siswa ===
+    // kolom template (jangan diubah)
     $fields = [
         'nis','nisn','nik','nama','jk','agama','tempat_lahir','tgl_lahir',
         'alamat','jalan','rt','rw','dusun','kecamatan','kode_pos','jenis_tinggal',
         'alat_transportasi','telp','hp','email','skhun','penerima_kps','no_kps',
         'nama_ayah','tahun_lahir_ayah','pendidikan_ayah','pekerjaan_ayah','penghasilan_ayah','nik_ayah',
         'nama_ibu','tahun_lahir_ibu','pendidikan_ibu','pekerjaan_ibu','penghasilan_ibu','nik_ibu',
+        'no_hp_ortu',
         'nama_wali','tahun_lahir_wali','pendidikan_wali','pekerjaan_wali','penghasilan_wali','nik_wali',
         'sekolah_asal','hobi','cita_cita','anak_keberapa','nomor_kk','berat_badan',
         'tinggi_badan','jumlah_saudara_kandung',
-
-        // Bagian relasi
-        'kelas',          // id_kelas → pakai nama kelas dropdown
-        'tahun_ajaran',   // tahun_id → pakai dropdown tahun
-        'status'
+        'kelas','tahun_ajaran','status'
     ];
 
-    $objPHPExcel = new PHPExcel();
-    $sheet = $objPHPExcel->setActiveSheetIndex(0);
+    // start excel
+    $spreadsheet = new Spreadsheet();
+    $sheet       = $spreadsheet->setActiveSheetIndex(0);
     $sheet->setTitle('Template Siswa');
 
-    // === HEADER DINAMIS ===
-    $col = 'A';
+    // header
+    $colIndex = 1;
     foreach ($fields as $f) {
-        $sheet->setCellValue($col . '1', strtoupper($f));
-        $col++;
+        $sheet->setCellValueByColumnAndRow($colIndex, 1, strtoupper($f));
+        $colIndex++;
     }
 
-    // === SHEET REFERENSI (untuk dropdown) ===
-    $objPHPExcel->createSheet();
-    $refSheet = $objPHPExcel->setActiveSheetIndex(1);
-    $refSheet->setTitle('Referensi');
+    // sheet referensi
+    $ref = $spreadsheet->createSheet();
+    $ref->setTitle('Referensi');
 
-    // Kelas
-    $rowKelas = 1;
+    // isi referensi kelas
+    $i=1;
     foreach ($kelas as $k) {
-        $refSheet->setCellValue("A$rowKelas", $k['nama']);
-        $rowKelas++;
+        $ref->setCellValue("A$i", $k['nama']);
+        $i++;
     }
 
-    // Tahun
-    $rowTahun = 1;
+    // isi referensi tahun
+    $i=1;
     foreach ($tahun as $t) {
-        $refSheet->setCellValue("B$rowTahun", $t['tahun']);
-        $rowTahun++;
+        $ref->setCellValue("B$i", $t['tahun']);
+        $i++;
     }
 
-    // Status
-    $rowStatus = 1;
+    // isi referensi status
+    $i=1;
     foreach ($status as $s) {
-        $refSheet->setCellValue("C$rowStatus", $s);
-        $rowStatus++;
+        $ref->setCellValue("C$i", $s);
+        $i++;
     }
 
-    // Agama
-    $rowAgama = 1;
+    // isi referensi agama
+    $i=1;
     foreach ($agama_list as $a) {
-        $refSheet->setCellValue("D$rowAgama", $a);
-        $rowAgama++;
+        $ref->setCellValue("D$i", $a);
+        $i++;
     }
 
-    // Kembali ke sheet utama
-    $sheet = $objPHPExcel->setActiveSheetIndex(0);
+    // kembali ke sheet utama
+    $sheet = $spreadsheet->setActiveSheetIndex(0);
 
-    // Range dropdown
-    $kelasRange  = 'Referensi!$A$1:$A$' . count($kelas);
-    $tahunRange  = 'Referensi!$B$1:$B$' . count($tahun);
-    $statusRange = 'Referensi!$C$1:$C$' . count($status);
-    $agamaRange  = 'Referensi!$D$1:$D$' . count($agama_list);
+    // range dropdown
+    $kelasRange  = "'Referensi'!\$A\$1:\$A\$" . count($kelas);
+$tahunRange  = "'Referensi'!\$B\$1:\$B\$" . count($tahun);
+$statusRange = "'Referensi'!\$C\$1:\$C\$" . count($status);
+$agamaRange  = "'Referensi'!\$D\$1:\$D\$" . count($agama_list);
 
-    // =======================
-//   DROPDOWN YANG BENAR
-// =======================
+    // mapping kolom
+    $jkCol         = array_search('jk', $fields) + 1;
+    $agamaCol      = array_search('agama', $fields) + 1;
+    $kelasCol      = array_search('kelas', $fields) + 1;
+    $tahunCol      = array_search('tahun_ajaran', $fields) + 1;
+    $statusCol     = array_search('status', $fields) + 1;
 
-for ($i = 2; $i <= 300; $i++) {
+    // apply validation
+    for ($row = 2; $row <= 300; $row++) {
 
-    // ==== Cari posisi kolom berdasarkan nama field ====
-    $colJK        = PHPExcel_Cell::stringFromColumnIndex(array_search('jk', $fields));
-    $colAgama     = PHPExcel_Cell::stringFromColumnIndex(array_search('agama', $fields));
-    $colKelas     = PHPExcel_Cell::stringFromColumnIndex(array_search('kelas', $fields));
-    $colTahun     = PHPExcel_Cell::stringFromColumnIndex(array_search('tahun_ajaran', $fields));
-    $colStatus    = PHPExcel_Cell::stringFromColumnIndex(array_search('status', $fields));
+        // JK
+        $sheet->getCellByColumnAndRow($jkCol, $row)
+              ->getDataValidation()
+              ->setType(DataValidation::TYPE_LIST)
+              ->setAllowBlank(true)
+              ->setShowDropDown(true)
+              ->setFormula1('"L,P"');
 
-    // ==== DROPDOWN JK ====
-    $validJK = $sheet->getCell($colJK . $i)->getDataValidation();
-    $validJK->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
-    $validJK->setShowDropDown(true);
-    $validJK->setAllowBlank(true);
-    $validJK->setFormula1('"L,P"');
+        // Agama
+        $sheet->getCellByColumnAndRow($agamaCol, $row)
+              ->getDataValidation()
+              ->setType(DataValidation::TYPE_LIST)
+              ->setAllowBlank(true)
+              ->setShowDropDown(true)
+              ->setFormula1($agamaRange);
 
-    // ==== DROPDOWN AGAMA ====
-    $validAgama = $sheet->getCell($colAgama . $i)->getDataValidation();
-    $validAgama->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
-    $validAgama->setShowDropDown(true);
-    $validAgama->setAllowBlank(true);
-    $validAgama->setFormula1($agamaRange);
+        // Kelas
+        $sheet->getCellByColumnAndRow($kelasCol, $row)
+              ->getDataValidation()
+              ->setType(DataValidation::TYPE_LIST)
+              ->setAllowBlank(true)
+              ->setShowDropDown(true)
+              ->setFormula1($kelasRange);
 
-    // ==== DROPDOWN KELAS ====
-    $validKelas = $sheet->getCell($colKelas . $i)->getDataValidation();
-    $validKelas->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
-    $validKelas->setShowDropDown(true);
-    $validKelas->setAllowBlank(true);
-    $validKelas->setFormula1($kelasRange);
+        // Tahun
+        $sheet->getCellByColumnAndRow($tahunCol, $row)
+              ->getDataValidation()
+              ->setType(DataValidation::TYPE_LIST)
+              ->setAllowBlank(true)
+              ->setShowDropDown(true)
+              ->setFormula1($tahunRange);
 
-    // ==== DROPDOWN TAHUN AJARAN ====
-    $validTahun = $sheet->getCell($colTahun . $i)->getDataValidation();
-    $validTahun->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
-    $validTahun->setShowDropDown(true);
-    $validTahun->setAllowBlank(true);
-    $validTahun->setFormula1($tahunRange);
-
-    // ==== DROPDOWN STATUS ====
-    $validStatus = $sheet->getCell($colStatus . $i)->getDataValidation();
-    $validStatus->setType(PHPExcel_Cell_DataValidation::TYPE_LIST);
-    $validStatus->setShowDropDown(true);
-    $validStatus->setAllowBlank(true);
-    $validStatus->setFormula1($statusRange);
-}
-
-
-    // Auto width
-    $lastColumn = PHPExcel_Cell::stringFromColumnIndex(count($fields) - 1);
-    foreach (range('A', $lastColumn) as $col) {
-        $sheet->getColumnDimension($col)->setAutoSize(true);
+        // Status
+        $sheet->getCellByColumnAndRow($statusCol, $row)
+              ->getDataValidation()
+              ->setType(DataValidation::TYPE_LIST)
+              ->setAllowBlank(true)
+              ->setShowDropDown(true)
+              ->setFormula1($statusRange);
     }
 
-    $objPHPExcel->setActiveSheetIndex(0);
+    // autosize columns
+    $lastCol = count($fields);
+    for ($i=1; $i <= $lastCol; $i++) {
+        $sheet->getColumnDimensionByColumn($i)->setAutoSize(true);
+    }
 
+    // output
     header('Content-Type: application/vnd.ms-excel');
     header('Content-Disposition: attachment;filename="template_siswa_full.xls"');
     header('Cache-Control: max-age=0');
 
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-    $objWriter->save('php://output');
+    $writer = new Xls($spreadsheet);
+    $writer->save('php://output');
 }
+
 
 
  // IMPORT EXCEL (versi tolerant header + auto siswa_tahun)
@@ -457,11 +528,31 @@ public function import_excel()
         return;
     }
 
-    // Load file Excel
+    // ============================================================
+    // LOAD FILE EXCEL (SUPPORT PHPSPREADSHEET)
+    // ============================================================
     $path = $_FILES['file']['tmp_name'];
-    $objPHPExcel = PHPExcel_IOFactory::load($path);
-    $sheet = $objPHPExcel->getActiveSheet();
-    $rows = $sheet->toArray(null, true, true, true); // keys A,B,C...
+    $objSpreadsheet = IOFactory::load($path);
+    $sheet = $objSpreadsheet->getActiveSheet();
+
+    // FIX: toArray PhpSpreadsheet → key numeric menjadi A,B,C,D...
+    $rowsRaw = $sheet->toArray(null, true, true, false);
+
+// Convert numeric index → A,B,C...
+$rows = [];
+foreach ($rowsRaw as $rIndex => $cols) {
+    $newRow = [];
+    $colIndex = 1;
+    foreach ($cols as $v) {
+        $colLetter = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex);
+        $newRow[$colLetter] = $v;
+        $colIndex++;
+    }
+    $rows[$rIndex] = $newRow;
+}
+
+    // ============================================================
+
 
     if (count($rows) < 2) {
         $this->session->set_flashdata('error', 'File Excel kosong atau hanya header.');
@@ -469,21 +560,21 @@ public function import_excel()
         return;
     }
 
-    // ======= Daftar field yang kita dukung (sesuaikan bila perlu) =======
+    // ======= Daftar field yang kita dukung =======
     $expected_fields = [
         'nis','nisn','nik','nama','jk','agama','tempat_lahir','tgl_lahir','alamat',
         'jalan','rt','rw','dusun','kecamatan','kode_pos','jenis_tinggal','alat_transportasi',
         'telp','hp','email','skhun','penerima_kps','no_kps',
         'nama_ayah','tahun_lahir_ayah','pendidikan_ayah','pekerjaan_ayah','penghasilan_ayah','nik_ayah',
         'nama_ibu','tahun_lahir_ibu','pendidikan_ibu','pekerjaan_ibu','penghasilan_ibu','nik_ibu',
+        'no_hp_ortu',
         'nama_wali','tahun_lahir_wali','pendidikan_wali','pekerjaan_wali','penghasilan_wali','nik_wali',
         'sekolah_asal','hobi','cita_cita','anak_keberapa','nomor_kk','berat_badan',
         'tinggi_badan','jumlah_saudara_kandung',
-        // relasi / akhir
         'id_kelas','tahun_id','status'
     ];
 
-    // Helper normalize string (header/kelas)
+    // Normalize helper
     $normalize = function($s) {
         $s = strtolower(trim((string)$s));
         $s = str_replace(["\r","\n","\t"], ' ', $s);
@@ -492,14 +583,18 @@ public function import_excel()
         return $s;
     };
 
-    // Build header mapping: Excel column letter -> field name
-    $header = $rows[1]; // first row
-    $colMap = []; // 'A' => 'nis', ...
+    // Build header mapping: kolom Excel → field DB
+    $header = $rows[0];
+    $colMap = [];
+
     foreach ($header as $col => $text) {
-        $norm = $normalize($text);
+        // Normalisasi header agar pasti cocok
+$norm = strtolower(trim((string)$text));
+$norm = str_replace(["\xc2\xa0", " ", "_", ".", "-", "–", "—"], "", $norm); // hapus NBSP & simbol
+$norm = preg_replace('/[^a-z0-9]/', '', $norm); // keep alnum only
+
         if ($norm === '') continue;
 
-        // Direct match against expected field names
         foreach ($expected_fields as $f) {
             if ($norm === $normalize($f)) {
                 $colMap[$col] = $f;
@@ -508,10 +603,13 @@ public function import_excel()
         }
         if (isset($colMap[$col])) continue;
 
-        // Some common synonyms
+        // Sinonim
         $synonyms = [
             'nis' => ['nis','no.nis','no nis','nomor nis'],
-            'nisn' => ['nisn','no.nisn','no nisn','nomor nisn','no nis/nisn','nis / nisn'],
+            'nisn' => [
+    'nisn','no.nisn','nonisn','no nisn','nomor nisn','nis/n','nis n','nis n '
+],
+
             'nik' => ['nik','no.nik','no nik'],
             'nama' => ['nama','nama siswa','nama_lengkap'],
             'jk' => ['jk','jenis kelamin','jenis_kelamin'],
@@ -535,7 +633,7 @@ public function import_excel()
 
         if (isset($colMap[$col])) continue;
 
-        // If still not matched, try matching by containing words (e.g. header "Nama Siswa" -> 'nama')
+        // Containing words
         foreach ($expected_fields as $f) {
             if (strpos($norm, $normalize($f)) !== false) {
                 $colMap[$col] = $f;
@@ -544,13 +642,13 @@ public function import_excel()
         }
     }
 
-    // Inverse mapping: field -> col letter (if present)
+    // Invers mapping
     $fieldToCol = [];
     foreach ($colMap as $col => $f) {
         $fieldToCol[$f] = $col;
     }
 
-    // If id_kelas not found but there is a 'kelas' header mapped to something else, normalize it to id_kelas
+    // alias kelas → id_kelas
     if (!isset($fieldToCol['id_kelas'])) {
         foreach ($colMap as $c => $fname) {
             if (in_array($fname, ['kelas','nama_kelas'])) {
@@ -560,22 +658,22 @@ public function import_excel()
         }
     }
 
-    // Jika tahun_id tidak ada tapi ada 'tahun_ajaran'
+    // alias tahun_id
     if (!isset($fieldToCol['tahun_id']) && isset($fieldToCol['tahun_ajaran'])) {
         $fieldToCol['tahun_id'] = $fieldToCol['tahun_ajaran'];
     }
 
-    // Ambil daftar kelas dan tahun dari DB untuk pencocokan cepat
+    // Ambil data kelas & tahun
     $kelasDB = $this->db->get('kelas')->result();
     $tahunDB = $this->db->get('tahun_ajaran')->result();
 
-    // Pre-normalize kelas DB
+    $normalize = $normalize; // alias
+
     $kelasLookupByNorm = [];
     foreach ($kelasDB as $k) {
         $kelasLookupByNorm[$normalize($k->nama)] = $k->id;
     }
 
-    // Pre-index tahun: by id and by tahun string
     $tahunById = [];
     $tahunByValue = [];
     foreach ($tahunDB as $t) {
@@ -587,11 +685,12 @@ public function import_excel()
     $update = 0;
     $gagal = [];
 
-    // Process rows mulai dari baris 2
+    // ======================================================================
+    // LOOP DATA ROW
+    // ======================================================================
     foreach ($rows as $rowIdx => $row) {
-        if ($rowIdx == 1) continue; // header
+        if ($rowIdx == 0) continue;
 
-        // Build data array
         $data = [];
         foreach ($expected_fields as $field) {
             if ($field === 'id' || $field === 'created_at') continue;
@@ -600,71 +699,51 @@ public function import_excel()
                 $val = isset($row[$col]) ? trim($row[$col]) : '';
                 $data[$field] = $val;
             } else {
-                // field tidak ada di file -> kosongkan
                 $data[$field] = '';
             }
         }
 
-        // Jika pengguna memakai header 'kelas' (alias) map ke id_kelas
-        $kelasRaw = isset($data['id_kelas']) ? $data['id_kelas'] : '';
-        $kelasRaw = trim((string)$kelasRaw);
+        // Map kelas
+        $kelasRaw = trim((string)($data['id_kelas'] ?? ''));
 
         if ($kelasRaw !== '') {
-            // 1) numeric -> coba langsung id
             if (ctype_digit($kelasRaw)) {
                 $kelasRow = $this->db->get_where('kelas', ['id' => $kelasRaw])->row();
                 if ($kelasRow) {
                     $data['id_kelas'] = $kelasRow->id;
                 } else {
-                    $gagal[] = "Baris $rowIdx: Kelas tidak valid ('$kelasRaw'). (angka tapi id tidak ditemukan)";
+                    $gagal[] = "Baris $rowIdx: Kelas tidak valid ('$kelasRaw')";
                     continue;
                 }
             } else {
-                // 2) non-numeric => normalisasi dan cari di lookup
                 $kNorm = $normalize($kelasRaw);
                 if (isset($kelasLookupByNorm[$kNorm])) {
                     $data['id_kelas'] = $kelasLookupByNorm[$kNorm];
                 } else {
-                    // Coba pencocokan lebih longgar: hilangkan semua non-alnum lalu compare
-                    $kNormLoose = preg_replace('/[^a-z0-9]/', '', strtolower($kelasRaw));
-                    $found = false;
-                    foreach ($kelasLookupByNorm as $dbNorm => $dbId) {
-                        $dbNormLoose = preg_replace('/[^a-z0-9]/', '', $dbNorm);
-                        if ($kNormLoose === $dbNormLoose) {
-                            $data['id_kelas'] = $dbId;
-                            $found = true;
-                            break;
-                        }
-                    }
-                    if (!$found) {
-                        $gagal[] = "Baris $rowIdx: Kelas tidak valid ('$kelasRaw').";
-                        continue;
-                    }
+                    $gagal[] = "Baris $rowIdx: Kelas tidak valid ('$kelasRaw')";
+                    continue;
                 }
             }
         } else {
-            // kosong -> biarkan kosong (tidak wajib)
             $data['id_kelas'] = null;
         }
 
-        // Tahun ajaran mapping
-        $tahunRaw = isset($data['tahun_id']) ? trim((string)$data['tahun_id']) : '';
+        // Map tahun ajaran
+        $tahunRaw = trim((string)($data['tahun_id'] ?? ''));
         if ($tahunRaw !== '') {
             if (ctype_digit($tahunRaw)) {
-                // numeric: bisa id
                 if (isset($tahunById[$tahunRaw])) {
                     $data['tahun_id'] = $tahunById[$tahunRaw];
                 } else {
-                    $gagal[] = "Baris $rowIdx: Tahun ajaran id tidak ditemukan ('$tahunRaw').";
+                    $gagal[] = "Baris $rowIdx: Tahun ajaran id tidak ditemukan ('$tahunRaw')";
                     continue;
                 }
             } else {
-                // cari by value
                 $tNorm = $normalize($tahunRaw);
                 if (isset($tahunByValue[$tNorm])) {
                     $data['tahun_id'] = $tahunByValue[$tNorm];
                 } else {
-                    $gagal[] = "Baris $rowIdx: Tahun ajaran tidak valid ('$tahunRaw').";
+                    $gagal[] = "Baris $rowIdx: Tahun ajaran tidak valid ('$tahunRaw')";
                     continue;
                 }
             }
@@ -672,28 +751,26 @@ public function import_excel()
             $data['tahun_id'] = null;
         }
 
-        // Pastikan nisn ada (kamu bisa ubah jika mau pakai nis sebagai kunci)
-        $nisnVal = isset($data['nisn']) ? trim($data['nisn']) : '';
+        // NISN wajib
+        $nisnVal = trim($data['nisn']);
         if ($nisnVal === '') {
             $gagal[] = "Baris $rowIdx: NISN wajib diisi.";
             continue;
         }
 
-        // Normalize JK: jika ada L/P variasi, ambil huruf pertama uppercase
-        if (isset($data['jk']) && $data['jk'] !== '') {
-            $jk = strtoupper(substr(trim($data['jk']), 0, 1));
-            $data['jk'] = ($jk === 'P') ? 'P' : 'L';
+        // JK normalize
+        if (!empty($data['jk'])) {
+            $data['jk'] = strtoupper(substr($data['jk'], 0, 1)) === 'P' ? 'P' : 'L';
         }
 
-        // Siapkan array yang akan di-insert/update (cocokkan nama kolom DB)
+        // Prepare save data
         $save = [];
         foreach ($expected_fields as $f) {
-            if ($f == 'id' || $f == 'created_at') continue;
-            // Jika field ada dalam data -> masukkan; kosongkan string jadi NULL bila perlu
+            if ($f === 'id' || $f == 'created_at') continue;
             $save[$f] = ($data[$f] === '') ? null : $data[$f];
         }
 
-        // Cek ada di DB berdasarkan nisn
+        // Insert / Update siswa
         $exist = $this->db->get_where('siswa', ['nisn' => $nisnVal])->row();
         if ($exist) {
             $this->db->where('nisn', $nisnVal)->update('siswa', $save);
@@ -704,79 +781,52 @@ public function import_excel()
             $siswa_id = $this->db->insert_id();
             $insert++;
         }
-// ================== GENERATE QR OFFLINE OTOMATIS ==================
-if (!$exist || empty($exist->token_qr)) { // hanya jika belum punya token
 
-   require_once APPPATH . 'libraries/phpqrcode/qrlib.php';
+        // QR Generator
+        if (!$exist || empty($exist->token_qr)) {
+            require_once APPPATH . 'libraries/phpqrcode/qrlib.php';
 
+            $qr_folder = FCPATH . 'uploads/qr/';
+            if (!file_exists($qr_folder)) mkdir($qr_folder, 0777, true);
 
-    $qr_folder = FCPATH . 'uploads/qr/';
-    if (!file_exists($qr_folder)) {
-        mkdir($qr_folder, 0777, true);
-    }
+            $token = 'qr_' . $siswa_id;
+            $qr_file = $qr_folder . $token . '.png';
 
-    // $token = uniqid('qr_');
-    // $qr_file = $qr_folder . $token . '.png';
-    // QRcode::png($token, $qr_file, QR_ECLEVEL_M, 6);
+            if (!file_exists($qr_file)) {
+                QRcode::png($token, $qr_file, QR_ECLEVEL_H, 10, 2);
+            }
 
+            $this->db->where('id', $siswa_id)->update('siswa', ['token_qr' => $token]);
+        }
 
-    // // simpan token
-    // $this->db->where('id', $siswa_id)
-    //          ->update('siswa', ['token_qr' => $token]);
-    $token = 'qr_' . $siswa_id;   // QR tetap & tidak berubah
-    $qr_file = $qr_folder . $token . '.png';
-
-    if (!file_exists($qr_file)) {
-    QRcode::png(
-        $token,
-        $qr_file,
-        QR_ECLEVEL_H,   // 🔥 Tingkat akurasi tinggi → scan super cepat
-        10,             // 🔥 Size besar → gampang dibaca kamera
-        2               // 🔥 Margin minimal aman
-    );
-}
-
-    $this->db->where('id', $siswa_id)->update('siswa', ['token_qr' => $token]);
-}
-
-        // =============================================================
-        // TAMBAHKAN / UPDATE siswa_tahun
-        // =============================================================
-
-        // Pastikan kelas dan tahun tidak null
+        // siswa_tahun update
         $kelas_id = $save['id_kelas'];
         $tahun_id = $save['tahun_id'];
         if ($kelas_id && $tahun_id) {
-
-            // Cek apakah data siswa_tahun sudah ada
             $st = $this->db->get_where('siswa_tahun', [
                 'siswa_id' => $siswa_id,
                 'tahun_id' => $tahun_id
             ])->row();
 
             if ($st) {
-                // Update siswa_tahun saja
                 $this->db->where('id', $st->id)->update('siswa_tahun', [
                     'kelas_id' => $kelas_id,
-                    'status'   => 'aktif'
+                    'status' => 'aktif'
                 ]);
             } else {
-                // Insert baru ke siswa_tahun
                 $this->db->insert('siswa_tahun', [
                     'siswa_id' => $siswa_id,
                     'kelas_id' => $kelas_id,
                     'tahun_id' => $tahun_id,
-                    'status'   => 'aktif'
+                    'status' => 'aktif'
                 ]);
             }
         }
+    }
 
-    } // END foreach rows
-
-    // Build message
+    // Finish message
     if (!empty($gagal)) {
-        $msg = "<b>Import selesai dengan catatan:</b><br>";
-        $msg .= "Insert: $insert<br>Update: $update<br><ul>";
+        $msg = "<b>Import selesai dengan catatan:</b><br>Insert: $insert<br>Update: $update<br><ul>";
         foreach ($gagal as $e) $msg .= "<li>$e</li>";
         $msg .= "</ul>";
         $this->session->set_flashdata('error', $msg);
@@ -786,6 +836,7 @@ if (!$exist || empty($exist->token_qr)) { // hanya jika belum punya token
 
     redirect('siswa');
 }
+
 
 public function cetak($id)
 {

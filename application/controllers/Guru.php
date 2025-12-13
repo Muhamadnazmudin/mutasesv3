@@ -1,12 +1,13 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class Guru extends CI_Controller {
 
   public function __construct() {
     parent::__construct();
     $this->load->model('Guru_model');
-    $this->load->library(['form_validation', 'pagination', 'PHPExcel_lib']);
+    $this->load->library(['form_validation', 'pagination', 'Spreadsheet_Lib']);
     $this->load->helper(['url', 'form']);
   }
 
@@ -90,52 +91,80 @@ class Guru extends CI_Controller {
   }
 
   // export Excel
-  public function export_excel() {
-    $data = $this->Guru_model->get_all(10000, 0);
-    $objPHPExcel = new PHPExcel();
-    $objPHPExcel->setActiveSheetIndex(0)
-      ->setCellValue('A1', 'No')
-      ->setCellValue('B1', 'NIP')
-      ->setCellValue('C1', 'Nama')
-      ->setCellValue('D1', 'Email')
-      ->setCellValue('E1', 'Telp');
+  public function export_excel()
+{
+    @ob_end_clean();
+    ob_start();
+    error_reporting(0);
 
-    $no = 1; $row = 2;
+    $data = $this->Guru_model->get_all(10000, 0);
+
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    $sheet->setCellValue('A1', 'No')
+          ->setCellValue('B1', 'NIP')
+          ->setCellValue('C1', 'Nama')
+          ->setCellValue('D1', 'Email')
+          ->setCellValue('E1', 'Telp');
+
+    $no = 1;
+    $row = 2;
     foreach ($data as $g) {
-      $objPHPExcel->getActiveSheet()
-        ->setCellValue("A$row", $no++)
-        ->setCellValue("B$row", $g->nip)
-        ->setCellValue("C$row", $g->nama)
-        ->setCellValue("D$row", $g->email)
-        ->setCellValue("E$row", $g->telp);
-      $row++;
+
+        $sheet->setCellValue("A$row", $no++);
+
+        // << FIX NIP BIAR TIDAK 1.9E+17 >>
+        $sheet->setCellValueExplicit(
+            "B$row",
+            $g->nip,
+            \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING
+        );
+
+        $sheet->setCellValue("C$row", $g->nama);
+        $sheet->setCellValue("D$row", $g->email);
+        $sheet->setCellValue("E$row", $g->telp);
+
+        $row++;
     }
 
     header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment;filename="data_guru.xls"');
+    header('Content-Disposition: attachment; filename="data_guru.xls"');
     header('Cache-Control: max-age=0');
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-    $objWriter->save('php://output');
-  }
+
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xls($spreadsheet);
+    $writer->save('php://output');
+
+    ob_end_flush();
+    exit;
+}
+
+
 
   // import Excel
-  public function import_excel() {
-    if (isset($_FILES['file']['name'])) {
-      $path = $_FILES['file']['tmp_name'];
-      $objPHPExcel = PHPExcel_IOFactory::load($path);
-      $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+  public function import_excel()
+{
+    if (!empty($_FILES['file']['name'])) {
+        $path = $_FILES['file']['tmp_name'];
 
-      foreach ($sheetData as $key => $row) {
-        if ($key == 1) continue; // header
-        $data = [
-          'nip' => $row['B'],
-          'nama' => $row['C'],
-          'email' => $row['D'],
-          'telp' => $row['E']
-        ];
-        $this->Guru_model->insert($data);
-      }
+        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($path);
+        $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
+
+        foreach ($sheetData as $key => $row) {
+            if ($key == 1) continue; // skip header
+
+            $data = [
+                'nip'  => $row['B'],
+                'nama' => $row['C'],
+                'email'=> $row['D'],
+                'telp' => $row['E'],
+            ];
+
+            $this->Guru_model->insert($data);
+        }
     }
+
     redirect('guru');
-  }
+}
+
 }

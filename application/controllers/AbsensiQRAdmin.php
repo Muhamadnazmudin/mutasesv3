@@ -15,9 +15,6 @@ class AbsensiQRAdmin extends CI_Controller {
         // coba load pdf library (jika ada wrapper). Jika tidak, controller akan fallback ke TCPDF di third_party.
         // Jangan hapus; wrapper sering ada di project CI
         @$this->load->library('pdf');
-
-        // PHPExcel wrapper (jika tersedia)
-        @$this->load->library('PHPExcel_Lib');
     }
 
     // 1) Halaman list absensi QR
@@ -208,13 +205,12 @@ class AbsensiQRAdmin extends CI_Controller {
     // 5) Excel export (kalender style)
     public function excel()
 {
-    // bersihkan buffer supaya header file tidak rusak
     if (ob_get_length()) { ob_end_clean(); }
 
     $kelas_param  = $this->input->get('kelas');
     $dari_raw     = $this->input->get('dari');
     $sampai_raw   = $this->input->get('sampai');
-    $status_param = $this->input->get('status'); // optional filter kehadiran
+    $status_param = $this->input->get('status');
 
     if (!$dari_raw || !$sampai_raw) {
         show_error("Filter tanggal wajib diisi.");
@@ -223,16 +219,17 @@ class AbsensiQRAdmin extends CI_Controller {
     $dari   = date('Y-m-d', strtotime($dari_raw));
     $sampai = date('Y-m-d', strtotime($sampai_raw));
 
-    // load PHPExcel wrapper & buat object
-    $this->load->library('PHPExcel_Lib');
-    $excel = new PHPExcel();
+    // ================================
+    // **GANTI PHPExcel → SPREADSHEET**
+    // ================================
+    $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
 
-    // 1) daftar kelas
+    // ambil semua kelas
     if ($kelas_param === "" || $kelas_param === "all" || $kelas_param === null) {
         $kelas_list = $this->db->query("SELECT id, nama FROM kelas ORDER BY nama ASC")->result();
         $single_class = false;
     } else {
-        $kelas_list = $this->db->query("SELECT id, nama FROM kelas WHERE id = ?", array($kelas_param))->result();
+        $kelas_list = $this->db->query("SELECT id, nama FROM kelas WHERE id = ?", [$kelas_param])->result();
         $single_class = true;
     }
 
@@ -240,190 +237,182 @@ class AbsensiQRAdmin extends CI_Controller {
         show_error("Tidak ada data kelas.");
     }
 
-    // 2) buat array tanggal dari dari..sampai
-    $tanggal_all = array();
+    // rangkai tanggal dari..sampai
+    $tanggal_all = [];
     $start = new DateTime($dari);
     $end   = new DateTime($sampai);
+
     for ($d = $start; $d <= $end; $d->modify('+1 day')) {
         $tanggal_all[] = $d->format('Y-m-d');
     }
 
-    // 3) kelompokkan tanggal per bulan (format key: YYYY-mm)
-    $tanggal_per_bulan = array();
+    // kelompok tanggal per bulan
+    $tanggal_per_bulan = [];
     foreach ($tanggal_all as $tgl) {
-        $bulan_key = date('Y-m', strtotime($tgl));
-        if (!isset($tanggal_per_bulan[$bulan_key])) {
-            $tanggal_per_bulan[$bulan_key] = array();
-        }
-        $tanggal_per_bulan[$bulan_key][] = $tgl;
+        $month = date('Y-m', strtotime($tgl));
+        if (!isset($tanggal_per_bulan[$month])) $tanggal_per_bulan[$month] = [];
+        $tanggal_per_bulan[$month][] = $tgl;
     }
 
-    // 4) ambil hari libur (kolom start)
+    // libur
     $q_libur = $this->db->query("SELECT start FROM hari_libur")->result();
-    $hariMerah = array();
-    foreach ($q_libur as $r) {
-        $hariMerah[] = $r->start;
-    }
+    $hariMerah = array_map(fn($r) => $r->start, $q_libur);
 
-    // 5) Ambil semua absensi_qr dalam rentang global (agar tidak query ulang di tiap sheet)
-    // optional: filter by status kehadiran jika diberikan (H/S/I/A)
-    $params = array($dari, $sampai);
+    // ambil semua absensi dulu (satu query besar)
+    $params = [$dari, $sampai];
     $sqlStatus = "";
+
     if ($status_param !== null && $status_param !== "") {
-        // user might pass full words like "Terlambat" or codes H/I/S/A;
-        // here we assume the status filter maps to q.kehadiran code directly (H/I/S/A)
         $sqlStatus = " AND kehadiran = ?";
         $params[] = $status_param;
     }
-    $q_all = $this->db->query("SELECT nis, tanggal, kehadiran FROM absensi_qr WHERE tanggal BETWEEN ? AND ? {$sqlStatus}", $params)->result();
 
-    // index absensi [nis][tanggal] => kode (H/I/S/A)
-    $arrAbsenGlobal = array();
-    foreach ($q_all as $aa) {
-        $arrAbsenGlobal[$aa->nis][$aa->tanggal] = strtoupper($aa->kehadiran);
+    $q_all = $this->db->query("
+        SELECT nis, tanggal, kehadiran 
+        FROM absensi_qr 
+        WHERE tanggal BETWEEN ? AND ? {$sqlStatus}
+    ", $params)->result();
+
+    $arrAbsenGlobal = [];
+    foreach ($q_all as $r) {
+        $arrAbsenGlobal[$r->nis][$r->tanggal] = strtoupper($r->kehadiran);
     }
 
     $sheetIndex = 0;
 
-    // 6) loop per kelas
+    // ==============================================================
+    //                LOOP PER KELAS DAN PER BULAN
+    // ==============================================================
     foreach ($kelas_list as $k) {
 
-        // ambil siswa untuk kelas ini (gunakan nis untuk mapping)
-        $siswa = $this->db->query("SELECT id, nis, nama FROM siswa WHERE id_kelas = ? AND status='aktif' ORDER BY nama ASC", array($k->id))->result();
+        $siswa = $this->db->query("
+            SELECT id, nis, nama
+            FROM siswa
+            WHERE id_kelas = ? AND status='aktif'
+            ORDER BY nama ASC
+        ", [$k->id])->result();
 
-        // jika tidak ada siswa, skip kelas
-        if (empty($siswa)) {
-            continue;
-        }
+        if (empty($siswa)) continue;
 
-        // untuk setiap bulan di rentang
         foreach ($tanggal_per_bulan as $bulan_key => $tgl_bulan) {
 
-            // create or select sheet
-            if ($sheetIndex > 0) {
-                $excel->createSheet();
-            }
-            $sheet = $excel->setActiveSheetIndex($sheetIndex);
-
-            // penamaan sheet:
-            if ($single_class) {
-                // nama sheet = "Jan 2025"
-                $sheetTitle = date('F Y', strtotime($bulan_key . '-01'));
+            if ($sheetIndex == 0) {
+                $sheet = $spreadsheet->getActiveSheet();
             } else {
-                // "KELAS - Mon YYYY"
-                $sheetTitle = $k->nama . ' - ' . date('M Y', strtotime($bulan_key . '-01'));
+                $sheet = $spreadsheet->createSheet();
             }
 
-            // pastikan tidak lebih dari 31 karakter untuk sheet title
-            $sheet->setTitle(substr($sheetTitle, 0, 31));
+            $sheet->setTitle(
+                substr($single_class ?
+                    date('F Y', strtotime($bulan_key . '-01')) :
+                    $k->nama . " - " . date('M Y', strtotime($bulan_key . '-01')),
+                0, 31)
+            );
 
-            // Header utama
+            // HEADER
             $sheet->setCellValue('A1', 'REKAP ABSENSI SISWA');
             $sheet->setCellValue('A2', 'KELAS: ' . $k->nama);
             $sheet->setCellValue('A3', 'PERIODE: ' . date('d-m-Y', strtotime($dari)) . ' s/d ' . date('d-m-Y', strtotime($sampai)));
             $sheet->setCellValue('A4', 'BULAN: ' . date('F Y', strtotime($bulan_key . '-01')));
 
-            // Header kolom (baris 6)
+            // TABEL HEADER
             $sheet->setCellValue('A6', 'No');
-            $sheet->setCellValue('B6', 'Nama Siswa');
+            $sheet->setCellValue('B6', 'Nama');
 
-            // tulis tanggal khusus untuk bulan ini
-            $col = 'C';
+            $colIndex = 3;
             foreach ($tgl_bulan as $tgl) {
-                $sheet->setCellValue($col . '6', date('d', strtotime($tgl)));
-                // set column width kecil
-                $sheet->getColumnDimension($col)->setWidth(4.5);
-                $col++;
+                $sheet->setCellValueByColumnAndRow($colIndex, 6, date('d', strtotime($tgl)));
+                $sheet->getColumnDimension(
+                    \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($colIndex)
+                )->setWidth(4.5);
+                $colIndex++;
             }
 
-            // setelah tanggal, tulis header jumlah
-            $sheet->setCellValue($col . '6', 'H'); $col++;
-            $sheet->setCellValue($col . '6', 'S'); $col++;
-            $sheet->setCellValue($col . '6', 'I'); $col++;
-            $sheet->setCellValue($col . '6', 'A'); $col++;
-            $sheet->setCellValue($col . '6', 'L');
+            // Kolom total
+            $totH = $colIndex++;
+            $totS = $colIndex++;
+            $totI = $colIndex++;
+            $totA = $colIndex++;
+            $totL = $colIndex;
 
-            // tulis data siswa mulai baris 7
+            $sheet->setCellValueByColumnAndRow($totH, 6, 'H');
+            $sheet->setCellValueByColumnAndRow($totS, 6, 'S');
+            $sheet->setCellValueByColumnAndRow($totI, 6, 'I');
+            $sheet->setCellValueByColumnAndRow($totA, 6, 'A');
+            $sheet->setCellValueByColumnAndRow($totL, 6, 'L');
+
+            // ROW DATA
             $row = 7;
-            $no = 1;
+            $no  = 1;
+
             foreach ($siswa as $s) {
 
-                $sheet->setCellValue('A' . $row, $no);
-                $sheet->setCellValue('B' . $row, $s->nama);
+                $sheet->setCellValue("A{$row}", $no++);
+                $sheet->setCellValue("B{$row}", $s->nama);
 
-                // reset hitungan
-                $jumlahH = $jumlahS = $jumlahI = $jumlahA = $jumlahL = 0;
+                $col = 3;
+                $countH = $countS = $countI = $countA = $countL = 0;
 
-                $col = 'C';
                 foreach ($tgl_bulan as $tgl) {
 
-                    $hariNum = date('N', strtotime($tgl));
-                    $isWeekend = ($hariNum == 6 || $hariNum == 7);
-                    $isMerah   = in_array($tgl, $hariMerah);
-
-                    // default: '-' (sama seperti PDF)
                     $val = '-';
 
-                    // weekend / tanggal merah -> L (tapi still '-' if we prefer? user's PDF used L for libur, so we keep L)
-                    if ($isWeekend || $isMerah) {
+                    if (in_array($tgl, $hariMerah) || in_array(date('N', strtotime($tgl)), [6,7])) {
                         $val = 'L';
                     }
 
-                    // override jika ada data QR untuk nis ini & tanggal ini
                     if (isset($arrAbsenGlobal[$s->nis][$tgl])) {
-                        $val = strtoupper($arrAbsenGlobal[$s->nis][$tgl]);
+                        $val = $arrAbsenGlobal[$s->nis][$tgl];
                     }
 
-                    // count only real statuses
-                    if ($val == 'H') $jumlahH++;
-                    if ($val == 'S') $jumlahS++;
-                    if ($val == 'I') $jumlahI++;
-                    if ($val == 'A') $jumlahA++;
-                    if ($val == 'L') $jumlahL++;
+                    // hitung total
+                    if ($val === 'H') $countH++;
+                    if ($val === 'S') $countS++;
+                    if ($val === 'I') $countI++;
+                    if ($val === 'A') $countA++;
+                    if ($val === 'L') $countL++;
 
-                    $sheet->setCellValue($col . $row, $val);
+                    $cell = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex($col) . $row;
+                    $sheet->setCellValue($cell, $val);
 
-                    // jika L beri warna ringan merah
-                    if ($val == 'L') {
-                        $sheet->getStyle($col . $row)->getFill()->applyFromArray(array(
-                            'type' => PHPExcel_Style_Fill::FILL_SOLID,
-                            'startcolor' => array('rgb' => 'FF9999')
-                        ));
+                    // warna merah untuk L
+                    if ($val === 'L') {
+                        $sheet->getStyle($cell)->getFill()->setFillType(
+                            \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID
+                        )->getStartColor()->setARGB('FFFF9999');
                     }
 
                     $col++;
                 }
 
-                // tulis totals di kolom setelah tanggal
-                $sheet->setCellValue($col . $row, $jumlahH); $col++;
-                $sheet->setCellValue($col . $row, $jumlahS); $col++;
-                $sheet->setCellValue($col . $row, $jumlahI); $col++;
-                $sheet->setCellValue($col . $row, $jumlahA); $col++;
-                $sheet->setCellValue($col . $row, $jumlahL);
+                // TOTAL
+                $sheet->setCellValueByColumnAndRow($totH, $row, $countH);
+                $sheet->setCellValueByColumnAndRow($totS, $row, $countS);
+                $sheet->setCellValueByColumnAndRow($totI, $row, $countI);
+                $sheet->setCellValueByColumnAndRow($totA, $row, $countA);
+                $sheet->setCellValueByColumnAndRow($totL, $row, $countL);
 
                 $row++;
-                $no++;
             }
 
             $sheetIndex++;
-        } // end foreach bulan
+        }
+    }
 
-    } // end foreach kelas
+    // OUTPUT
+    $spreadsheet->setActiveSheetIndex(0);
 
-    // aktifkan sheet pertama
-    $excel->setActiveSheetIndex(0);
-
-    // output ke browser
     $filename = 'Rekap_Absensi_QR_' . date('Ymd_His') . '.xlsx';
 
-    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    header('Content-Disposition: attachment;filename="' . $filename . '"');
-    header('Cache-Control: max-age=0');
+    header("Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    header("Content-Disposition: attachment;filename=\"$filename\"");
+    header("Cache-Control: max-age=0");
 
-    $writer = PHPExcel_IOFactory::createWriter($excel, 'Excel2007');
+    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
     $writer->save('php://output');
     exit;
 }
+
 
     // internal helper kalau perlu (tidak wajib)
     private function _array_months_from_range($start, $end)

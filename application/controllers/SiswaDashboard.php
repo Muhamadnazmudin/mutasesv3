@@ -268,6 +268,8 @@ public function update_biodata()
         'pendidikan_wali' => $this->input->post('pendidikan_wali'),
         'pekerjaan_wali' => $this->input->post('pekerjaan_wali'),
         'penghasilan_wali' => $this->input->post('penghasilan_wali'),
+
+        'no_hp_ortu' => $this->input->post('no_hp_ortu'),
     ];
 
     $this->db->where('id', $siswa->id)->update('siswa', $data);

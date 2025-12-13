@@ -1,5 +1,8 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 class Laporan extends CI_Controller {
 
@@ -7,7 +10,7 @@ class Laporan extends CI_Controller {
     parent::__construct();
     $this->load->model('Laporan_model');
     $this->load->library('pdf'); // library TCPDF
-    $this->load->library('PHPExcel_lib'); // untuk export Excel
+    $this->load->library('Spreadsheet_Lib'); // untuk export Excel
   }
 
   public function index() {
@@ -109,17 +112,20 @@ class Laporan extends CI_Controller {
   // 🔹 EXPORT EXCEL
   // ==========================================================
   public function export_excel()
-  {
-      $tahun = $this->input->get('tahun');
-      if (empty($tahun)) $tahun = date('Y');
+{
+    $tahun = $this->input->get('tahun');
+    if (empty($tahun)) $tahun = date('Y');
 
-      $kelas  = $this->input->get('kelas');
-      $jenis  = $this->input->get('jenis');
-      $search = $this->input->get('search');
+    $kelas  = $this->input->get('kelas');
+    $jenis  = $this->input->get('jenis');
+    $search = $this->input->get('search');
 
-      $data = $this->Laporan_model->get_laporan($tahun, $kelas, $jenis, $search);
+    $data = $this->Laporan_model->get_laporan($tahun, $kelas, $jenis, $search);
 
-      $this->load->library('PHPExcel_lib');
-      $this->phpexcel_lib->export_laporan_mutasi($data, $tahun);
-  }
+    $this->load->library('Spreadsheet_Lib');
+
+    // FIX: nama objek benar adalah spreadsheet_lib
+    $this->spreadsheet_lib->export_laporan_mutasi($data, $tahun);
+}
+
 }

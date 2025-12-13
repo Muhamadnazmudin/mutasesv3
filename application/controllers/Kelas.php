@@ -1,12 +1,17 @@
 <?php
 defined('BASEPATH') OR exit('No direct script access allowed');
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+
 
 class Kelas extends CI_Controller {
 
   public function __construct() {
     parent::__construct();
     $this->load->model('Kelas_model');
-    $this->load->library(['form_validation', 'pagination', 'PHPExcel_lib']);
+    $this->load->library(['form_validation', 'pagination', 'Spreadsheet_Lib']);
     $this->load->helper(['url', 'form']);
   }
 
@@ -217,84 +222,127 @@ class Kelas extends CI_Controller {
   }
 
   // EXPORT
-  public function export_excel() {
-    $data = $this->Kelas_model->get_all(10000, 0);
-    $objPHPExcel = new PHPExcel();
-    $objPHPExcel->setActiveSheetIndex(0)
-      ->setCellValue('A1', 'No')
-      ->setCellValue('B1', 'Nama Kelas')
-      ->setCellValue('C1', 'Wali Kelas')
-      ->setCellValue('D1', 'Kapasitas');
+  public function export_excel()
+{
+    @ob_end_clean();
+    ob_start();
+    error_reporting(0);
 
-    $no = 1; $row = 2;
+    $data = $this->Kelas_model->get_all(10000, 0);
+
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    // Header
+    $sheet->setCellValue('A1', 'No')
+          ->setCellValue('B1', 'Nama Kelas')
+          ->setCellValue('C1', 'Wali Kelas')
+          ->setCellValue('D1', 'Kapasitas');
+
+    // Style header
+    $sheet->getStyle('A1:D1')->applyFromArray([
+        'font' => ['bold' => true],
+        'borders' => ['allBorders' => ['style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN]],
+        'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER]
+    ]);
+
+    $no = 1;
+    $row = 2;
+
     foreach ($data as $k) {
-      $objPHPExcel->getActiveSheet()
-        ->setCellValue("A$row", $no++)
-        ->setCellValue("B$row", $k->nama)
-        ->setCellValue("C$row", $k->wali_nama)
-        ->setCellValue("D$row", $k->kapasitas);
-      $row++;
+        $sheet->setCellValue("A$row", $no++);
+        $sheet->setCellValue("B$row", $k->nama);
+        $sheet->setCellValue("C$row", $k->wali_nama);
+
+        // kapasitas supaya tidak dianggap angka scientific
+        $sheet->setCellValueExplicit(
+            "D$row",
+            (string)$k->kapasitas,
+            DataType::TYPE_STRING
+        );
+
+        $row++;
     }
 
+    // Auto width
+    foreach (range('A', 'D') as $col) {
+        $sheet->getColumnDimension($col)->setAutoSize(true);
+    }
+
+    // Output
     header('Content-Type: application/vnd.ms-excel');
-    header('Content-Disposition: attachment;filename="data_kelas.xls"');
+    header('Content-Disposition: attachment; filename="data_kelas.xls"');
     header('Cache-Control: max-age=0');
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
-    $objWriter->save('php://output');
-  }
+
+    $writer = new Xls($spreadsheet);
+    $writer->save('php://output');
+
+    ob_end_flush();
+    exit;
+}
+
 
   // IMPORT
-  public function import_excel() {
-    if (isset($_FILES['file']['name'])) {
-      $path = $_FILES['file']['tmp_name'];
-      $objPHPExcel = PHPExcel_IOFactory::load($path);
-      $sheetData = $objPHPExcel->getActiveSheet()->toArray(null, true, true, true);
+  public function import_excel()
+{
+    if (!empty($_FILES['file']['name'])) {
 
-      foreach ($sheetData as $key => $row) {
-        if ($key == 1) continue;
-        // kolom asumsi: B=nama kelas, C=nama guru, D=kapasitas
-        $guru = $this->db->get_where('guru', ['nama' => trim($row['C'])])->row();
-        $wali_id = $guru ? $guru->id : NULL;
+        $path = $_FILES['file']['tmp_name'];
+        $spreadsheet = IOFactory::load($path);
+        $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
 
-        // cek jika guru sudah menjadi wali di kelas lain, skip dan tetap insert kelas tanpa wali
-        if ($wali_id) {
-            $cek = $this->db->get_where('kelas', ['wali_kelas_id' => $wali_id])->row();
-            if ($cek) {
-                // sudah terpakai => set NULL supaya tidak duplikasi wali
-                $wali_id = NULL;
+        foreach ($sheetData as $key => $row) {
+            if ($key == 1) continue; // skip header
+
+            // B = nama kelas
+            // C = wali kelas (nama guru)
+            // D = kapasitas
+
+            $guru = $this->db->get_where('guru', ['nama' => trim($row['C'])])->row();
+            $wali_id = $guru ? $guru->id : NULL;
+
+            // Cek guru sudah dipakai wali kelas lain
+            if ($wali_id) {
+                $cek = $this->db->get_where('kelas', ['wali_kelas_id' => $wali_id])->row();
+                if ($cek) {
+                    $wali_id = NULL; // kosongkan
+                }
             }
-        }
 
-        $data = [
-          'nama' => $row['B'],
-          'wali_kelas_id' => $wali_id,
-          'kapasitas' => $row['D']
-        ];
-        $this->Kelas_model->insert($data);
+            $data_insert = [
+                'nama'          => $row['B'],
+                'wali_kelas_id' => $wali_id,
+                'kapasitas'     => $row['D']
+            ];
 
-        // jika wali_id valid dan belum punya akun -> buat akun
-        if ($wali_id) {
-            $guru = $this->db->get_where('guru', ['id' => $wali_id])->row();
-            if ($guru && !empty($guru->email)) {
-                $cekUser = $this->db->get_where('users', ['guru_id' => $wali_id])->row();
-                $cekByEmail = $this->db->get_where('users', ['email' => $guru->email])->row();
-                if (!$cekUser && !$cekByEmail) {
-                    $password_default = password_hash('guruwali123', PASSWORD_BCRYPT);
-                    $this->db->insert('users', [
-                        'username'   => $guru->email,
-                        'password'   => $password_default,
-                        'nama'       => $guru->nama,
-                        'email'      => $guru->email,
-                        'role_id'    => 3,
-                        'guru_id'    => $wali_id,
-                        'created_at' => date('Y-m-d H:i:s')
-                    ]);
+            $this->Kelas_model->insert($data_insert);
+
+            // Auto-create user jika wali valid & belum punya akun
+            if ($wali_id) {
+                $guru = $this->db->get_where('guru', ['id' => $wali_id])->row();
+                if ($guru && !empty($guru->email)) {
+                    $cekUser = $this->db->get_where('users', ['guru_id' => $wali_id])->row();
+                    $cekByEmail = $this->db->get_where('users', ['email' => $guru->email])->row();
+
+                    if (!$cekUser && !$cekByEmail) {
+                        $password_default = password_hash('guruwali123', PASSWORD_BCRYPT);
+                        $this->db->insert('users', [
+                            'username'   => $guru->email,
+                            'password'   => $password_default,
+                            'nama'       => $guru->nama,
+                            'email'      => $guru->email,
+                            'role_id'    => 3,
+                            'guru_id'    => $wali_id,
+                            'created_at' => date('Y-m-d H:i:s')
+                        ]);
+                    }
                 }
             }
         }
-      }
     }
+
     $this->session->set_flashdata('success', 'Import selesai.');
     redirect('kelas');
-  }
+}
+
 }

@@ -169,53 +169,89 @@ body:not(.dark-mode) header .btn-toggle i.fa-moon {
 
 <!-- 🔹 HEADER -->
 <header>
-  <div class="container d-flex justify-content-between align-items-center flex-wrap">
-    <div class="brand">
+<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg,#007bff,#00bcd4);">
+  <div class="container-fluid">
+
+    <!-- Brand -->
+    <a class="navbar-brand fw-bold" href="#">
       <i class="fas fa-chart-line"></i> Dashboard Mutasi Siswa
+    </a>
+
+    <!-- Toggle button -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Menu -->
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+        <li class="nav-item">
+          <a class="nav-link" href="<?= base_url('index.php/dashboard/mutasi') ?>">
+            <i class="fas fa-users"></i> Siswa Mutasi
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="<?= base_url('index.php/izin/scan') ?>">
+            <i class="fas fa-qrcode"></i> Izin Keluar
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="<?= base_url('index.php/AbsensiQR/scan') ?>">
+            <i class="fas fa-qrcode"></i> Absensi QR
+          </a>
+        </li>
+
+        <li class="nav-item">
+          <a class="nav-link" href="<?= base_url('index.php/DashboardMBG?tanggal='.date('Y-m-d')) ?>">
+            <i class="fas fa-chart-bar"></i> Dashboard MBG
+          </a>
+        </li>
+      <li class="nav-item">
+          <a class="nav-link" href="<?= base_url('index.php/scrapijazah') ?>">
+            <i class="fas fa-graduation-cap"></i> Scrap Ijazah PDF
+          </a>
+        </li>
+
+      <!-- Right side -->
+      <div class="d-flex align-items-center gap-2">
+
+        <!-- Dark Mode Toggle -->
+        <button class="btn-toggle" id="toggleDark" title="Ganti Tema">
+          <i class="fas fa-moon"></i>
+        </button>
+
+        <!-- Login dropdown -->
+        <div class="dropdown">
+          <button class="btn-login dropdown-toggle" type="button" data-bs-toggle="dropdown">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </button>
+
+          <ul class="dropdown-menu dropdown-menu-end shadow">
+            <li><a class="dropdown-item" href="<?= base_url('index.php/auth/login') ?>">
+              <i class="fas fa-user-shield text-primary"></i> Login Admin
+            </a></li>
+
+            <li><a class="dropdown-item" href="<?= base_url('index.php/SiswaAuth') ?>">
+              <i class="fas fa-user-graduate text-success"></i> Login Siswa
+            </a></li>
+
+            <li><a class="dropdown-item" href="<?= base_url('index.php/auth/login') ?>">
+              <i class="fas fa-chalkboard-teacher text-warning"></i> Login Wali Kelas
+            </a></li>
+          </ul>
+
+        </div>
+
+      </div>
+
     </div>
-    <div class="actions">
-  <a href="<?= base_url('index.php/dashboard/mutasi') ?>" class="btn btn-light btn-sm me-2">
-    <i class="fas fa-users"></i> Siswa Mutasi
-  </a>
-  <a href="<?= base_url('index.php/izin/scan') ?>" class="btn btn-outline-warning btn-sm me-2">
-  <i class="fas fa-qrcode"></i> Izin Keluar
-</a>
-<a href="<?= base_url('index.php/AbsensiQR/scan') ?>" class="btn btn-outline-success btn-sm me-2">
-        <i class="fas fa-qrcode"></i> Absensi QR
-      </a>
-
-  <button class="btn-toggle" id="toggleDark" title="Ganti Tema">
-  <i class="fas fa-moon"></i>
-</button>
-
-  <!-- DROPDOWN LOGIN -->
-<div class="dropdown">
-  <button class="btn-login dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-    <i class="fas fa-sign-in-alt"></i> Login
-  </button>
-
-  <ul class="dropdown-menu dropdown-menu-end shadow">
-    <li>
-      <a class="dropdown-item" href="<?= base_url('index.php/auth/login') ?>">
-        <i class="fas fa-user-shield text-primary"></i> Login Admin
-      </a>
-    </li>
-    <li>
-      <a class="dropdown-item" href="<?= base_url('index.php/SiswaAuth') ?>">
-        <i class="fas fa-user-graduate text-success"></i> Login Siswa
-      </a>
-      <li>
-  <a class="dropdown-item" href="<?= base_url('index.php/auth/login') ?>">
-    <i class="fas fa-chalkboard-teacher text-warning"></i> Login Wali Kelas
-  </a>
-</li>
-
-    </li>
-  </ul>
-</div>
-
-</div>
+  </div>
+</nav>
 </header>
+
 
 <!-- 🔹 MAIN CONTENT -->
 <main class="container my-5">
