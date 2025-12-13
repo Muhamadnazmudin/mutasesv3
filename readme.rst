@@ -1,72 +1,78 @@
 ###################
-What is CodeIgniter
+What is Mutases
 ###################
 
-CodeIgniter is an Application Development Framework - a toolkit - for people
-who build web sites using PHP. Its goal is to enable you to develop projects
-much faster than you could if you were writing code from scratch, by providing
-a rich set of libraries for commonly needed tasks, as well as a simple
-interface and logical structure to access these libraries. CodeIgniter lets
-you creatively focus on your project by minimizing the amount of code needed
-for a given task.
+Mutases adalah aplikasi berbasis **CodeIgniter 3** yang digunakan untuk pengelolaan data mutasi dan administrasi sekolah. Project ini merupakan **versi pengembangan (v2)** dengan peningkatan kompatibilitas PHP dan perbaikan struktur kode.
 
-*******************
+---
+
 Release Information
-*******************
 
-This repo contains in-development code for future releases. To download the
-latest stable release please visit the `CodeIgniter Downloads
-<https://codeigniter.com/download>`_ page.
+---
 
-**************************
+Repository ini berisi source code **Mutases v2** yang telah disesuaikan dan diuji menggunakan PHP versi terbaru yang stabil untuk CodeIgniter 3.
+
+---
+
 Changelog and New Features
-**************************
 
-You can find a list of all changes for each release in the `user
-guide change log <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide_src/source/changelog.rst>`_.
+---
 
-*******************
+* Upgrade kompatibilitas PHP dari 5.6 ke **PHP 7.4**
+* Perbaikan struktur kode agar lebih stabil
+* Penyesuaian library agar aman dijalankan di PHP 7.4
+
+---
+
 Server Requirements
-*******************
 
-PHP version 5.6 or newer is recommended.
+---
 
-It should work on 5.3.7 as well, but we strongly advise you NOT to run
-such old versions of PHP, because of potential security and performance
-issues, as well as missing features.
+**PHP 7.4 (Recommended & Used)**
 
-************
+* PHP >= 7.4
+* CodeIgniter 3
+* MySQL / MariaDB
+* Apache / Nginx
+* Composer
+
+> Catatan:
+> CodeIgniter 3 secara resmi masih mendukung PHP 5.6 sebagai **minimum requirement**,
+> namun project **Mutases v2** ini **dioptimalkan dan dijalankan menggunakan PHP 7.4**
+> demi keamanan, performa, dan kompatibilitas yang lebih baik.
+
+---
+
 Installation
-************
 
-Please see the `installation section <https://codeigniter.com/userguide3/installation/index.html>`_
-of the CodeIgniter User Guide.
+---
 
-*******
+1. Clone repository ini
+2. Jalankan perintah berikut di terminal:
+
+```bash
+composer install --no-scripts
+```
+
+3. Atur konfigurasi database pada file `application/config/database.php`
+4. Jalankan aplikasi melalui web server
+
+---
+
 License
-*******
 
-Please see the `license
-agreement <https://github.com/bcit-ci/CodeIgniter/blob/develop/user_guide_src/source/license.rst>`_.
+---
 
-*********
-Resources
-*********
+Project ini dikembangkan untuk kebutuhan internal dan edukasi.
 
--  `User Guide <https://codeigniter.com/docs>`_
--  `Contributing Guide <https://github.com/bcit-ci/CodeIgniter/blob/develop/contributing.md>`_
--  `Language File Translations <https://github.com/bcit-ci/codeigniter3-translations>`_
--  `Community Forums <http://forum.codeigniter.com/>`_
--  `Community Wiki <https://github.com/bcit-ci/CodeIgniter/wiki>`_
--  `Community Slack Channel <https://codeigniterchat.slack.com>`_
+---
 
-Report security issues to our `Security Panel <mailto:security@codeigniter.com>`_
-or via our `page on HackerOne <https://hackerone.com/codeigniter>`_, thank you.
-
-***************
 Acknowledgement
-***************
 
-The CodeIgniter team would like to thank EllisLab, all the
-contributors to the CodeIgniter project and you, the CodeIgniter user.
-jalankan composer install --no-scripts pada terminal
+---
+
+Terima kasih kepada:
+
+* Tim CodeIgniter
+* Seluruh kontributor dan pengembang
+* Pengguna aplikasi Mutases
