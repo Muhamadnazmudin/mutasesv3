@@ -15,6 +15,7 @@ class Siswa extends CI_Controller {
     $this->load->library(['form_validation', 'pagination', 'Spreadsheet_Lib']);
     $this->load->helper(['url', 'form']);
     $this->load->library('idcard_lib');
+     $this->load->helper('tanggal');
     if (!$this->session->userdata('logged_in')) {
             redirect('auth/login');
             exit;
@@ -957,6 +958,69 @@ public function cetak_semua()
 
     // Download ZIP
     $this->zip->download($zipName);
+}
+public function surat_pernyataan($id)
+{
+    // Ambil data siswa
+    $data['siswa'] = $this->db
+        ->select('siswa.*, kelas.nama AS nama_kelas, tahun_ajaran.tahun AS tahun_ajaran')
+        ->join('kelas', 'kelas.id = siswa.id_kelas', 'left')
+        ->join('tahun_ajaran', 'tahun_ajaran.id = siswa.tahun_id', 'left')
+        ->where('siswa.id', $id)
+        ->get('siswa')
+        ->row();
+
+    if (!$data['siswa']) {
+        show_error('Data siswa tidak ditemukan');
+    }
+
+    // Load helper tanggal
+    $this->load->helper('tanggal');
+
+    // Render HTML surat pernyataan
+    $html = $this->load->view('siswa/cetak_surat_pernyataan', $data, TRUE);
+
+    // Load TCPDF
+    $this->load->library('pdf');
+
+    /**
+     * ===========================
+     * SETUP PDF (AMBIL REFERENSI DARI cetak())
+     * ===========================
+     */
+
+    // PILIH SALAH SATU:
+    // LETTER (8.5 x 11)
+    $pdf = new Tcpdf('P', 'mm', array(215.9, 279.4), true, 'UTF-8', false);
+
+
+    // F4 (kalau mau)
+    // $pdf = new Tcpdf('P', 'mm', array(210, 330), true, 'UTF-8', false);
+
+    // Info PDF
+    $pdf->SetCreator('Sistem Mutasi');
+    $pdf->SetAuthor('Sekolah');
+    $pdf->SetTitle('Surat Pernyataan Orang Tua');
+    $pdf->setPrintHeader(false);
+$pdf->setPrintFooter(false);
+
+    // Margin (PENTING biar tidak melebar)
+    $pdf->SetMargins(28, 10, 25);
+    $pdf->SetHeaderMargin(0);
+    $pdf->SetFooterMargin(0);
+
+    // Auto page break
+    $pdf->SetAutoPageBreak(false, 0);
+
+    // Tambah halaman
+    $pdf->AddPage();
+
+    // Tulis HTML
+    $pdf->writeHTML($html, true, false, true, false, '');
+
+    // Output
+    $fileName = 'cetak_surat_Pernyataan_' . str_replace(' ', '_', $data['siswa']->nama) . '.pdf';
+    $pdf->Output($fileName, 'I');
 }
 
 }
