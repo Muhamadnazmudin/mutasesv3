@@ -11,7 +11,8 @@ class Kelas_model extends CI_Model {
     public function get_all($limit = null, $offset = null) {
         $this->db->select('kelas.*, guru.nama AS wali_nama');
         $this->db->join('guru', 'guru.id = kelas.wali_kelas_id', 'left');
-        $this->db->order_by('kelas.id', 'DESC');
+        $this->db->order_by('kelas.nama', 'ASC');
+
 
         if ($limit !== null) {
             return $this->db->get($this->table, $limit, $offset)->result();

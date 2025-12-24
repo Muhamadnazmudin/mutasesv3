@@ -1,4 +1,5 @@
-<div class="container mt-4">
+<div class="container-fluid mt-4">
+
 
 <h3 class="mb-3">Data Izin Siswa</h3>
 <?php if ($this->session->flashdata('success')): ?>

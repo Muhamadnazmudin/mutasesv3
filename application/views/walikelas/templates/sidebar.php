@@ -119,6 +119,14 @@ html, body {
       <span>Data Siswa</span>
     </a>
   </li>
+<!-- Hasil Verval PD -->
+<li class="nav-item <?= ($active=='wk_vervalpd')?'active':'' ?>">
+  <a class="nav-link" href="<?= site_url('hasilverval') ?>">
+    <i class="fas fa-check-circle"></i>
+    <span>Hasil Verval PD</span>
+  </a>
+</li>
+
 
   <!-- Rekap Absensi -->
   <li class="nav-item <?= ($active=='wk_absensi')?'active':'' ?>">
