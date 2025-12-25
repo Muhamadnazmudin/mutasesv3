@@ -113,6 +113,7 @@ $group_verval = in_array($active, ['verval_siswa','laporan_verval']);
     </a>
     <div id="mIzinAdmin" class="collapse <?= $group_izin ? 'show' : '' ?>">
         <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="<?= site_url('izin/scan') ?>">Scan Izin</a>
             <a class="collapse-item" href="<?= site_url('izin') ?>">Izin Keluar Siswa</a>
             <a class="collapse-item" href="<?= site_url('izin/laporan') ?>">Laporan Izin</a>
         </div>
