@@ -524,14 +524,7 @@ public function batalkan($id)
     }
 
     // ============================
-    // 1. Set mutasi jadi dibatalkan
-    // ============================
-    $this->db->where('id', $id)->update('mutasi', [
-        'status_mutasi' => 'dibatalkan'
-    ]);
-
-    // ============================
-    // 2. Kembalikan status siswa
+    // 1. Kembalikan status siswa
     // ============================
     $updateData = ['status' => 'aktif'];
 
@@ -539,10 +532,11 @@ public function batalkan($id)
         $updateData['id_kelas'] = $mutasi->kelas_asal_id;
     }
 
-    $this->db->where('id', $mutasi->siswa_id)->update('siswa', $updateData);
+    $this->db->where('id', $mutasi->siswa_id)
+             ->update('siswa', $updateData);
 
     // ============================
-    // 3. FIX UTAMA: perbaiki siswa_tahun
+    // 2. Perbaiki siswa_tahun
     // ============================
     $st = $this->db->get_where('siswa_tahun', [
         'siswa_id' => $mutasi->siswa_id,
@@ -550,13 +544,11 @@ public function batalkan($id)
     ])->row();
 
     if ($st) {
-        // Update → kembali aktif
         $this->db->where('id', $st->id)->update('siswa_tahun', [
             'status'   => 'aktif',
             'kelas_id' => $mutasi->kelas_asal_id
         ]);
     } else {
-        // Insert → jika row tidak ada
         $this->db->insert('siswa_tahun', [
             'siswa_id' => $mutasi->siswa_id,
             'kelas_id' => $mutasi->kelas_asal_id,
@@ -566,10 +558,16 @@ public function batalkan($id)
     }
 
     // ============================
+    // 3. HAPUS DATA MUTASI (FIX UTAMA)
+    // ============================
+    $this->db->where('id', $id)->delete('mutasi');
+
+    // ============================
     // 4. Redirect
     // ============================
-    $this->session->set_flashdata('success', 'Mutasi siswa berhasil dibatalkan.');
+    $this->session->set_flashdata('success', 'Mutasi siswa berhasil dibatalkan dan data mutasi dihapus.');
     redirect('mutasi');
 }
+
 
 }
