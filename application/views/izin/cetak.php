@@ -22,10 +22,12 @@
         border: 1px solid #ddd;
     }
 
-    @media print {
-        .btn-print { display: none; }
-        .surat-box { box-shadow: none; border: none; }
+    
+@media print {
+    .no-print {
+        display: none !important;
     }
+}
 </style>
 </head>
 <body>
@@ -79,18 +81,15 @@
     </div>
 </div>
 
-<div class="text-center mt-3 d-flex justify-content-center gap-2 btn-print">
-
-    <a href="<?= base_url('') ?>" 
-       class="btn btn-secondary">
-        Kembali
+<div class="text-center mt-4 no-print">
+    <a href="javascript:history.back()" class="btn btn-secondary">
+        ⬅ Kembali
     </a>
-
     <button onclick="window.print()" class="btn btn-primary">
-        Cetak Surat
+        🖨 Cetak
     </button>
-
 </div>
+
 
 
 </body>

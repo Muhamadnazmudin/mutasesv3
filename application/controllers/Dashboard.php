@@ -161,28 +161,24 @@ class Dashboard extends CI_Controller {
     // ==========================================================
     // 🔹 SISWA PER ROMBEL (PUBLIK) — siswa_tahun
     // ==========================================================
-    private function get_siswa_per_rombel() {
-        $tahun = $this->tahun_id;
+    private function get_siswa_per_rombel()
+{
+    $q = $this->db
+        ->select("
+            kelas.nama AS nama_kelas,
+            SUM(CASE WHEN siswa.jk = 'L' THEN 1 ELSE 0 END) AS laki,
+            SUM(CASE WHEN siswa.jk = 'P' THEN 1 ELSE 0 END) AS perempuan,
+            COUNT(siswa.id) AS total
+        ")
+        ->from('siswa')
+        ->join('kelas', 'kelas.id = siswa.id_kelas', 'left')
+        ->where('siswa.status', 'aktif')   // 🔥 SAMA PERSIS DENGAN CONTROLLER REFERENSI
+        ->group_by('kelas.id')
+        ->order_by('kelas.nama', 'ASC')
+        ->get();
 
-        $q = $this->db
-            ->select("
-                k.nama AS nama_kelas,
-                SUM(CASE WHEN s.jk = 'L' THEN 1 ELSE 0 END) AS laki,
-                SUM(CASE WHEN s.jk = 'P' THEN 1 ELSE 0 END) AS perempuan,
-                COUNT(st.id) AS total
-            ")
-            ->from("siswa_tahun st")
-            ->join("siswa s", "s.id = st.siswa_id", "left")
-            ->join("kelas k", "k.id = st.kelas_id", "left")
-            ->where("st.tahun_id", $tahun)
-            ->where("st.status", "aktif")
-            ->group_by("k.nama")
-            ->order_by("k.nama", "ASC")
-            ->get();
-
-        return $q->result();
-    }
-
+    return $q->result();
+}
 
     // ==========================================================
     // 🔹 DOWNLOAD PER KELAS (pakai siswa, tetap aman)
@@ -214,11 +210,6 @@ class Dashboard extends CI_Controller {
         show_error('Tidak ada data siswa aktif di kelas ini.');
     }
 
-    // gunakan PhpSpreadsheet
-    // pastikan di bagian atas file controller ada:
-    // use PhpOffice\PhpSpreadsheet\Spreadsheet;
-    // use PhpOffice\PhpSpreadsheet\Writer\Xls;
-    // use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
     @ob_end_clean();
     ob_start();
@@ -230,10 +221,10 @@ class Dashboard extends CI_Controller {
     // Header
     $sheet->setCellValue('A1', 'No');
     $sheet->setCellValue('B1', 'NIS');
-    $sheet->setCellValue('C1', 'NISN');
+    // $sheet->setCellValue('C1', 'NISN');
     $sheet->setCellValue('D1', 'Nama');
     $sheet->setCellValue('E1', 'JK');
-    $sheet->setCellValue('F1', 'No HP Ortu');
+    // $sheet->setCellValue('F1', 'No HP Ortu');
     $sheet->setCellValue('G1', 'Tahun Ajaran');
     $sheet->setCellValue('H1', 'Kelas');
 
@@ -259,13 +250,13 @@ class Dashboard extends CI_Controller {
 
         // NIS & NISN sebagai teks (paksa agar tidak hilang/format)
         $sheet->setCellValueExplicit("B{$row}", (string)$s->nis, DataType::TYPE_STRING);
-        $sheet->setCellValueExplicit("C{$row}", (string)$s->nisn, DataType::TYPE_STRING);
+        // $sheet->setCellValueExplicit("C{$row}", (string)$s->nisn, DataType::TYPE_STRING);
 
         $sheet->setCellValue("D{$row}", $s->nama);
         $sheet->setCellValue("E{$row}", $s->jk ?: '-');
 
         // Nomor HP orang tua juga sebagai teks
-        $sheet->setCellValueExplicit("F{$row}", (string)$s->no_hp_ortu, DataType::TYPE_STRING);
+        // $sheet->setCellValueExplicit("F{$row}", (string)$s->no_hp_ortu, DataType::TYPE_STRING);
 
         $sheet->setCellValue("G{$row}", $s->tahun_ajaran ?: '-');
 

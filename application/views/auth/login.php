@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Login - SimSGTK</title>
-  
+<link rel="icon" type="image/png" href="<?= base_url('assets/img/logobonti.png'); ?>">
   <!-- Bootstrap -->
   <link href="<?= base_url('assets/sbadmin2/vendor/bootstrap/css/bootstrap.min.css') ?>" rel="stylesheet">
   <!-- Font Awesome -->

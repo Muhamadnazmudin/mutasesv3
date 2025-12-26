@@ -9,7 +9,12 @@
 
 <h3>Ajukan Izin</h3>
 
-<form method="POST" action="<?= base_url('index.php/izin/ajukan/' . $token_qr) ?>">
+<!-- <form method="POST" action="<?= base_url('index.php/izin/ajukan/' . $token_qr) ?>"> -->
+<form method="POST"
+      action="<?= base_url('index.php/izin/ajukan/' . $token_qr) ?>"
+      target="_blank"
+      onsubmit="kembaliKeScan()">
+
 
     <!-- Nama -->
     <div class="mb-3">
@@ -126,6 +131,15 @@ jenis.addEventListener('change', function() {
 
 });
 </script>
+<script>
+function kembaliKeScan() {
+    // kasih jeda dikit biar submit jalan
+    setTimeout(function () {
+        window.location.href = "<?= base_url('index.php/izin/scan') ?>";
+    }, 300);
+}
+</script>
+
 
 </body>
 </html>

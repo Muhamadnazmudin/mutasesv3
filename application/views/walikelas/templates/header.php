@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title><?= isset($title) ? $title.' - Mutases' : 'Mutases - Wali Kelas' ?></title>
-
+    <link rel="icon" type="image/png" href="<?= base_url('assets/img/logobonti.png'); ?>">
   <!-- FontAwesome -->
   <link href="<?= base_url('assets/sbadmin2/vendor/fontawesome-free/css/all.min.css') ?>" rel="stylesheet">
 

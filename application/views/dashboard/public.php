@@ -4,6 +4,11 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard Mutasi Siswa</title>
+  <link rel="icon" href="<?= base_url('assets/pwa/favicon.ico') ?>" sizes="any">
+<link rel="icon" type="image/png" sizes="192x192" href="<?= base_url('assets/pwa/icon-192.png') ?>">
+<link rel="icon" type="image/png" sizes="512x512" href="<?= base_url('assets/pwa/icon-512.png') ?>">
+<link rel="apple-touch-icon" href="<?= base_url('assets/pwa/icon-192.png') ?>">
+
   <link rel="manifest" href="<?= base_url('assets/pwa/manifest.json') ?>">
 <meta name="theme-color" content="#007bff">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
