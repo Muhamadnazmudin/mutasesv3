@@ -2,8 +2,8 @@
 
 function send_wa($number, $message)
 {
-    $url = "https://waapi.smkn1cilimus.my.id/send"; // IP server WA kamu
-    $token = "RAHASIA-123"; // token API dari node
+    $url = "URL/WEBKAMU"; // IP server WA kamu
+    $token = "TOKENKAMU"; // token API dari node
 
     $data = array(
         "number" => $number,
