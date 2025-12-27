@@ -33,6 +33,17 @@ $group_izin    = in_array($active, ['izin','laporan_izin']);
 $group_setting = in_array($active, ['hari_libur','tahun','jadwal_absensi']);
 $group_qr      = in_array($active, ['absensiqr_siswa','laporan_absensiqr']);
 $group_verval = in_array($active, ['verval_siswa','laporan_verval']);
+$group_guru = in_array($active, [
+    'guru',
+    'guru_mengajar',
+    'guru_sertifikasi',
+    'guru_pendidikan',
+    'guru_anak',
+    'guru_tugas',
+    'guru_gaji',
+    'guru_kepangkatan',
+    'guru_karir'
+]);
 ?>
 
 <hr class="sidebar-divider">
@@ -56,6 +67,65 @@ $group_verval = in_array($active, ['verval_siswa','laporan_verval']);
             <a class="collapse-item <?= $active=='kelas'?'active':'' ?>" href="<?= site_url('kelas') ?>">Data Kelas</a>
             <a class="collapse-item <?= $active=='siswa'?'active':'' ?>" href="<?= site_url('siswa') ?>">Data Siswa</a>
             <a class="collapse-item <?= $active=='kartu_osis'?'active':'' ?>" href="<?= site_url('kartu_osis') ?>">Kartu OSIS</a>
+        </div>
+    </div>
+</li>
+<!-- ==============================
+     GURU (ADMIN)
+================================= -->
+<li class="nav-item <?= $group_guru ? 'active' : '' ?>">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mGuruAdmin">
+        <i class="fas fa-chalkboard-teacher"></i>
+        <span>Guru</span>
+    </a>
+    <div id="mGuruAdmin" class="collapse <?= $group_guru ? 'show' : '' ?>">
+        <div class="bg-white py-2 collapse-inner rounded">
+<!-- 
+            <a class="collapse-item <?= $active=='guru'?'active':'' ?>"
+               href="<?= site_url('guru') ?>">
+               Data Guru
+            </a> -->
+
+            <a class="collapse-item <?= $active=='guru_mengajar'?'active':'' ?>"
+               href="<?= site_url('guru_mengajar') ?>">
+               Data Mengajar
+            </a>
+
+            <a class="collapse-item <?= $active=='guru_sertifikasi'?'active':'' ?>"
+               href="<?= site_url('guru_sertifikasi') ?>">
+               Riwayat Sertifikasi
+            </a>
+
+            <a class="collapse-item <?= $active=='guru_pendidikan'?'active':'' ?>"
+               href="<?= site_url('guru_pendidikan') ?>">
+               Riwayat Pendidikan Formal
+            </a>
+
+            <a class="collapse-item <?= $active=='guru_anak'?'active':'' ?>"
+               href="<?= site_url('guru_anak') ?>">
+               Anak
+            </a>
+
+            <a class="collapse-item <?= $active=='guru_tugas'?'active':'' ?>"
+               href="<?= site_url('guru_tugas') ?>">
+               Tugas Tambahan
+            </a>
+
+            <a class="collapse-item <?= $active=='guru_gaji'?'active':'' ?>"
+               href="<?= site_url('guru_gaji') ?>">
+               Riwayat Gaji Berkala
+            </a>
+
+            <a class="collapse-item <?= $active=='guru_kepangkatan'?'active':'' ?>"
+               href="<?= site_url('guru_kepangkatan') ?>">
+               Riwayat Kepangkatan
+            </a>
+
+            <a class="collapse-item <?= $active=='guru_karir'?'active':'' ?>"
+               href="<?= site_url('guru_karir') ?>">
+               Riwayat Karir Guru
+            </a>
+
         </div>
     </div>
 </li>

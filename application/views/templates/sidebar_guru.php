@@ -104,6 +104,7 @@ html, body {
       <span>Dashboard</span>
     </a>
   </li>
+  <hr class="sidebar-divider">
   <li class="nav-item <?= ($active=='guru_account')?'active':'' ?>">
   <a class="nav-link" href="<?= site_url('guru_account') ?>">
     <i class="fas fa-id-badge"></i>
@@ -132,12 +133,14 @@ html, body {
     </a>
   </li>
 
-  <li class="nav-item">
-    <a class="nav-link" href="#">
-      <i class="fas fa-certificate"></i>
-      <span>Riwayat Sertifikasi</span>
-    </a>
-  </li>
+<li class="nav-item <?= ($active=='guru_sertifikasi')?'active':'' ?>">
+  <a class="nav-link" href="<?= site_url('guru_sertifikasi_guru') ?>">
+    <i class="fas fa-certificate"></i>
+    <span>Riwayat Sertifikasi</span>
+  </a>
+</li>
+
+
 
   <li class="nav-item">
     <a class="nav-link" href="#">

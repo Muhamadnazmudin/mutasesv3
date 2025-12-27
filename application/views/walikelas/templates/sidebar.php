@@ -105,6 +105,15 @@ html, body {
       <span>Dashboard</span>
     </a>
   </li>
+<hr class="sidebar-divider">
+
+<!-- KEMBALI KE MENU GURU -->
+<li class="nav-item">
+  <a class="nav-link" href="<?= site_url('guru_dashboard') ?>">
+    <i class="fas fa-chalkboard-teacher"></i>
+    <span>Kembali ke Menu Guru</span>
+  </a>
+</li>
 
   <hr class="sidebar-divider">
 
