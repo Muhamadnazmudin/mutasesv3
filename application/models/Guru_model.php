@@ -30,7 +30,7 @@ class Guru_model extends CI_Model {
     // insert user guru (DEFAULT)
     $user = [
         'username' => $data['email'],
-        'password' => password_hash('guru123', PASSWORD_DEFAULT),
+        'password' => password_hash('@Smkn1cilimus', PASSWORD_DEFAULT),
         'nama'     => $data['nama'],
         'email'    => $data['email'],
         'role_id'  => 3, // GURU

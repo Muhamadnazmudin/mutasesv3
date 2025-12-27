@@ -104,6 +104,12 @@ html, body {
       <span>Dashboard</span>
     </a>
   </li>
+  <li class="nav-item <?= ($active=='guru_account')?'active':'' ?>">
+  <a class="nav-link" href="<?= site_url('guru_account') ?>">
+    <i class="fas fa-id-badge"></i>
+    <span>Profile</span>
+  </a>
+</li>
 
   <hr class="sidebar-divider">
 
@@ -111,12 +117,13 @@ html, body {
     Menu Guru
   </div>
 
-  <li class="nav-item">
-    <a class="nav-link" href="#">
-      <i class="fas fa-user"></i>
-      <span>Data Guru</span>
-    </a>
-  </li>
+  <li class="nav-item <?= ($active=='guru_profile')?'active':'' ?>">
+  <a class="nav-link" href="<?= site_url('guru_profile') ?>">
+    <i class="fas fa-user"></i>
+    <span>Data Guru</span>
+  </a>
+</li>
+
 
   <li class="nav-item">
     <a class="nav-link" href="#">
