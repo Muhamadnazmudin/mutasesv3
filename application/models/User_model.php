@@ -2,9 +2,17 @@
 class User_model extends CI_Model {
 
   // --- sudah ada ---
-  public function get_by_username($username){
-    return $this->db->get_where('users', ['username'=>$username])->row();
-  }
+  public function get_by_username($username)
+{
+    return $this->db
+        ->group_start()
+            ->where('username', $username)
+            ->or_where('email', $username)
+        ->group_end()
+        ->get('users')
+        ->row();
+}
+
 
   public function role_name($role_id){
     $r = $this->db->get_where('roles', ['id'=>$role_id])->row();

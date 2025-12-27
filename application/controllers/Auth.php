@@ -31,26 +31,33 @@ class Auth extends CI_Controller {
           'tahun_id'  => $tahun_id
         ]);
 
-        // ======================================================
-        // 🔵 REDIRECT KHUSUS WALIKELAS (role_id = 3)
-        // ======================================================
-        if ($user->role_id == 3) {
+       // ======================================================
+// 🔵 ROLE GURU (role_id = 3)
+// ======================================================
+if ($user->role_id == 3) {
 
-            // Cek kelas yang diasuh berdasarkan guru_id
-            $kelas = $this->db->get_where('kelas', [
-                'wali_kelas_id' => $user->guru_id
-            ])->row();
+    // cek apakah guru ini wali kelas
+    $kelas = $this->db->get_where('kelas', [
+        'wali_kelas_id' => $user->guru_id
+    ])->row();
 
-            if ($kelas) {
-                $this->session->set_userdata([
-                    'kelas_id'   => $kelas->id,
-                    'kelas_nama' => $kelas->nama
-                ]);
-            }
+    // simpan flag saja (BUKAN redirect)
+    if ($kelas) {
+        $this->session->set_userdata([
+            'is_walikelas' => true,
+            'kelas_id'     => $kelas->id,
+            'kelas_nama'   => $kelas->nama
+        ]);
+    } else {
+        $this->session->set_userdata([
+            'is_walikelas' => false
+        ]);
+    }
 
-            // redirect ke dashboard walikelas
-            redirect('walikelas');
-        }
+    // 👉 SEMUA GURU MASUK DASHBOARD GURU
+    redirect('guru_dashboard');
+}
+
 
         // ======================================================
         // 🔴 ADMIN → ke dashboard biasa

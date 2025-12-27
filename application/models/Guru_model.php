@@ -19,9 +19,30 @@ class Guru_model extends CI_Model {
     return $this->db->count_all($this->table);
   }
 
-  public function insert($data) {
-    return $this->db->insert($this->table, $data);
-  }
+  public function insert($data)
+{
+    $this->db->trans_start();
+
+    // insert guru
+    $this->db->insert('guru', $data);
+    $guru_id = $this->db->insert_id();
+
+    // insert user guru (DEFAULT)
+    $user = [
+        'username' => $data['email'],
+        'password' => password_hash('guru123', PASSWORD_DEFAULT),
+        'nama'     => $data['nama'],
+        'email'    => $data['email'],
+        'role_id'  => 3, // GURU
+        'guru_id'  => $guru_id
+    ];
+
+    $this->db->insert('users', $user);
+
+    $this->db->trans_complete();
+    return $this->db->trans_status();
+}
+
 
   public function get_by_id($id) {
     return $this->db->get_where($this->table, ['id' => $id])->row();
@@ -40,5 +61,6 @@ class Guru_model extends CI_Model {
 {
     return $this->db->get_where('guru', ['id' => $id])->row();
 }
+
 
 }

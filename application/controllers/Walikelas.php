@@ -3,19 +3,40 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Walikelas extends CI_Controller {
 
-    public function __construct() {
-        parent::__construct();
+    public function __construct()
+{
+    parent::__construct();
 
-        // pastikan session login wali kelas
-        if (!$this->session->userdata('logged_in') || 
-            $this->session->userdata('role_id') != 3) {
-            redirect('auth/login');
-        }
-
-        $this->load->database();
-        $this->load->model('Kelas_model');
-        $this->load->model('Siswa_model');
+    if (!$this->session->userdata('logged_in')) {
+        redirect('auth/login');
     }
+
+    $guru_id = $this->session->userdata('guru_id');
+
+    if (!$guru_id) {
+        show_error('Akses ditolak', 403);
+    }
+
+    // cek apakah guru ini wali kelas
+    $kelas = $this->db
+        ->get_where('kelas', ['wali_kelas_id' => $guru_id])
+        ->row();
+
+    if (!$kelas) {
+        show_error('Anda bukan wali kelas', 403);
+    }
+
+    // simpan info kelas ke session
+    $this->session->set_userdata([
+        'kelas_id'   => $kelas->id,
+        'kelas_nama' => $kelas->nama
+    ]);
+
+    $this->load->database();
+    $this->load->model('Kelas_model');
+    $this->load->model('Siswa_model');
+}
+
 
     // ===========================
     // DASHBOARD WALIKELAS
@@ -305,7 +326,7 @@ public function cetak($id)
         ->row();
 
     // 🔥 AMBIL DATA WALI KELAS (dari session user login guru)
-    $guru_id = $this->session->userdata('user_id');   // pastikan ini ID guru
+    $guru_id = $this->session->userdata('guru_id');   // pastikan ini ID guru
     $data['walikelas'] = $this->db->get_where('guru', ['id' => $guru_id])->row();
 
     if (!$data['walikelas']) {
