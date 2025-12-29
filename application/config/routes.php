@@ -72,6 +72,8 @@ $route['backup/restore'] = 'backup/restore';
 $route['backup/do_restore'] = 'backup/do_restore';
 $route['install'] = 'install/index';
 $route['install/run'] = 'install/run';
+$route['chatbot/reply'] = 'chatbot/reply';
+
 
 
 

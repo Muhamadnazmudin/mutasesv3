@@ -169,6 +169,144 @@ body:not(.dark-mode) header .btn-toggle i.fa-moon {
         font-size: .8rem;
       }
     }
+    /* 💬 CHATBOT STYLE */
+#chatbot {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  width: 320px;
+  max-height: 420px;
+  background: #fff;
+  border-radius: 15px;
+  box-shadow: 0 8px 25px rgba(0,0,0,.2);
+  display: none;
+  flex-direction: column;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+body.dark-mode #chatbot {
+  background: #1f1f1f;
+  color: #eaeaea;
+}
+
+#chatbot-header {
+  background: linear-gradient(90deg,#007bff,#00bcd4);
+  color: #fff;
+  padding: 10px 15px;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#chatbot-body {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  font-size: 14px;
+}
+
+.bot-msg {
+  background: #e9f5ff;
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  width: fit-content;
+}
+
+.user-msg {
+  background: #007bff;
+  color: #fff;
+  padding: 8px 10px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  margin-left: auto;
+  width: fit-content;
+}
+
+body.dark-mode .bot-msg {
+  background: #2a2a2a;
+}
+
+#chatbot-footer {
+  display: flex;
+  border-top: 1px solid #ddd;
+}
+
+#chatbot-input {
+  flex: 1;
+  border: none;
+  padding: 10px;
+  outline: none;
+}
+
+#chatbot-send {
+  background: #007bff;
+  border: none;
+  color: #fff;
+  padding: 0 15px;
+}
+
+/* Floating button */
+#chatbot-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(90deg,#007bff,#00bcd4);
+  color: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 5px 20px rgba(0,0,0,.3);
+  z-index: 9999;
+}
+/* Wrapper chatbot */
+#chatbot-wrapper {
+  position: fixed;
+  bottom: 15px;
+  right: 20px;
+  z-index: 9999;
+  text-align: center;
+}
+
+/* Tombol chat */
+#chatbot-toggle {
+  position: relative;
+  z-index: 9999;
+}
+
+/* Label teks */
+.chatbot-label {
+  position: absolute;
+  bottom: -10px;
+  left: 10%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: #007bff;
+  background: #fff;
+  padding: 3px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,.15);
+  z-index: 9998;          /* di bawah tombol */
+}
+
+
+/* Dark mode support */
+body.dark-mode .chatbot-label {
+  background: #1f1f1f;
+  color: #4fc3f7;
+}
+#chatbot-wrapper:hover .chatbot-label {
+  transform: translateY(-2px);
+  transition: 0.2s;
+}
+
   </style>
 </head>
 
@@ -415,6 +553,103 @@ if ('serviceWorker' in navigator) {
       .register('/mutases/service-worker.js')
       .then(reg => console.log('PWA aktif:', reg.scope))
       .catch(err => console.error('PWA gagal:', err));
+  });
+}
+</script>
+<!-- 💬 CHATBOT -->
+<div id="chatbot">
+  <div id="chatbot-header">
+    <span><i class="fas fa-robot"></i> Asisten Sekolah</span>
+    <button id="chatbot-close">&times;</button>
+  </div>
+
+  <div id="chatbot-body">
+    <div class="bot-msg">
+      👋 Halo! Saya Asisten Mutasi Siswa.<br>
+      Silakan ketik pertanyaan Anda.
+    </div>
+  </div>
+
+  <div id="chatbot-footer">
+    <input type="text" id="chatbot-input" placeholder="ketik cek utk lihat list pertanyaan..." />
+    <button id="chatbot-send"><i class="fas fa-paper-plane"></i></button>
+  </div>
+</div>
+
+<!-- Tombol Floating -->
+<div id="chatbot-wrapper">
+  <button id="chatbot-toggle">
+    <i class="fas fa-comments"></i>
+  </button>
+  <div class="chatbot-label">Chat dengan AI</div>
+</div>
+
+
+<script>
+const CHATBOT_URL = "<?= site_url('chatbot/reply') ?>";
+const CSRF_NAME = "<?= $this->security->get_csrf_token_name(); ?>";
+const CSRF_HASH = "<?= $this->security->get_csrf_hash(); ?>";
+</script>
+
+<script>
+const chatbot = document.getElementById('chatbot');
+const toggleBtn = document.getElementById('chatbot-toggle');
+const closeBtn = document.getElementById('chatbot-close');
+const sendBtn = document.getElementById('chatbot-send');
+const input = document.getElementById('chatbot-input');
+const body = document.getElementById('chatbot-body');
+
+// toggle open
+toggleBtn.onclick = () => chatbot.style.display = 'flex';
+closeBtn.onclick = () => chatbot.style.display = 'none';
+
+// kirim pesan
+sendBtn.onclick = sendMessage;
+input.addEventListener('keypress', e => {
+  if (e.key === 'Enter') sendMessage();
+});
+
+function sendMessage() {
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  appendMessage(msg, 'user-msg');
+  input.value = '';
+
+  setTimeout(() => botReply(msg), 600);
+}
+
+function appendMessage(text, className) {
+  const div = document.createElement('div');
+  div.className = className;
+  div.innerText = text;
+  body.appendChild(div);
+  body.scrollTop = body.scrollHeight;
+}
+
+// LOGIKA CHAT BOT (simple rule)
+function botReply(text) {
+  const params =
+    "message=" + encodeURIComponent(text) +
+    "&" + CSRF_NAME + "=" + CSRF_HASH;
+
+  fetch(CHATBOT_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: params
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("HTTP error");
+    return res.json();
+  })
+  .then(data => {
+    appendMessage(data.reply, 'bot-msg');
+  })
+  .catch(err => {
+    console.error(err);
+    appendMessage("⚠️ Server sedang bermasalah.", 'bot-msg');
   });
 }
 </script>
