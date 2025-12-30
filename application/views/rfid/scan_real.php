@@ -282,27 +282,30 @@ function prosesUID(uid) {
             return;
         }
 
-        /* === TERLAMBAT === */
-        if (data.status === "Terlambat") {
-            resultBox.classList.add("bg-late-custom");
-            resultBox.innerHTML = `
-                <h4 class="fw-bold">${data.nama}</h4>
-                <p class="m-0">Terlambat — ${data.jam}</p>
-            `;
-            setTimeout(resetScanUI, 500);
-            return;
-        }
-
         /* === MASUK === */
-        if (data.type === "masuk") {
-            resultBox.classList.add("bg-success-custom");
-            resultBox.innerHTML = `
-                <h4 class="fw-bold">${data.nama}</h4>
-                <p class="m-0">Masuk: ${data.jam}</p>
-            `;
-            setTimeout(resetScanUI, 500);
-            return;
-        }
+if (data.type === "masuk") {
+
+    // TELAT
+    if (data.status === "Terlambat") {
+        resultBox.classList.add("bg-late-custom");
+        resultBox.innerHTML = `
+            <h4 class="fw-bold">${data.nama}</h4>
+            <p class="m-0">Masuk (Terlambat) — ${data.jam}</p>
+        `;
+    } 
+    // TEPAT WAKTU
+    else {
+        resultBox.classList.add("bg-success-custom");
+        resultBox.innerHTML = `
+            <h4 class="fw-bold">${data.nama}</h4>
+            <p class="m-0">Masuk: ${data.jam}</p>
+        `;
+    }
+
+    setTimeout(resetScanUI, 500);
+    return;
+}
+
 
     })
     .catch(err => {
