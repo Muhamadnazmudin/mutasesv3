@@ -293,7 +293,7 @@ body.dark-mode .bot-msg {
   border-radius: 12px;
   white-space: nowrap;
   box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  z-index: 9998;          /* di bawah tombol */
+  z-index: 9998;
 }
 
 
@@ -302,9 +302,29 @@ body.dark-mode .chatbot-label {
   background: #1f1f1f;
   color: #4fc3f7;
 }
-#chatbot-wrapper:hover .chatbot-label {
+/* #chatbot-wrapper:hover .chatbot-label {
   transform: translateY(-2px);
   transition: 0.2s;
+} */
+.quick-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.quick-btn {
+  background: #e7f3ff;
+  border: 1px solid #b6dbff;
+  border-radius: 12px;
+  padding: 5px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: #007bff;
+}
+
+.quick-btn:hover {
+  background: #cfe8ff;
 }
 
   </style>
@@ -384,7 +404,7 @@ body.dark-mode .chatbot-label {
             </a></li>
 
             <li><a class="dropdown-item" href="<?= base_url('index.php/auth/login') ?>">
-              <i class="fas fa-chalkboard-teacher text-warning"></i> Login Wali Kelas
+              <i class="fas fa-chalkboard-teacher text-warning"></i> Login Guru/Wali Kelas
             </a></li>
           </ul>
 
@@ -581,7 +601,7 @@ if ('serviceWorker' in navigator) {
   <button id="chatbot-toggle">
     <i class="fas fa-comments"></i>
   </button>
-  <div class="chatbot-label">Chat dengan AI</div>
+  <div class="chatbot-label">Chat diatas</div>
 </div>
 
 
@@ -622,10 +642,70 @@ function sendMessage() {
 function appendMessage(text, className) {
   const div = document.createElement('div');
   div.className = className;
-  div.innerText = text;
+
+  // Jika bot dan ada list (•)
+  if (className === 'bot-msg' && text.includes('•')) {
+    const lines = text.split('\n');
+    let normalText = '';
+    let buttons = [];
+
+    lines.forEach(line => {
+      if (line.trim().startsWith('•')) {
+        buttons.push(line.replace('•', '').trim());
+      } else {
+        normalText += line + '<br>';
+      }
+    });
+
+    div.innerHTML = normalText;
+
+    if (buttons.length > 0) {
+      const wrap = document.createElement('div');
+      wrap.className = 'quick-list';
+
+      buttons.forEach(q => {
+        const btn = document.createElement('button');
+        btn.className = 'quick-btn';
+        btn.innerText = q;
+        btn.onclick = () => {
+           wrap.remove();
+  // tampilkan pesan user
+  appendMessage(q, 'user-msg');
+
+  // cek apakah special action
+  const lowerQ = q.toLowerCase();
+
+if (lowerQ === 'kelas') {
+  appendMessage("🏫 Silakan ketik nama kelas.\nContoh: kelas XI KL1", 'bot-msg');
+  input.value = 'kelas ';
+  input.focus();
+
+} else if (lowerQ === 'cek nisn') {
+  appendMessage("🆔 Silakan masukkan NISN siswa.\nContoh: cek nisn 1234567890", 'bot-msg');
+  input.value = 'cek nisn ';
+  input.focus();
+
+} else {
+  botReply(q);
+}
+
+
+};
+
+        wrap.appendChild(btn);
+      });
+
+      div.appendChild(wrap);
+    }
+
+  } else {
+    div.innerText = text;
+  }
+
   body.appendChild(div);
   body.scrollTop = body.scrollHeight;
 }
+
 
 // LOGIKA CHAT BOT (simple rule)
 function botReply(text) {
