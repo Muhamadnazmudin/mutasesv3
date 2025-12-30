@@ -24,7 +24,7 @@ class Kelas extends CI_Controller {
     // === Konfigurasi Pagination ===
     $config['base_url'] = site_url('kelas/index');
     $config['total_rows'] = $this->Kelas_model->count_all();
-    $config['per_page'] = 10;
+    $config['per_page'] = 15;
     $config['uri_segment'] = 3;
 
     // 💅 Pagination Styling (Bootstrap 5)

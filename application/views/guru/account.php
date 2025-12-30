@@ -14,7 +14,7 @@
 
       <img src="<?= $user->foto 
         ? base_url('uploads/profile/'.$user->foto) 
-        : base_url('assets/img/default-user.png') ?>"
+        : base_url('assets/img/default-user.jpg') ?>"
         class="rounded-circle mb-3"
         width="120" height="120">
 

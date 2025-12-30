@@ -11,7 +11,7 @@
         <!-- FOTO PROFIL -->
         <div class="col-md-3 text-center mb-3 mb-md-0">
           <?php
-$fotoUrl  = base_url('assets/img/default-avatar.png');
+$fotoUrl  = base_url('assets/img/default-user.jpg');
 $fotoPath = FCPATH.'uploads/profile/'.($user->foto ?? '');
 
 if (!empty($user->foto) && file_exists($fotoPath)) {
