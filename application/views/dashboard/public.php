@@ -579,7 +579,7 @@ if ('serviceWorker' in navigator) {
 <!-- 💬 CHATBOT -->
 <div id="chatbot">
   <div id="chatbot-header">
-    <span><i class="fas fa-robot"></i> Asisten Sekolah</span>
+    <span><i class="fas fa-robot"></i> SiMumu</span>
     <button id="chatbot-close">&times;</button>
   </div>
 
