@@ -435,6 +435,32 @@ body.dark-mode .chatbot-label {
   color: var(--text-dark);
 }
 
+.bot-anim {
+  animation: botWave 2s infinite ease-in-out;
+  transform-origin: center;
+}
+
+@keyframes botWave {
+  0%   { transform: rotate(0deg) scale(1); }
+  25%  { transform: rotate(5deg) scale(1.05); }
+  50%  { transform: rotate(0deg) scale(1); }
+  75%  { transform: rotate(-5deg) scale(1.05); }
+  100% { transform: rotate(0deg) scale(1); }
+}
+.bot-anim {
+  color: #0d6efd; /* biru Bootstrap */
+  animation: botWave 2s infinite ease-in-out;
+}
+.bot-anu {
+  color: #6f42c1; /* biru Bootstrap */
+  animation: botWave 2s infinite ease-in-out;
+}
+body:not(.dark-mode) .bot-anim {
+  color: #0d6efd; /* biru */
+}
+body.dark-mode .bot-anim {
+  color: #66b2ff; /* biru terang */
+}
 
   </style>
 </head>
@@ -631,15 +657,15 @@ body.dark-mode .chatbot-label {
 
 <!-- ==================== CHATBOT ==================== -->
 <div id="chatbot">
-  <div id="chatbot-header">
-    <span><i class="fas fa-robot"></i> SiMumu</span>
-    <button id="chatbot-close">&times;</button>
-  </div>
+  <span class="bot-title">
+  <i class="fas fa-robot bot-anim"></i> SiMuMu <i class="fas fa-robot bot-anu"></i>
+</span>
+
 
   <div id="chatbot-body">
     <div class="bot-msg">
       👋 Halo! Saya Asisten Mutasi Siswa.<br>
-      Silakan ketik pertanyaan Anda.
+      Silakan Ketik 'cek' untuk memunculkan list pertanyaan.
     </div>
   </div>
 
