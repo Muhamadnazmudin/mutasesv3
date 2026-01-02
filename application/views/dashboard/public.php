@@ -3,13 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard Mutasi Siswa</title>
+
+  <!-- ===== TITLE ===== -->
+  <title>SimSGTK – Sistem Informasi Siswa & GTK</title>
+
+  <!-- ===== BASIC META ===== -->
+  <meta name="description" content="SimSGTK adalah aplikasi manajemen sekolah modern untuk pengelolaan data siswa, guru, absensi, mutasi, dan administrasi pendidikan secara terintegrasi.">
+  <meta name="theme-color" content="#007bff">
+
+  <!-- ===== OPEN GRAPH (WHATSAPP, FB, TELEGRAM) ===== -->
+  <meta property="og:title" content="SimSGTK – Sistem Informasi Siswa & GTK">
+  <meta property="og:description" content="Aplikasi manajemen sekolah terpadu untuk pengelolaan siswa, guru, absensi, mutasi, dan administrasi pendidikan secara cepat, rapi, dan modern.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="<?= base_url() ?>">
+  <meta property="og:image" content="<?= base_url('assets/pwa/icon-512.png') ?>">
+  <meta property="og:image:width" content="512">
+  <meta property="og:image:height" content="512">
+
+  <!-- ===== TWITTER CARD (OPSIONAL) ===== -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="SimSGTK – Sistem Informasi Siswa & GTK">
+  <meta name="twitter:description" content="Solusi digital sekolah untuk pengelolaan data siswa dan tenaga kependidikan secara efisien.">
+  <meta name="twitter:image" content="<?= base_url('assets/pwa/icon-512.png') ?>">
+
+  <!-- ===== ICON ===== -->
   <link rel="icon" href="<?= base_url('assets/pwa/favicon.ico') ?>" sizes="any">
   <link rel="icon" type="image/png" sizes="192x192" href="<?= base_url('assets/pwa/icon-192.png') ?>">
   <link rel="icon" type="image/png" sizes="512x512" href="<?= base_url('assets/pwa/icon-512.png') ?>">
   <link rel="apple-touch-icon" href="<?= base_url('assets/pwa/icon-192.png') ?>">
+
+  <!-- ===== PWA ===== -->
   <link rel="manifest" href="<?= base_url('assets/pwa/manifest.json') ?>">
-  <meta name="theme-color" content="#007bff">
+
+  <!-- ===== CSS ===== -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
