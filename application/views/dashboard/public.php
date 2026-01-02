@@ -448,18 +448,18 @@ body.dark-mode .chatbot-label {
   100% { transform: rotate(0deg) scale(1); }
 }
 .bot-anim {
-  color: #0d6efd; /* biru Bootstrap */
+  color: #fefdffff; /* biru Bootstrap */
   animation: botWave 2s infinite ease-in-out;
 }
 .bot-anu {
-  color: #6f42c1; /* biru Bootstrap */
+  color: #fefdffff; /* biru Bootstrap */
   animation: botWave 2s infinite ease-in-out;
 }
 body:not(.dark-mode) .bot-anim {
   color: #0d6efd; /* biru */
 }
 body.dark-mode .bot-anim {
-  color: #66b2ff; /* biru terang */
+  color: #f7f7f7ff; /* biru terang */
 }
 
   </style>
@@ -656,11 +656,21 @@ body.dark-mode .bot-anim {
 </footer>
 
 <!-- ==================== CHATBOT ==================== -->
-<div id="chatbot">
-  <span class="bot-title">
-  <i class="fas fa-robot bot-anim"></i> SiMuMu <i class="fas fa-robot bot-anu"></i>
-</span>
 
+<div id="chatbot">
+  <div id="chatbot-header">
+  <span class="bot-title">
+  <i class="fas fa-robot bot-anu"></i> SiMuMu <i class="fas fa-robot bot-anu"></i><i class="fas fa-robot bot-anu"></i>
+</span>
+<button id="chatbot-close">&times;</button>
+            </div>
+
+<!-- <div id="chatbot">
+  <div id="chatbot-header">
+    <span><i class="fas fa-robot"></i> Asisten Sekolah</span>
+    <span><i class="fas fa-robot"></i> SiMumu</span>
+    <button id="chatbot-close">&times;</button>
+  </div> -->
 
   <div id="chatbot-body">
     <div class="bot-msg">
