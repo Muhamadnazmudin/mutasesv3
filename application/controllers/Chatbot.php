@@ -39,7 +39,7 @@ class Chatbot extends CI_Controller {
     /* ======================
        SAPAAN & OBROLAN UMUM
     ====================== */
-    if (in_array($text, ['halo','haloo','hai','hallo','assalamualaikum'])) {
+    if (in_array($text, ['halo','haloo','hai','hallo','assalamualaikum','hey','huy','sampurasun'])) {
       $reply =
         "👋 Halo! Selamat datang di *Chat Mutasi Siswa*.\n" .
         "Silakan ketik pertanyaan yang ingin Anda ketahui 😊";
@@ -49,7 +49,7 @@ class Chatbot extends CI_Controller {
       $reply = "Alhamdulillah baik 😊 Ada yang bisa saya bantu terkait data siswa atau mutasi?";
     }
 
-    elseif (strpos($text, 'bantu') !== false || strpos($text, 'bingung') !== false) {
+    elseif (strpos($text, 'cek') !== false || strpos($text, 'bingung') !== false) {
       $reply = $this->menuBantuan();
     }
 
@@ -75,9 +75,9 @@ class Chatbot extends CI_Controller {
        SISWA LULUS
     ====================== */
     elseif (strpos($text, 'siswa lulus') !== false) {
-      $this->db->where('status', 'lulus');
+      $this->db->where('status', 'lulus', 'tahun_id', $tahun_id);
       $total = $this->db->count_all_results('siswa');
-      $reply = "🎓 Jumlah siswa yang sudah *lulus* adalah *{$total} siswa*.";
+      $reply = "🎓 Jumlah siswa yang sudah *lulus* tahun *{$tahun->tahun}* adalah *{$total} siswa*.";
     }
 
     /* ======================
@@ -164,7 +164,7 @@ class Chatbot extends CI_Controller {
     ====================== */
     else {
       $reply =
-        "🤔 Maaf, saya belum memahami pertanyaan tersebut.\n\n" .
+        "🤔\n" .
         "Silakan pilih atau ketik salah satu contoh berikut:\n" .
         $this->menuBantuan();
     }
