@@ -3,56 +3,71 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Laporan_model extends CI_Model {
 
-  public function get_laporan($tahun, $kelas = null, $jenis = null, $search = null) {
+    public function get_laporan($kelas = null, $jenis = null, $search = null)
+    {
+        // ======================================
+        // RESET QUERY (WAJIB)
+        // ======================================
+        $this->db->reset_query();
 
-    // Tahun ajaran aktif (ID → ambil string tahun)
-    $tahun_id = $this->session->userdata('tahun_id');
-    $tahun_aktif = $this->db->get_where('tahun_ajaran', ['id' => $tahun_id])->row();
+        // ======================================
+        // AMBIL TAHUN AJARAN AKTIF (STRING)
+        // ======================================
+        $tahun_ajaran = null;
+        $tahun_id = $this->session->userdata('tahun_id');
 
-    $this->db->from('v_mutasi_detail');
+        if ($tahun_id) {
+            $row = $this->db
+                ->select('tahun')
+                ->from('tahun_ajaran')
+                ->where('tahun_ajaran.id', $tahun_id)
+                ->get()
+                ->row();
 
-    // ======================================================
-    // FILTER TAHUN AJARAN LOGIN (gunakan kolom `tahun_ajaran`)
-    // ======================================================
-    if ($tahun_aktif) {
-        $this->db->where('tahun_ajaran', $tahun_aktif->tahun);
+            if ($row) {
+                $tahun_ajaran = $row->tahun;
+            }
+        }
+
+        // ======================================
+        // QUERY UTAMA: VIEW
+        // ======================================
+        $this->db->from('v_mutasi_detail');
+
+        if ($tahun_ajaran) {
+            $this->db->where('tahun_ajaran', $tahun_ajaran);
+        }
+
+        // hanya mutasi aktif
+        $this->db->where('status_mutasi', 'aktif');
+
+        // filter kelas
+        if (!empty($kelas)) {
+            $this->db->where('kelas_asal_id', $kelas);
+        }
+
+        // filter jenis
+        if (!empty($jenis)) {
+            $this->db->where('jenis', strtolower($jenis));
+        }
+
+        // pencarian
+        if (!empty($search)) {
+            $this->db->group_start()
+                     ->like('nama_siswa', $search)
+                     ->or_like('nis', $search)
+                     ->or_like('nisn', $search)
+                     ->group_end();
+        }
+
+        $this->db->order_by('tanggal', 'DESC');
+
+        return $this->db->get()->result();
     }
 
-    // ======================================================
-    // OPTIONAL: FILTER TAHUN KALENDER (YEAR(tanggal))
-    // ======================================================
-    if (!empty($tahun)) {
-        $this->db->where('YEAR(tanggal)', $tahun);
+    // dropdown kelas
+    public function get_kelas()
+    {
+        return $this->db->order_by('nama', 'ASC')->get('kelas')->result();
     }
-
-    // Mutasi aktif saja
-    $this->db->where('(status_mutasi IS NULL OR status_mutasi = "aktif")');
-
-    // Filter kelas asal
-    if (!empty($kelas)) {
-        $this->db->where('kelas_asal_id', $kelas);
-    }
-
-    // Filter jenis mutasi
-    if (!empty($jenis)) {
-        $this->db->where('jenis', strtolower($jenis));
-    }
-
-    // Pencarian
-    if (!empty($search)) {
-        $this->db->group_start()
-                 ->like('nama_siswa', $search)
-                 ->or_like('nis', $search)
-                 ->or_like('nisn', $search)
-                 ->group_end();
-    }
-
-    $this->db->order_by('tanggal', 'DESC');
-
-    return $this->db->get()->result();
-  }
-
-  public function get_kelas() {
-    return $this->db->order_by('nama', 'ASC')->get('kelas')->result();
-  }
 }

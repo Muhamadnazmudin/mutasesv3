@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title><?= isset($title) ? $title.' - Mutases' : 'Mutases' ?></title>
+  <title><?= isset($title) ? $title.' - SimSGTK' : 'SimSGTK' ?></title>
   <link rel="icon" type="image/png" href="<?= base_url('assets/img/logobonti.png'); ?>">
 
   <!-- FontAwesome -->
@@ -32,7 +32,7 @@ body.light-mode #wrapper,
 body.light-mode #content-wrapper,
 body.light-mode #content,
 body.light-mode .container-fluid {
-    background-color: #f7f9ff !important; /* very soft blue white */
+    background-color: #fafcffff !important; /* very soft blue white */
     color: #000 !important;
 }
 
@@ -70,7 +70,7 @@ body.light-mode .topbar {
 
 /* Sidebar tetap gradient biru */
 body.light-mode .sidebar {
-    background: linear-gradient(180deg, #4e73df 10%, #224abe 100%) !important;
+    background: linear-gradient(180deg, #ffffffff 10%, #f4f7ffff 100%) !important;
 }
 
 /* Warna teks umum */
@@ -313,7 +313,7 @@ html, body {
     .sidebar .collapse-inner {
         position: relative;
         z-index: 3500 !important;
-        background-color: #2d2f38 !important; /* biar kelihatan */
+        background-color: #002fffff !important; /* biar kelihatan */
     }
 
     /* Biar sub-menu tidak terpotong */

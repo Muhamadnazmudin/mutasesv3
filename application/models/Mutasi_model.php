@@ -308,6 +308,44 @@ class Mutasi_model extends CI_Model {
     // Hapus data mutasi
     return $this->db->delete('mutasi', ['id' => $id]);
 }
+public function get_public($filter = [])
+{
+    $this->db->select('
+        mutasi.*,
+        siswa.nama AS nama_siswa,
+        siswa.nis,
+        siswa.nisn,
+        kelas_asal.nama AS kelas_asal,
+        kelas_tujuan.nama AS kelas_tujuan,
+        tahun_ajaran.tahun AS tahun_ajaran,
+        users.nama AS dibuat_oleh
+    ');
+    $this->db->from('mutasi');
+    $this->db->join('siswa', 'siswa.id = mutasi.siswa_id', 'left');
+    $this->db->join('kelas kelas_asal', 'kelas_asal.id = mutasi.kelas_asal_id', 'left');
+    $this->db->join('kelas kelas_tujuan', 'kelas_tujuan.id = mutasi.tujuan_kelas_id', 'left');
+    $this->db->join('tahun_ajaran', 'tahun_ajaran.id = mutasi.tahun_id', 'left');
+    $this->db->join('users', 'users.id = mutasi.created_by', 'left');
+
+    $this->db->where('mutasi.status_mutasi', 'aktif');
+
+    if (!empty($filter['kelas'])) {
+        $this->db->where('mutasi.kelas_asal_id', $filter['kelas']);
+    }
+
+    if (!empty($filter['jenis'])) {
+        $this->db->where('mutasi.jenis', $filter['jenis']);
+    }
+
+    if (!empty($filter['search'])) {
+        $this->db->like('siswa.nama', $filter['search']);
+    }
+
+    $this->db->order_by('mutasi.id', 'DESC');
+
+    return $this->db->get()->result();
+}
+
 
 }
 

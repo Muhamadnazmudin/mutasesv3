@@ -172,7 +172,7 @@ class Dashboard extends CI_Controller {
         ")
         ->from('siswa')
         ->join('kelas', 'kelas.id = siswa.id_kelas', 'left')
-        ->where('siswa.status', 'aktif')   // 🔥 SAMA PERSIS DENGAN CONTROLLER REFERENSI
+        ->where('siswa.status', 'aktif')
         ->group_by('kelas.id')
         ->order_by('kelas.nama', 'ASC')
         ->get();
@@ -284,71 +284,6 @@ class Dashboard extends CI_Controller {
     exit;
 }
 
-
-
-    // ==========================================================
-    // 🔹 HALAMAN PUBLIK: MUTASI
-    // ==========================================================
-    public function mutasi() {
-        $this->load->model('Laporan_model');
-        $this->load->library('pagination');
-
-        $tahun  = date('Y');
-        $kelas  = $this->input->get('kelas');
-        $jenis  = $this->input->get('jenis');
-        $search = $this->input->get('search');
-
-        $config['base_url'] = site_url('dashboard/mutasi');
-        $config['per_page'] = 10;
-        $config['page_query_string'] = TRUE;
-        $config['query_string_segment'] = 'page';
-        $config['reuse_query_string'] = TRUE;
-
-        $page   = ($this->input->get('page')) ? (int)$this->input->get('page') : 0;
-        $offset = $page;
-
-        $all_mutasi = $this->Laporan_model->get_laporan($tahun, $kelas, $jenis, $search);
-        $config['total_rows'] = count($all_mutasi);
-
-        // paginasi
-        $config['full_tag_open']   = '<ul class="pagination justify-content-center">';
-$config['full_tag_close']  = '</ul>';
-
-$config['first_link']      = '&laquo;';
-$config['first_tag_open']  = '<li class="page-item">';
-$config['first_tag_close'] = '</li>';
-
-$config['last_link']       = '&raquo;';
-$config['last_tag_open']   = '<li class="page-item">';
-$config['last_tag_close']  = '</li>';
-
-$config['next_link']       = '&rsaquo;';
-$config['next_tag_open']   = '<li class="page-item">';
-$config['next_tag_close']  = '</li>';
-
-$config['prev_link']       = '&lsaquo;';
-$config['prev_tag_open']   = '<li class="page-item">';
-$config['prev_tag_close']  = '</li>';
-
-$config['cur_tag_open']    = '<li class="page-item active"><span class="page-link">';
-$config['cur_tag_close']   = '</span></li>';
-
-$config['num_tag_open']    = '<li class="page-item">';
-$config['num_tag_close']   = '</li>';
-
-$config['attributes']      = ['class' => 'page-link'];
-
-        $this->pagination->initialize($config);
-
-        $data['mutasi'] = array_slice($all_mutasi, $offset, $config['per_page']);
-
-        $data['judul']    = 'Data Siswa Mutasi';
-        $data['tahun']    = $tahun;
-        $data['kelas_list'] = $this->Laporan_model->get_kelas();
-        $data['pagination'] = $this->pagination->create_links();
-
-        $this->load->view('dashboard/mutasi_public', $data);
-    }
 // ==========================================================
 // 🔹 SISWA MASUK PER TINGKAT (mutasi masuk)
 // ==========================================================

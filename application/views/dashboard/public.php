@@ -5,428 +5,510 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dashboard Mutasi Siswa</title>
   <link rel="icon" href="<?= base_url('assets/pwa/favicon.ico') ?>" sizes="any">
-<link rel="icon" type="image/png" sizes="192x192" href="<?= base_url('assets/pwa/icon-192.png') ?>">
-<link rel="icon" type="image/png" sizes="512x512" href="<?= base_url('assets/pwa/icon-512.png') ?>">
-<link rel="apple-touch-icon" href="<?= base_url('assets/pwa/icon-192.png') ?>">
-
+  <link rel="icon" type="image/png" sizes="192x192" href="<?= base_url('assets/pwa/icon-192.png') ?>">
+  <link rel="icon" type="image/png" sizes="512x512" href="<?= base_url('assets/pwa/icon-512.png') ?>">
+  <link rel="apple-touch-icon" href="<?= base_url('assets/pwa/icon-192.png') ?>">
   <link rel="manifest" href="<?= base_url('assets/pwa/manifest.json') ?>">
-<meta name="theme-color" content="#007bff">
+  <meta name="theme-color" content="#007bff">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
   <style>
-    :root {
-      --bg-light: #f8f9fa;
-      --text-light: #333;
-      --card-light: #fff;
-      --bg-dark: #121212;
-      --text-dark: #eaeaea;
-      --card-dark: #1f1f1f;
-    }
+  :root {
+  /* ===== COLOR SYSTEM ===== */
+  --primary: #0d6efd;
+  --primary-dark: #0b5ed7;
 
-    body {
-      background: var(--bg-light);
-      color: var(--text-light);
-      font-family: 'Segoe UI', sans-serif;
-      transition: background 0.3s, color 0.3s;
-      overflow-x: hidden;
-    }
+  /* Light */
+  --bg-light: #f5f7fb;
+  --card-light: #ffffff;
+  --text-light: #212529;
+  --muted-light: #6c757d;
+  --border-light: #dee2e6;
 
-    body.dark-mode {
-      background: var(--bg-dark);
-      color: var(--text-dark);
-    }
+  /* Dark */
+  --bg-dark: #12141c;
+  --card-dark: #1c1f2b;
+  --text-dark: #f1f3f5;
+  --muted-dark: #adb5bd;
+  --border-dark: #343a55;
 
-    header {
-      background: linear-gradient(90deg, #007bff, #00bcd4);
-      color: #fff;
-      padding: .8rem 0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-    }
+  --radius: 12px;
+  --shadow: 0 4px 14px rgba(0,0,0,.08);
+}
 
-    header .brand {
-      font-weight: 700;
-      font-size: 1.2rem;
-      letter-spacing: .3px;
-    }
+* {
+  box-sizing: border-box;
+}
 
-    header .actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  background: var(--bg-light);
+  color: var(--text-light);
+  transition: background .25s, color .25s;
+}
 
-    header a.btn-login {
-      color: #007bff;
-      background: #fff;
-      border-radius: 50px;
-      padding: .4rem 1rem;
-      font-weight: 500;
-      font-size: .9rem;
-      transition: 0.3s;
-    }
+body.dark-mode {
+  background: var(--bg-dark);
+  color: var(--text-dark);
+}
 
-    header a.btn-login:hover {
-      background: #e2e6ea;
-      text-decoration: none;
-    }
+/* ================= HEADER ================= */
+header {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  box-shadow: 0 4px 15px rgba(13,110,253,.35);
+}
 
-    header .btn-toggle {
-  background: rgba(255, 255, 255, 0.3);
-  border: none;
+.navbar {
+  padding: .8rem 0;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  font-size: 1.3rem;
+}
+
+.nav-link {
+  color: rgba(255,255,255,.9) !important;
+  border-radius: 8px;
+  padding: .5rem .9rem !important;
+}
+
+.nav-link:hover {
+  background: rgba(255,255,255,.15);
+}
+
+/* Toggle */
+.btn-theme-toggle {
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.4s ease;
+  border: 1px solid rgba(255,255,255,.4);
+  background: rgba(255,255,255,.2);
   color: #fff;
-  position: relative;
+}
+
+/* ================= CONTENT ================= */
+main {
+  padding: 2rem 0;
+}
+
+.welcome-section h3 {
+  font-weight: 700;
+  color: var(--primary);
+}
+
+body.dark-mode .welcome-section h3 {
+  color: #8bb4ff;
+}
+
+#currentTime {
+  color: var(--muted-light);
+}
+
+body.dark-mode #currentTime {
+  color: var(--muted-dark);
+}
+
+/* ================= CARD ================= */
+.card {
+  border-radius: var(--radius);
+  background: var(--card-light);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow);
+}
+
+body.dark-mode .card {
+  background: var(--card-dark);
+  border-color: var(--border-dark);
+}
+
+.card h5 {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+body.dark-mode .card h5 {
+  color: #9bbcff;
+}
+
+/* ================= TABLE ================= */
+.table-responsive {
+  border-radius: var(--radius);
   overflow: hidden;
 }
 
-    header .btn-toggle:hover {
-  background: rgba(255, 255, 255, 0.5);
-  transform: rotate(20deg);
-}
-header .btn-toggle i {
-  font-size: 1.1rem;
-  transition: transform 0.4s ease, opacity 0.3s ease;
+.table {
+  margin: 0;
 }
 
-body.dark-mode header .btn-toggle i.fa-sun {
-  color: #ffeb3b; /* kuning matahari */
+.table thead th {
+  background: #eef2ff;
+  font-size: .8rem;
+  text-transform: uppercase;
+  color: #1e293b;
+  border-bottom: 2px solid var(--border-light);
 }
 
-body:not(.dark-mode) header .btn-toggle i.fa-moon {
-  color: #212121; /* abu gelap untuk moon di light mode */
+body.dark-mode .table thead th {
+  background: #232844;
+  color: #ffffff;
+  border-bottom-color: var(--border-dark);
 }
 
-    h2.section-title {
-      font-weight: 700;
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
+.table td {
+  border-bottom: 1px solid var(--border-light);
+}
 
-    .dark-mode h2.section-title {
-      color: #eaeaea;
-    }
+body.dark-mode .table td {
+  color: var(--text-dark);
+  border-bottom-color: var(--border-dark);
+}
 
-    footer {
-      padding: 1.5rem 0;
-      background: var(--card-light);
-      border-top: 1px solid #ddd;
-      margin-top: 3rem;
-      color: #777;
-      font-size: .9rem;
-      transition: background 0.3s;
-    }
+.table tbody tr:hover {
+  background: rgba(13,110,253,.06);
+}
 
-    body.dark-mode footer {
-      background: var(--card-dark);
-      color: #bbb;
-      border-color: #333;
-    }
+body.dark-mode .table tbody tr:hover {
+  background: rgba(13,110,253,.2);
+}
 
-    .card {
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      background: var(--card-light);
-      transition: background 0.3s;
-    }
+.table-secondary {
+  background: rgba(13,110,253,.12);
+  font-weight: 600;
+}
 
-    body.dark-mode .card {
-      background: var(--card-dark);
-      box-shadow: 0 2px 10px rgba(255,255,255,0.05);
-    }
+body.dark-mode .table-secondary {
+  background: rgba(13,110,253,.3);
+}
 
-    /* 🔹 Responsive tweaks */
-    @media (max-width: 768px) {
-      header .container {
-        flex-direction: column;
-        text-align: center;
-      }
-      header .actions {
-        margin-top: .5rem;
-      }
-      h2.section-title {
-        font-size: 1.2rem;
-      }
-      .card h5 {
-        font-size: 1rem;
-      }
-      table th, table td {
-        font-size: .8rem;
-        padding: .3rem;
-      }
-      .btn-login {
-        font-size: .8rem;
-      }
-    }
-    /* 💬 CHATBOT STYLE */
+/* ================= BUTTON ================= */
+.btn-success {
+  background: var(--primary);
+  border: none;
+}
+
+.btn-success:hover {
+  background: var(--primary-dark);
+}
+
+/* ================= FOOTER ================= */
+footer {
+  margin-top: 4rem;
+  padding: 1.5rem 0;
+  background: var(--card-light);
+  border-top: 1px solid var(--border-light);
+}
+
+body.dark-mode footer {
+  background: var(--card-dark);
+  border-top-color: var(--border-dark);
+}
+
+/* ================= CHATBOT ================= */
+#chatbot {
+  background: var(--card-light);
+  border-radius: var(--radius);
+  border: 1px solid var(--border-light);
+}
+
+body.dark-mode #chatbot {
+  background: var(--card-dark);
+  border-color: var(--border-dark);
+}
+
+#chatbot-header {
+  background: var(--primary);
+  color: #fff;
+}
+
+.bot-msg {
+  background: #e7f1ff;
+  color: #084298;
+}
+
+body.dark-mode .bot-msg {
+  background: #2a3158;
+  color: #dbe4ff;
+}
+
+.user-msg {
+  background: var(--primary);
+}
+/* ================= DARK MODE TABLE FIX ================= */
+body.dark-mode table {
+  background-color: transparent;
+}
+
+body.dark-mode .table {
+  color: #f1f3f5;
+}
+
+body.dark-mode .table thead th {
+  background-color: #1f253a !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #3d4566 !important;
+}
+
+body.dark-mode .table tbody td {
+  background-color: #161b2e !important;
+  color: #e9ecef !important;
+  border-color: #2f3658 !important;
+}
+
+body.dark-mode .table tbody tr:hover td {
+  background-color: rgba(13,110,253,0.25) !important;
+}
+
+/* Baris TOTAL */
+body.dark-mode .table-secondary td {
+  background-color: #24305e !important;
+  color: #ffffff !important;
+  font-weight: 700;
+}
+
+/* Jika tabel kosong */
+body.dark-mode .table td.text-muted {
+  color: #adb5bd !important;
+}
+
+/* ================= CHATBOT FIX TOTAL ================= */
 #chatbot {
   position: fixed;
   bottom: 90px;
   right: 20px;
-  width: 320px;
-  max-height: 420px;
-  background: #fff;
-  border-radius: 15px;
-  box-shadow: 0 8px 25px rgba(0,0,0,.2);
+  width: 340px;
+  max-height: 520px;
+  background: var(--card-light);
+  border-radius: 14px;
   display: none;
   flex-direction: column;
-  z-index: 9999;
   overflow: hidden;
+  z-index: 9999;
+  border: 1px solid var(--border-light);
+  box-shadow: 0 12px 30px rgba(0,0,0,.25);
 }
 
 body.dark-mode #chatbot {
-  background: #1f1f1f;
-  color: #eaeaea;
+  background: var(--card-dark);
+  border-color: var(--border-dark);
 }
 
+/* HEADER */
 #chatbot-header {
-  background: linear-gradient(90deg,#007bff,#00bcd4);
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   color: #fff;
-  padding: 10px 15px;
-  font-weight: bold;
+  padding: .7rem 1rem;
+  font-weight: 700;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
+/* BODY */
 #chatbot-body {
   flex: 1;
-  padding: 10px;
+  padding: .8rem;
   overflow-y: auto;
-  font-size: 14px;
+  background: transparent;
+  font-size: .85rem;
 }
 
-.bot-msg {
-  background: #e9f5ff;
-  padding: 8px 10px;
-  border-radius: 10px;
-  margin-bottom: 8px;
-  width: fit-content;
-}
-
-.user-msg {
-  background: #007bff;
-  color: #fff;
-  padding: 8px 10px;
-  border-radius: 10px;
-  margin-bottom: 8px;
-  margin-left: auto;
-  width: fit-content;
-}
-
-body.dark-mode .bot-msg {
-  background: #2a2a2a;
-}
-
+/* FOOTER */
 #chatbot-footer {
   display: flex;
-  border-top: 1px solid #ddd;
+  border-top: 1px solid var(--border-light);
+  background: inherit;
 }
 
+body.dark-mode #chatbot-footer {
+  border-top-color: var(--border-dark);
+}
+
+/* INPUT */
 #chatbot-input {
   flex: 1;
   border: none;
-  padding: 10px;
+  padding: .6rem .8rem;
   outline: none;
+  background: transparent;
+  color: inherit;
+  font-size: .85rem;
 }
 
+/* SEND BUTTON */
 #chatbot-send {
-  background: #007bff;
   border: none;
+  padding: 0 .9rem;
+  background: var(--primary);
   color: #fff;
-  padding: 0 15px;
+  cursor: pointer;
 }
 
-/* Floating button */
-#chatbot-toggle {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  border: none;
-  background: linear-gradient(90deg,#007bff,#00bcd4);
-  color: #fff;
-  font-size: 22px;
-  cursor: pointer;
-  box-shadow: 0 5px 20px rgba(0,0,0,.3);
-  z-index: 9999;
+/* CHAT BUBBLE */
+.bot-msg {
+  background: #e7f1ff;
+  color: #084298;
+  padding: .55rem .75rem;
+  border-radius: 12px 12px 12px 4px;
+  margin-bottom: .5rem;
+  max-width: 85%;
 }
-/* Wrapper chatbot */
+
+body.dark-mode .bot-msg {
+  background: #2a3158;
+  color: #dbe4ff;
+}
+
+.user-msg {
+  background: var(--primary);
+  color: #fff;
+  padding: .55rem .75rem;
+  border-radius: 12px 12px 4px 12px;
+  margin-left: auto;
+  margin-bottom: .5rem;
+  max-width: 85%;
+}
+
+/* FLOAT BUTTON */
+#chatbot-toggle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: none;
+  color: #fff;
+  font-size: 1.3rem;
+  box-shadow: 0 8px 20px rgba(13,110,253,.45);
+}
+/* ================= FLOAT CHAT WRAPPER ================= */
 #chatbot-wrapper {
   position: fixed;
-  bottom: 15px;
-  right: 20px;
-  z-index: 9999;
-  text-align: center;
-}
-
-/* Tombol chat */
-#chatbot-toggle {
-  position: relative;
-  z-index: 9999;
-}
-
-/* Label teks */
-.chatbot-label {
-  position: absolute;
-  bottom: -10px;
-  left: 10%;
-  transform: translateX(-50%);
-  font-size: 11px;
-  font-weight: 600;
-  color: #007bff;
-  background: #fff;
-  padding: 3px 10px;
-  border-radius: 12px;
-  white-space: nowrap;
-  box-shadow: 0 2px 8px rgba(0,0,0,.15);
-  z-index: 9998;
-}
-
-
-/* Dark mode support */
-body.dark-mode .chatbot-label {
-  background: #1f1f1f;
-  color: #4fc3f7;
-}
-/* #chatbot-wrapper:hover .chatbot-label {
-  transform: translateY(-2px);
-  transition: 0.2s;
-} */
-.quick-list {
+  right: 22px;
+  bottom: 22px;
+  z-index: 99999;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
   gap: 6px;
-  margin-top: 6px;
 }
 
-.quick-btn {
-  background: #e7f3ff;
-  border: 1px solid #b6dbff;
-  border-radius: 12px;
-  padding: 5px 10px;
-  font-size: 12px;
-  cursor: pointer;
-  color: #007bff;
+/* Label */
+.chatbot-label {
+  background: var(--card-light);
+  color: var(--text-light);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: .75rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,.15);
 }
 
-.quick-btn:hover {
-  background: #cfe8ff;
+body.dark-mode .chatbot-label {
+  background: var(--card-dark);
+  color: var(--text-dark);
 }
+
 
   </style>
 </head>
 
 <body>
 
-<!-- 🔹 HEADER -->
+<!-- ==================== HEADER ==================== -->
 <header>
-<nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(90deg,#007bff,#00bcd4);">
-  <div class="container-fluid">
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
 
-    <!-- Brand -->
-    <a class="navbar-brand fw-bold" href="#">
-      <i class="fas fa-chart-line"></i> Dashboard Mutasi Siswa
-    </a>
+      <!-- Brand -->
+      <a class="navbar-brand" href="#">
+        <i class="fas fa-chart-line"></i> Dashboard Mutasi Siswa
+      </a>
 
-    <!-- Toggle button -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-      <span class="navbar-toggler-icon"></span>
-    </button>
+      <!-- Toggle button -->
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-    <!-- Menu -->
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+      <!-- Menu -->
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('index.php/public_mutasi') ?>">
+              <i class="fas fa-users"></i> Siswa Mutasi
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('index.php/izin/scan') ?>">
+              <i class="fas fa-qrcode"></i> Izin Keluar
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('index.php/AbsensiQR/scan') ?>">
+              <i class="fas fa-qrcode"></i> Absensi QR
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('index.php/DashboardMBG?tanggal='.date('Y-m-d')) ?>">
+              <i class="fas fa-chart-bar"></i> Dashboard MBG
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="<?= base_url('index.php/scrapijazah') ?>">
+              <i class="fas fa-graduation-cap"></i> Scrap Ijazah PDF
+            </a>
+          </li>
+        </ul>
 
-        <li class="nav-item">
-          <a class="nav-link" href="<?= base_url('index.php/dashboard/mutasi') ?>">
-            <i class="fas fa-users"></i> Siswa Mutasi
-          </a>
-        </li>
+        <!-- Right side actions -->
+        <div class="d-flex align-items-center gap-2">
 
-        <li class="nav-item">
-          <a class="nav-link" href="<?= base_url('index.php/izin/scan') ?>">
-            <i class="fas fa-qrcode"></i> Izin Keluar
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="<?= base_url('index.php/AbsensiQR/scan') ?>">
-            <i class="fas fa-qrcode"></i> Absensi QR
-          </a>
-        </li>
-
-        <li class="nav-item">
-          <a class="nav-link" href="<?= base_url('index.php/DashboardMBG?tanggal='.date('Y-m-d')) ?>">
-            <i class="fas fa-chart-bar"></i> Dashboard MBG
-          </a>
-        </li>
-      <li class="nav-item">
-          <a class="nav-link" href="<?= base_url('index.php/scrapijazah') ?>">
-            <i class="fas fa-graduation-cap"></i> Scrap Ijazah PDF
-          </a>
-        </li>
-
-      <!-- Right side -->
-      <div class="d-flex align-items-center gap-2">
-
-        <!-- Dark Mode Toggle -->
-        <button class="btn-toggle" id="toggleDark" title="Ganti Tema">
-          <i class="fas fa-moon"></i>
-        </button>
-
-        <!-- Login dropdown -->
-        <div class="dropdown">
-          <button class="btn-login dropdown-toggle" type="button" data-bs-toggle="dropdown">
-            <i class="fas fa-sign-in-alt"></i> Login
+          <!-- Dark Mode Toggle -->
+          <button class="btn-theme-toggle" id="toggleDark" title="Ganti Tema">
+            <i class="fas fa-moon"></i>
           </button>
 
-          <ul class="dropdown-menu dropdown-menu-end shadow">
-            <li><a class="dropdown-item" href="<?= base_url('index.php/auth/login') ?>">
-              <i class="fas fa-user-shield text-primary"></i> Login Admin
-            </a></li>
+          <!-- Login dropdown -->
+          <div class="dropdown">
+            <button class="btn-login dropdown-toggle" type="button" data-bs-toggle="dropdown">
+              <i class="fas fa-sign-in-alt"></i> Login
+            </button>
 
-            <li><a class="dropdown-item" href="<?= base_url('index.php/SiswaAuth') ?>">
-              <i class="fas fa-user-graduate text-success"></i> Login Siswa
-            </a></li>
-
-            <li><a class="dropdown-item" href="<?= base_url('index.php/auth/login') ?>">
-              <i class="fas fa-chalkboard-teacher text-warning"></i> Login Guru/Wali Kelas
-            </a></li>
-          </ul>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" href="<?= base_url('index.php/auth/login') ?>">
+                  <i class="fas fa-user-shield text-primary"></i> Login Admin
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="<?= base_url('index.php/SiswaAuth') ?>">
+                  <i class="fas fa-user-graduate text-success"></i> Login Siswa
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="<?= base_url('index.php/auth/login') ?>">
+                  <i class="fas fa-chalkboard-teacher text-warning"></i> Login Guru/Wali Kelas
+                </a>
+              </li>
+            </ul>
+          </div>
 
         </div>
-
       </div>
 
     </div>
-  </div>
-</nav>
+  </nav>
 </header>
 
-
-<!-- 🔹 MAIN CONTENT -->
+<!-- ==================== MAIN CONTENT ==================== -->
 <main class="container my-5">
 
-  <div class="text-center mb-4">
-    <h3 class="fw-bold mb-2">Selamat Datang di Sistem Mutasi Siswa 👋</h3>
-    <p class="text" id="currentTime">Data per <strong>-</strong></p>
+  <div class="welcome-section">
+    <h3>Selamat Datang di Sistem Mutasi Siswa 👋</h3>
+    <p id="currentTime">Data per <strong>-</strong></p>
   </div>
 
-  <h2 class="section-title mb-5">Statistik Mutasi Siswa Sekolah</h2>
+  <h2 class="section-title">Statistik Mutasi Siswa Sekolah</h2>
 
   <?php $this->load->view('dashboard/index', [
       'rombel' => $rombel,
@@ -435,148 +517,93 @@ body.dark-mode .chatbot-label {
       'lulus' => $lulus
   ]); ?>
 
-  <!-- 🔹 TABEL JUMLAH SISWA PER ROMBEL -->
-<div class="card shadow-sm mt-5">
-  <div class="card-body">
-    <h5 class="fw-bold text-primary mb-3">
-      <i class="fas fa-users"></i> Jumlah Siswa per Rombongan Belajar
-    </h5>
+  <!-- Tabel Jumlah Siswa per Rombel -->
+  <div class="card shadow-sm mt-5">
+    <div class="card-body">
+      <h5>
+        <i class="fas fa-users"></i> Jumlah Siswa per Rombongan Belajar
+      </h5>
 
-    <div class="table-responsive">
-      <table class="table table-bordered table-sm mb-0 text-center align-middle">
-        <thead class="table-light">
-          <tr>
-            <th style="width:50px">No</th>
-            <th>Nama Kelas</th>
-            <th>L</th>
-            <th>P</th>
-            <th>Total</th>
-            <th>Download</th>
-            <th>Jumlah Download</th>
-          </tr>
-        </thead>
-        <tbody>
-  <?php 
-    $no = 1; 
-    $sumL = 0;
-    $sumP = 0;
-    $sumTotal = 0;
-    
-    if (!empty($per_rombel)):
-      foreach($per_rombel as $r):
-        $sumL += $r->laki;
-        $sumP += $r->perempuan;
-        $sumTotal += $r->total;
+      <div class="table-responsive">
+        <table class="table table-sm mb-0 text-center align-middle">
+          <thead>
+            <tr>
+              <th style="width:50px">No</th>
+              <th>Nama Kelas</th>
+              <th>L</th>
+              <th>P</th>
+              <th>Total</th>
+              <th>Download</th>
+              <th>Jumlah Download</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php 
+              $no = 1; 
+              $sumL = 0;
+              $sumP = 0;
+              $sumTotal = 0;
+              
+              if (!empty($per_rombel)):
+                foreach($per_rombel as $r):
+                  $sumL += $r->laki;
+                  $sumP += $r->perempuan;
+                  $sumTotal += $r->total;
 
-        // Ambil ID kelas berdasarkan nama (supaya bisa link ke controller)
-        $kelas = $this->db->get_where('kelas', ['nama' => $r->nama_kelas])->row();
-        $kelas_id = $kelas ? $kelas->id : 0;
-
-        // Ambil jumlah download (kalau ada kolom download_count)
-        $count = isset($kelas->download_count) ? (int)$kelas->download_count : 0;
-  ?>
-    <tr>
-      <td><?= $no++; ?></td>
-      <td class="text-start"><?= $r->nama_kelas; ?></td>
-      <td><?= $r->laki; ?></td>
-      <td><?= $r->perempuan; ?></td>
-      <td class="fw-bold"><?= $r->total; ?></td>
-      <td>
-        <?php if ($kelas_id): ?>
-          <a href="<?= base_url('index.php/dashboard/download_excel/'.$kelas_id) ?>" 
-             class="btn btn-sm btn-success">
-             <i class="fas fa-file-excel"></i> Download
-          </a>
-        <?php else: ?>
-          <span class="text-muted">-</span>
-        <?php endif; ?>
-      </td>
-      <td><?= $count > 0 ? $count . 'x download' : '-' ?></td>
-    </tr>
-  <?php 
-      endforeach;
-  ?>
-    <!-- 🔹 Baris Total Keseluruhan -->
-    <tr class="table-secondary fw-bold">
-      <td colspan="2" class="text-end">Jumlah Keseluruhan</td>
-      <td><?= $sumL; ?></td>
-      <td><?= $sumP; ?></td>
-      <td><?= $sumTotal; ?></td>
-      <td colspan="2"></td>
-    </tr>
-  <?php else: ?>
-    <tr>
-      <td colspan="7" class="text-center text-muted">Belum ada data siswa aktif.</td>
-    </tr>
-  <?php endif; ?>
-</tbody>
-
-
-      </table>
+                  $kelas = $this->db->get_where('kelas', ['nama' => $r->nama_kelas])->row();
+                  $kelas_id = $kelas ? $kelas->id : 0;
+                  $count = isset($kelas->download_count) ? (int)$kelas->download_count : 0;
+            ?>
+              <tr>
+                <td><?= $no++; ?></td>
+                <td class="text-start"><?= $r->nama_kelas; ?></td>
+                <td><?= $r->laki; ?></td>
+                <td><?= $r->perempuan; ?></td>
+                <td class="fw-bold"><?= $r->total; ?></td>
+                <td>
+                  <?php if ($kelas_id): ?>
+                    <a href="<?= base_url('index.php/dashboard/download_excel/'.$kelas_id) ?>" 
+                       class="btn btn-sm btn-success">
+                       <i class="fas fa-file-excel"></i> Download
+                    </a>
+                  <?php else: ?>
+                    <span class="text-muted">-</span>
+                  <?php endif; ?>
+                </td>
+                <td><?= $count > 0 ? $count . 'x download' : '-' ?></td>
+              </tr>
+            <?php 
+                endforeach;
+            ?>
+              <!-- Baris Total -->
+              <tr class="table-secondary">
+                <td colspan="2" class="text-end">Jumlah Keseluruhan</td>
+                <td><?= $sumL; ?></td>
+                <td><?= $sumP; ?></td>
+                <td><?= $sumTotal; ?></td>
+                <td colspan="2"></td>
+              </tr>
+            <?php else: ?>
+              <tr>
+                <td colspan="7" class="text-center text-muted">Belum ada data siswa aktif.</td>
+              </tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
 
 </main>
 
-<!-- 🔹 FOOTER -->
+<!-- ==================== FOOTER ==================== -->
 <footer class="text-center">
   <div class="container">
     &copy; <?= date('Y') ?> Sistem Mutasi Siswa — Dibuat dengan 💙 oleh <strong>Nazmudin</strong>
   </div>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-// 🕒 Realtime tanggal & jam
-// 🕒 Realtime tanggal & jam
-function updateTime() {
-  const el = document.getElementById('currentTime');
-  const now = new Date();
-  const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][now.getDay()];
-  const bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][now.getMonth()];
-  const jam = now.getHours().toString().padStart(2,'0');
-  const menit = now.getMinutes().toString().padStart(2,'0');
-  const detik = now.getSeconds().toString().padStart(2,'0');
-  el.innerHTML = `Data per <strong>${hari}, ${now.getDate()} ${bulan} ${now.getFullYear()} — ${jam}:${menit}:${detik} WIB</strong>`;
-}
-setInterval(updateTime, 1000);
-updateTime();
-
-// 🌗 Dark mode toggle with icon animation
-const btnToggle = document.getElementById('toggleDark');
-const icon = btnToggle.querySelector('i');
-
-btnToggle.addEventListener('click', () => {
-  document.body.classList.toggle('dark-mode');
-  const isDark = document.body.classList.contains('dark-mode');
-  localStorage.setItem('darkMode', isDark);
-  icon.classList.add('fade');
-  setTimeout(() => {
-    icon.classList.remove('fa-moon', 'fa-sun');
-    icon.classList.add(isDark ? 'fa-sun' : 'fa-moon');
-    icon.classList.remove('fade');
-  }, 200);
-});
-
-// apply saved theme on load
-if (localStorage.getItem('darkMode') === 'true') {
-  document.body.classList.add('dark-mode');
-  icon.classList.replace('fa-moon', 'fa-sun');
-}
-
-</script>
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker
-      .register('/mutases/service-worker.js')
-      .then(reg => console.log('PWA aktif:', reg.scope))
-      .catch(err => console.error('PWA gagal:', err));
-  });
-}
-</script>
-<!-- 💬 CHATBOT -->
+<!-- ==================== CHATBOT ==================== -->
 <div id="chatbot">
   <div id="chatbot-header">
     <span><i class="fas fa-robot"></i> SiMumu</span>
@@ -591,7 +618,7 @@ if ('serviceWorker' in navigator) {
   </div>
 
   <div id="chatbot-footer">
-    <input type="text" id="chatbot-input" placeholder="ketik cek utk lihat list pertanyaan..." />
+    <input type="text" id="chatbot-input" placeholder="Ketik 'cek' untuk lihat menu..." />
     <button id="chatbot-send"><i class="fas fa-paper-plane"></i></button>
   </div>
 </div>
@@ -601,17 +628,63 @@ if ('serviceWorker' in navigator) {
   <button id="chatbot-toggle">
     <i class="fas fa-comments"></i>
   </button>
-  <div class="chatbot-label">Chat diatas</div>
+  <div class="chatbot-label">Chat di sini</div>
 </div>
 
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+// ==================== REALTIME CLOCK ====================
+function updateTime() {
+  const el = document.getElementById('currentTime');
+  const now = new Date();
+  const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][now.getDay()];
+  const bulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'][now.getMonth()];
+  const jam = now.getHours().toString().padStart(2,'0');
+  const menit = now.getMinutes().toString().padStart(2,'0');
+  const detik = now.getSeconds().toString().padStart(2,'0');
+  el.innerHTML = `Data per <strong>${hari}, ${now.getDate()} ${bulan} ${now.getFullYear()} — ${jam}:${menit}:${detik} WIB</strong>`;
+}
+setInterval(updateTime, 1000);
+updateTime();
+
+// ==================== DARK MODE TOGGLE ====================
+const btnToggle = document.getElementById('toggleDark');
+const icon = btnToggle.querySelector('i');
+
+btnToggle.addEventListener('click', () => {
+  document.body.classList.toggle('dark-mode');
+  const isDark = document.body.classList.contains('dark-mode');
+  localStorage.setItem('darkMode', isDark);
+  
+  icon.style.opacity = '0';
+  setTimeout(() => {
+    icon.classList.remove('fa-moon', 'fa-sun');
+    icon.classList.add(isDark ? 'fa-sun' : 'fa-moon');
+    icon.style.opacity = '1';
+  }, 200);
+});
+
+// Apply saved theme on load
+if (localStorage.getItem('darkMode') === 'true') {
+  document.body.classList.add('dark-mode');
+  icon.classList.replace('fa-moon', 'fa-sun');
+}
+
+// ==================== PWA SERVICE WORKER ====================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/mutases/service-worker.js')
+      .then(reg => console.log('PWA aktif:', reg.scope))
+      .catch(err => console.error('PWA gagal:', err));
+  });
+}
+
+// ==================== CHATBOT FUNCTIONALITY ====================
 const CHATBOT_URL = "<?= site_url('chatbot/reply') ?>";
 const CSRF_NAME = "<?= $this->security->get_csrf_token_name(); ?>";
 const CSRF_HASH = "<?= $this->security->get_csrf_hash(); ?>";
-</script>
 
-<script>
 const chatbot = document.getElementById('chatbot');
 const toggleBtn = document.getElementById('chatbot-toggle');
 const closeBtn = document.getElementById('chatbot-close');
@@ -619,11 +692,17 @@ const sendBtn = document.getElementById('chatbot-send');
 const input = document.getElementById('chatbot-input');
 const body = document.getElementById('chatbot-body');
 
-// toggle open
-toggleBtn.onclick = () => chatbot.style.display = 'flex';
-closeBtn.onclick = () => chatbot.style.display = 'none';
+// Toggle open/close
+toggleBtn.onclick = () => {
+  chatbot.style.display = 'flex';
+  input.focus();
+};
 
-// kirim pesan
+closeBtn.onclick = () => {
+  chatbot.style.display = 'none';
+};
+
+// Send message
 sendBtn.onclick = sendMessage;
 input.addEventListener('keypress', e => {
   if (e.key === 'Enter') sendMessage();
@@ -668,29 +747,23 @@ function appendMessage(text, className) {
         btn.className = 'quick-btn';
         btn.innerText = q;
         btn.onclick = () => {
-           wrap.remove();
-  // tampilkan pesan user
-  appendMessage(q, 'user-msg');
+          wrap.remove();
+          appendMessage(q, 'user-msg');
 
-  // cek apakah special action
-  const lowerQ = q.toLowerCase();
+          const lowerQ = q.toLowerCase();
 
-if (lowerQ === 'kelas') {
-  appendMessage("🏫 Silakan ketik nama kelas.\nContoh: kelas XI KL1", 'bot-msg');
-  input.value = 'kelas ';
-  input.focus();
-
-} else if (lowerQ === 'cek nisn') {
-  appendMessage("🆔 Silakan masukkan NISN siswa.\nContoh: cek nisn 1234567890", 'bot-msg');
-  input.value = 'cek nisn ';
-  input.focus();
-
-} else {
-  botReply(q);
-}
-
-
-};
+          if (lowerQ === 'kelas') {
+            appendMessage("🏫 Silakan ketik nama kelas.\nContoh: kelas XI KL1", 'bot-msg');
+            input.value = 'kelas ';
+            input.focus();
+          } else if (lowerQ === 'cek nisn') {
+            appendMessage("🆔 Silakan masukkan NISN siswa.\nContoh: cek nisn 1234567890", 'bot-msg');
+            input.value = 'cek nisn ';
+            input.focus();
+          } else {
+            botReply(q);
+          }
+        };
 
         wrap.appendChild(btn);
       });
@@ -706,8 +779,7 @@ if (lowerQ === 'kelas') {
   body.scrollTop = body.scrollHeight;
 }
 
-
-// LOGIKA CHAT BOT (simple rule)
+// Bot reply via API
 function botReply(text) {
   const params =
     "message=" + encodeURIComponent(text) +

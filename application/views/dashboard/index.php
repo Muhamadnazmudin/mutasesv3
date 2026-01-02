@@ -1,3 +1,28 @@
+<style>
+  body.light-mode .card {
+	border: none !important;
+	border-radius: 0.35rem !important;
+	box-shadow: 0 0.15rem 1.75rem rgba(58, 59, 69, 0.15) !important;
+	background-color: #ffffff !important;
+}
+
+body.light-mode .shadow,
+body.light-mode .shadow-sm,
+body.light-mode .shadow-lg {
+	box-shadow: 0 0.15rem 1.75rem rgba(58, 59, 69, 0.15) !important;
+}
+
+body.light-mode .border-left-primary { border-left: 0.25rem solid #4e73df !important; }
+body.light-mode .border-left-success { border-left: 0.25rem solid #1cc88a !important; }
+body.light-mode .border-left-info    { border-left: 0.25rem solid #36b9cc !important; }
+body.light-mode .border-left-warning { border-left: 0.25rem solid #f6c23e !important; }
+body.light-mode .border-left-danger  { border-left: 0.25rem solid #e74a3b !important; }
+
+body.light-mode .row > [class^="col-"] {
+	border: none !important;
+}
+</style>
+
 <?php if ($this->session->userdata('logged_in')): ?>
 <div class="text-center mt-4 mb-5">
   <h3>Selamat Datang, <?= $this->session->userdata('nama'); ?> 👋</h3>
