@@ -1,18 +1,24 @@
-const CACHE_NAME = "mutases-v1";
+const CACHE_NAME = "mutases";
 
 const urlsToCache = [
-	"/mutases/",
+	"/mutases/index.php",
 	"/mutases/assets/css/bootstrap.min.css",
 	"/mutases/assets/js/bootstrap.bundle.min.js",
 ];
 
 self.addEventListener("install", (event) => {
 	event.waitUntil(
-		caches
-			.open(CACHE_NAME)
-			.then((cache) => cache.addAll(urlsToCache))
-			.then(() => self.skipWaiting())
+		caches.open(CACHE_NAME).then(async (cache) => {
+			for (const url of urlsToCache) {
+				try {
+					await cache.add(url);
+				} catch (err) {
+					console.warn("Gagal cache:", url, err);
+				}
+			}
+		})
 	);
+	self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
@@ -21,8 +27,8 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("fetch", (event) => {
 	event.respondWith(
-		caches
-			.match(event.request)
-			.then((response) => response || fetch(event.request))
+		caches.match(event.request).then((response) => {
+			return response || fetch(event.request);
+		})
 	);
 });
