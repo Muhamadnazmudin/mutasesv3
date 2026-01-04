@@ -491,6 +491,13 @@ body.dark-mode .bot-anim {
             </a>
           </li>
           <li class="nav-item">
+  <a class="nav-link"
+     style="background: rgba(255,255,255,.15);"
+     href="<?= site_url('buku_tamu/daftar_hari_ini') ?>">
+    <i class="fas fa-clipboard-list"></i> Buku Tamu
+  </a>
+</li>
+          <li class="nav-item">
             <a class="nav-link" href="<?= base_url('index.php/izin/scan') ?>">
               <i class="fas fa-qrcode"></i> Izin Keluar
             </a>
@@ -505,6 +512,7 @@ body.dark-mode .bot-anim {
               <i class="fas fa-chart-bar"></i> Dashboard MBG
             </a>
           </li>
+          
           <li class="nav-item">
             <a class="nav-link" href="<?= base_url('index.php/scrapijazah') ?>">
               <i class="fas fa-graduation-cap"></i> Scrap Ijazah PDF

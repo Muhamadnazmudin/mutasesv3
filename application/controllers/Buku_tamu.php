@@ -25,7 +25,6 @@ class Buku_tamu extends CI_Controller {
 
         if ($selfie_base64) {
 
-            // bersihkan prefix
             $selfie_base64 = preg_replace(
                 '#^data:image/\w+;base64,#i',
                 '',
@@ -35,7 +34,6 @@ class Buku_tamu extends CI_Controller {
             $selfie_data = base64_decode($selfie_base64);
 
             if ($selfie_data !== false) {
-
                 $filename = 'selfie_' . time() . '_' . rand(1000,9999) . '.jpg';
                 $path = FCPATH . 'uploads/buku_tamu/selfie/' . $filename;
 
@@ -51,14 +49,15 @@ class Buku_tamu extends CI_Controller {
             'tanggal'        => date('Y-m-d H:i:s'),
             'nama_tamu'      => $this->input->post('nama_tamu', TRUE),
             'instansi'       => $this->input->post('instansi', TRUE),
-            'jumlah_orang' => (int) $this->input->post('jumlah_orang'),
+            'jumlah_orang'   => (int) $this->input->post('jumlah_orang'),
             'alamat'         => $this->input->post('alamat', TRUE),
             'no_hp'          => $this->input->post('no_hp', TRUE),
             'tujuan'         => $this->input->post('tujuan', TRUE),
             'keperluan'      => $this->input->post('keperluan', TRUE),
             'bertemu_dengan' => $this->input->post('bertemu_dengan', TRUE),
             'foto_selfie'    => $foto_selfie,
-            'foto_identitas' => $this->_upload_foto('foto_identitas', 'identitas')
+            'foto_identitas' => $this->_upload_foto('foto_identitas', 'identitas'),
+            'status'         => 0
         ];
 
         $this->Buku_tamu_model->insert($data);
@@ -68,9 +67,19 @@ class Buku_tamu extends CI_Controller {
             'Data buku tamu berhasil disimpan.'
         );
 
-        redirect('buku_tamu');
+        // ===============================
+        // REDIRECT SESUAI AKSES
+        // ===============================
+        if ($this->session->userdata('role_name') === 'admin') {
+            // ADMIN input manual
+            redirect('buku_tamu');
+        } else {
+            // TAMU PUBLIC
+            redirect('buku_tamu/daftar_hari_ini');
+        }
     }
 
+    // jika GET (public buka form)
     $this->load->view('buku_tamu/tambah');
 }
 
@@ -226,6 +235,101 @@ public function export_excel()
 
     $writer->save('php://output');
     exit;
+}
+
+public function daftar_hari_ini($offset = 0)
+{
+    $limit = 10;
+    $this->load->library('pagination');
+
+    // hitung hari ini
+    $total = $this->Buku_tamu_model->count_hari_ini();
+
+    $config['base_url']   = site_url('buku_tamu/daftar_hari_ini');
+    $config['total_rows'] = $total;
+    $config['per_page']   = $limit;
+    $config['uri_segment']= 3;
+
+    // style pagination
+    $config['full_tag_open']  = '<ul class="pagination justify-content-center mb-0">';
+    $config['full_tag_close'] = '</ul>';
+    $config['cur_tag_open']   = '<li class="page-item active"><span class="page-link">';
+    $config['cur_tag_close']  = '</span></li>';
+    $config['num_tag_open']   = '<li class="page-item"><span class="page-link">';
+    $config['num_tag_close']  = '</span></li>';
+    $config['prev_link']      = '&laquo;';
+    $config['next_link']      = '&raquo;';
+
+    $this->pagination->initialize($config);
+
+    $data['list']       = $this->Buku_tamu_model->get_hari_ini($limit, $offset);
+    $data['pagination'] = $this->pagination->create_links();
+    $data['start']      = $offset;
+
+    // 🔥 WAJIB load view INI
+    $this->load->view('buku_tamu/daftar_hari_ini', $data);
+}
+
+
+public function daftar_bulan_ini($offset = 0)
+{
+    $this->load->library('pagination');
+
+    $limit = 10;
+
+    // hitung total
+    $this->db->where('MONTH(tanggal)', date('m'));
+    $this->db->where('YEAR(tanggal)', date('Y'));
+    $total = $this->db->count_all_results('buku_tamu');
+
+    // config pagination
+    $config['base_url']    = site_url('buku_tamu/daftar_bulan_ini');
+    $config['total_rows']  = $total;
+    $config['per_page']    = $limit;
+    $config['uri_segment'] = 3;
+
+    $config['full_tag_open']  = '<ul class="pagination justify-content-center">';
+    $config['full_tag_close'] = '</ul>';
+    $config['num_tag_open']   = '<li class="page-item"><span class="page-link">';
+    $config['num_tag_close']  = '</span></li>';
+    $config['cur_tag_open']   = '<li class="page-item active"><span class="page-link">';
+    $config['cur_tag_close']  = '</span></li>';
+    $config['next_link']      = '&raquo;';
+    $config['prev_link']      = '&laquo;';
+
+    $this->pagination->initialize($config);
+
+    // ambil data
+    $this->db->where('MONTH(tanggal)', date('m'));
+    $this->db->where('YEAR(tanggal)', date('Y'));
+    $this->db->order_by('tanggal', 'DESC');
+    $data['list'] = $this->db->get('buku_tamu', $limit, $offset)->result();
+
+    $data['pagination'] = $this->pagination->create_links();
+    $data['start']      = $offset;
+    $data['title']      = 'Daftar Tamu Bulan Ini';
+
+    $this->load->view('buku_tamu/daftar_bulan_ini', $data);
+}
+
+public function set_selesai($id)
+{
+    // hanya admin
+    if ($this->session->userdata('role_name') !== 'admin') {
+        redirect('dashboard');
+        exit;
+    }
+
+    $this->Buku_tamu_model->update($id, [
+        'status' => 1
+    ]);
+
+    $this->session->set_flashdata(
+        'success',
+        'Status kunjungan ditandai selesai.'
+    );
+
+    redirect('buku_tamu');
 }
 
 }

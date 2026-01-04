@@ -122,6 +122,16 @@ body.dark-mode .modal-body .text-muted {
            class="btn btn-danger btn-sm mb-1">
            <i class="fas fa-trash"></i>
         </a>
+        <?php if ($r->status == 0): ?>
+<a href="<?= site_url('buku_tamu/set_selesai/'.$r->id) ?>"
+   class="btn btn-success btn-sm"
+   onclick="return confirm('Tandai kunjungan selesai?')">
+   <i class="fas fa-check"></i>
+</a>
+<?php else: ?>
+<span class="badge bg-success">Selesai</span>
+<?php endif; ?>
+
     </td>
 </tr>
 <?php endforeach; ?>
