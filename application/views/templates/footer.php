@@ -64,6 +64,22 @@
     setMode(newMode);
   });
 </script>
+<script>
+$(document).on('click', '.btn-edit', function () {
+    const id = $(this).data('id');
+
+    $('#modalEditBukuTamu').modal('show');
+    $('#editBukuTamuContent').html(
+        '<div class="text-center py-5 text-muted">' +
+        '<i class="fas fa-spinner fa-spin"></i> Memuat data...' +
+        '</div>'
+    );
+
+    $('#editBukuTamuContent').load(
+        '<?= site_url("buku_tamu/edit/") ?>' + id
+    );
+});
+</script>
 
 </body>
 </html>

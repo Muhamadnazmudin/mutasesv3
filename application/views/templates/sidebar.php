@@ -44,6 +44,7 @@ $group_guru = in_array($active, [
     'guru_kepangkatan',
     'guru_karir'
 ]);
+$group_buku_tamu = in_array($active, ['buku_tamu']);
 ?>
 
 <hr class="sidebar-divider">
@@ -209,6 +210,15 @@ $group_guru = in_array($active, [
             </a>
         </div>
     </div>
+</li>
+<!-- ==============================
+     BUKU TAMU (ADMIN)
+================================= -->
+<li class="nav-item <?= $active=='buku_tamu' ? 'active' : '' ?>">
+    <a class="nav-link" href="<?= site_url('buku_tamu') ?>">
+        <i class="fas fa-book"></i>
+        <span>Buku Tamu</span>
+    </a>
 </li>
 
 <!-- Pengaturan -->
