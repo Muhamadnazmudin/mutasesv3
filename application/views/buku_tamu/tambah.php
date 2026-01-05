@@ -211,16 +211,36 @@ if (!r) {
       (video.videoWidth * video.videoHeight);
 
     const lm = r.landmarks;
-    const eyeY =
-  (lm.getLeftEye()[0].y + lm.getRightEye()[0].y) / 2;
-const noseY = lm.getNose()[0].y;
-const diff = noseY - eyeY;
 
-    // ⬅️ THRESHOLD DIPERMUDAH (INI PENTING)
-    const sizeOK  = areaRatio > 0.07;
-    const angleOK = diff > 4 && diff < 43;
+// ===== LANDMARK UTAMA =====
+const leftEye  = lm.getLeftEye()[0];
+const rightEye = lm.getRightEye()[0];
+const nose     = lm.getNose()[0];
 
-    faceValid = sizeOK && angleOK;
+const eyeY  = (leftEye.y + rightEye.y) / 2;
+const diff  = Math.abs(nose.y - eyeY);
+
+// ===== VALIDASI UKURAN =====
+const sizeOK = areaRatio > 0.07;
+
+// ===== VALIDASI SUDUT (KEPALA TEGAK) =====
+const angleOK = diff < 12;
+
+// ===== ANTI WAJAH DITUTUP =====
+const eyeDistance = Math.abs(leftEye.x - rightEye.x);
+const eyeToNose   = Math.abs(nose.y - eyeY);
+
+const visibleOK =
+  eyeDistance > 18 &&   // mata harus jelas
+  eyeToNose < 22;       // hidung tidak tertutup
+
+// ===== CONFIDENCE MODEL =====
+const scoreOK = r.detection.score > 0.7;
+
+// ===== FINAL =====
+faceValid = sizeOK && angleOK && visibleOK && scoreOK;
+
+
 
     // DRAW BOX
     octx.lineWidth = 3;
@@ -228,8 +248,8 @@ const diff = noseY - eyeY;
     octx.strokeRect(x, y, w, h);
 
     statusWajah.textContent = faceValid
-      ? 'Posisi wajah OK'
-      : 'Sesuaikan wajah';
+  ? 'Wajah terdeteksi dengan jelas'
+  : 'Pastikan wajah terbuka & menghadap kamera';
     statusWajah.className =
       'status-text ' + (faceValid ? 'text-success' : 'text-danger');
   } else {
