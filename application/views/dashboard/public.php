@@ -563,12 +563,17 @@ body.dark-mode .bot-anim {
 <!-- ==================== MAIN CONTENT ==================== -->
 <main class="container my-5">
 
-  <div class="welcome-section">
-    <h3>Selamat Datang di Sistem Mutasi Siswa 👋</h3>
-    <p id="currentTime">Data per <strong>-</strong></p>
-  </div>
+  <!-- HEADER / INTRO -->
+  <div class="text-center mb-5">
+    <div class="welcome-section">
+      <h3>Selamat Datang di Sistem Mutasi Siswa 👋</h3>
+      <p id="currentTime">Data per <strong>-</strong></p>
+    </div>
 
-  <h2 class="section-title">Statistik Mutasi Siswa Sekolah</h2>
+    <h2 class="section-title mt-4">
+      Statistik Mutasi Siswa Sekolah
+    </h2>
+  </div>
 
   <?php $this->load->view('dashboard/index', [
       'rombel' => $rombel,
@@ -585,7 +590,7 @@ body.dark-mode .bot-anim {
       </h5>
 
       <div class="table-responsive">
-        <table class="table table-sm mb-0 text-center align-middle">
+        <table class="table table-sm mb-0 align-middle">
           <thead>
             <tr>
               <th style="width:50px">No</th>
@@ -659,7 +664,7 @@ body.dark-mode .bot-anim {
 <!-- ==================== FOOTER ==================== -->
 <footer class="text-center">
   <div class="container">
-    &copy; <?= date('Y') ?> Sistem Mutasi Siswa — Dibuat dengan 💙 oleh <strong>Nazmudin</strong>
+    © <?= date('Y') ?> <a href="https://www.profilsaya.my.id">SimSGTK </a> — Sistem Informasi Siswa dan GTK <strong>Nazmudin</strong>
   </div>
 </footer>
 

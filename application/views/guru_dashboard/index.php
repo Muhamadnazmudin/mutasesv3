@@ -1,4 +1,3 @@
-<div class="container-fluid">
 
   <h4 class="mb-3">Dashboard Guru</h4>
 
