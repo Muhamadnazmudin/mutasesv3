@@ -492,7 +492,6 @@ body.dark-mode .bot-anim {
           </li>
           <li class="nav-item">
   <a class="nav-link"
-     style="background: rgba(255,255,255,.15);"
      href="<?= site_url('buku_tamu/daftar_hari_ini') ?>">
     <i class="fas fa-clipboard-list"></i> Buku Tamu
   </a>
