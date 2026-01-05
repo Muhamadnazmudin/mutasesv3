@@ -212,12 +212,13 @@ if (!r) {
 
     const lm = r.landmarks;
     const eyeY =
-      (lm.getLeftEye()[0].y + lm.getRightEye()[0].y) / 2;
-    const noseY = lm.getNose()[0].y;
+  (lm.getLeftEye()[0].y + lm.getRightEye()[0].y) / 2;
+const noseY = lm.getNose()[0].y;
+const diff = noseY - eyeY;
 
     // ⬅️ THRESHOLD DIPERMUDAH (INI PENTING)
     const sizeOK  = areaRatio > 0.07;
-    const angleOK = (noseY - eyeY) > 6;
+    const angleOK = diff > 4 && diff < 43;
 
     faceValid = sizeOK && angleOK;
 
