@@ -125,13 +125,13 @@ html, body {
   </a>
 </li>
 
+<li class="nav-item <?= ($active=='guru_jadwal')?'active':'' ?>">
+  <a class="nav-link" href="<?= site_url('guru_jadwal') ?>">
+    <i class="fas fa-calendar-alt"></i>
+    <span>Jadwal Mengajar</span>
+  </a>
+</li>
 
-  <li class="nav-item">
-    <a class="nav-link" href="#">
-      <i class="fas fa-book"></i>
-      <span>Data Mengajar</span>
-    </a>
-  </li>
 
 <li class="nav-item <?= ($active=='guru_sertifikasi')?'active':'' ?>">
   <a class="nav-link" href="<?= site_url('guru_sertifikasi_guru') ?>">
