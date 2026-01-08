@@ -28,6 +28,7 @@ class Guru_jadwal_model extends CI_Model
 {
     return $this->db
         ->select('
+            j.id_jadwal AS jadwal_id,
             js.nama_jam,
             js.jam_mulai,
             js.jam_selesai,
@@ -44,5 +45,6 @@ class Guru_jadwal_model extends CI_Model
         ->get()
         ->result();
 }
+
 
 }

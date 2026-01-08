@@ -42,6 +42,7 @@
         <i class="fas fa-calendar-day"></i>
         Jadwal Mengajar Hari Ini (<?= $hari_ini ?>)
     </div>
+
     <div class="card-body">
 
         <?php if (empty($jadwal_hari_ini)): ?>
@@ -49,11 +50,15 @@
                 <i class="fas fa-coffee"></i>
                 Tidak ada jadwal mengajar hari ini.
             </div>
+
         <?php else: ?>
 
-            <ul class="list-group list-group-flush">
-                <?php foreach ($jadwal_hari_ini as $j): ?>
-                <li class="list-group-item">
+        <ul class="list-group list-group-flush">
+            <?php foreach ($jadwal_hari_ini as $j): ?>
+            <li class="list-group-item d-flex justify-content-between align-items-start">
+
+                <!-- INFO JADWAL -->
+                <div>
                     <strong><?= $j->nama_jam ?></strong>
                     <span class="text-muted">
                         (<?= $j->jam_mulai ?> – <?= $j->jam_selesai ?>)
@@ -64,9 +69,46 @@
                     <br>
                     <i class="fas fa-school text-success"></i>
                     <?= $j->nama_kelas ?>
-                </li>
-                <?php endforeach; ?>
-            </ul>
+                </div>
+
+                <!-- AKSI / STATUS -->
+                <div class="text-right">
+                    <?php if (empty($j->log)): ?>
+
+    <a href="<?= site_url('mengajar/mulai/'.$j->jadwal_id) ?>"
+       class="btn btn-sm btn-success">
+        <i class="fas fa-door-open"></i> Masuk Kelas
+    </a>
+
+<?php elseif ($j->log->status === 'mulai'): ?>
+
+    <a href="<?= site_url('mengajar/selesai/'.$j->log->id) ?>"
+       class="btn btn-sm btn-danger">
+        <i class="fas fa-stop-circle"></i> Selesai
+    </a>
+
+<?php elseif ($j->log && $j->log->status === 'menunggu_selfie'): ?>
+
+
+
+    <a href="<?= site_url('mengajar/selfie/'.$j->log->id) ?>"
+       class="btn btn-sm btn-warning">
+        <i class="fas fa-camera"></i> Selfie
+    </a>
+
+<?php else: ?>
+
+    <span class="badge badge-success">
+        <i class="fas fa-check"></i> Selesai
+    </span>
+
+<?php endif; ?>
+
+                </div>
+
+            </li>
+            <?php endforeach; ?>
+        </ul>
 
         <?php endif; ?>
 
