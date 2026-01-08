@@ -7,6 +7,7 @@ class SiswaDashboard extends CI_Controller {
     {
         parent::__construct();
         $this->load->model('Siswa_model');
+        $this->load->model('Siswa_jadwal_model');
         $this->load->database();
     }
 
@@ -34,19 +35,32 @@ class SiswaDashboard extends CI_Controller {
     }
 
     public function index()
-    {
-        $this->cek_login();
+{
+    $this->cek_login();
 
-        $data['siswa'] = $this->getSiswa();
-        if (!$data['siswa']) { redirect('SiswaAuth/logout'); }
-
-        $data['active'] = 'dashboard';
-
-        $this->load->view('siswa/layout/header', $data);
-        $this->load->view('siswa/layout/sidebar', $data);
-        $this->load->view('siswa/dashboard', $data);
-        $this->load->view('siswa/layout/footer');
+    // ambil data siswa
+    $data['siswa'] = $this->getSiswa();
+    if (!$data['siswa']) {
+        redirect('SiswaAuth/logout');
     }
+
+    // ===== INISIALISASI VARIABEL DULU (INI KUNCI) =====
+    $kelas_id = $this->session->userdata('kelas_id');
+    $hari_ini = $this->hari_ini();
+
+    // ===== AMBIL JADWAL HARI INI =====
+    $data['hari_ini'] = $hari_ini;
+    $data['jadwal_hari_ini'] = $this->Siswa_jadwal_model
+        ->get_jadwal_hari_ini($kelas_id, $hari_ini);
+
+    // ===== DATA VIEW =====
+    $data['active'] = 'dashboard';
+
+    $this->load->view('siswa/layout/header', $data);
+    $this->load->view('siswa/layout/sidebar', $data);
+    $this->load->view('siswa/dashboard', $data);
+    $this->load->view('siswa/layout/footer');
+}
 
     public function biodata()
     {
@@ -276,6 +290,20 @@ public function update_biodata()
 
     $this->session->set_flashdata('success', 'Biodata berhasil diperbarui!');
     redirect('SiswaDashboard/biodata');
+}
+private function hari_ini()
+{
+    $map = [
+        'Monday'    => 'Senin',
+        'Tuesday'   => 'Selasa',
+        'Wednesday' => 'Rabu',
+        'Thursday'  => 'Kamis',
+        'Friday'    => 'Jumat',
+        'Saturday'  => 'Sabtu',
+        'Sunday'    => 'Minggu',
+    ];
+
+    return $map[date('l')];
 }
 
 
