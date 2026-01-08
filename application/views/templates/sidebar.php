@@ -49,7 +49,7 @@ $group_kurikulum = in_array($active, [
     'jadwal_mengajar',
     'laporan_mengajar',
     'mapel',
-    // 'kurikulum_mapel',
+    'jam_sekolah'
 ]);
 
 ?>
@@ -147,7 +147,14 @@ $group_kurikulum = in_array($active, [
     </a>
     <div id="mKurikulumAdmin" class="collapse <?= $group_kurikulum ? 'show' : '' ?>">
         <div class="bg-white py-2 collapse-inner rounded">
-
+            <a class="collapse-item <?= $active=='mapel'?'active':'' ?>"
+               href="<?= site_url('mapel') ?>">
+               Mata Pelajaran
+            </a>
+            <a class="collapse-item <?= $active=='jam_sekolah'?'active':'' ?>"
+               href="<?= site_url('jam_sekolah') ?>">
+               Jam Sekolah
+            </a>
             <a class="collapse-item <?= $active=='jadwal_mengajar'?'active':'' ?>"
                href="<?= site_url('jadwal_mengajar') ?>">
                Jadwal Mengajar Guru
@@ -157,11 +164,6 @@ $group_kurikulum = in_array($active, [
                href="<?= site_url('laporan_mengajar') ?>">
                Laporan Mengajar Guru
             </a>
-            <a class="collapse-item <?= $active=='mapel'?'active':'' ?>"
-               href="<?= site_url('mapel') ?>">
-               Mata Pelajaran
-            </a>
-
         </div>
     </div>
 </li>
