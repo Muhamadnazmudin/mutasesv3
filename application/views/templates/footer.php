@@ -80,6 +80,48 @@ $(document).on('click', '.btn-edit', function () {
     );
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+    const sidebar = document.getElementById('accordionSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    // kalau bukan halaman guru, abaikan
+    if (!btnToggleSidebar || !sidebar || !overlay) {
+        return;
+    }
+
+    btnToggleSidebar.addEventListener('click', function (e) {
+        e.preventDefault();
+        sidebar.classList.toggle('show');
+        overlay.classList.toggle('show');
+    });
+
+    overlay.addEventListener('click', function () {
+        sidebar.classList.remove('show');
+        overlay.classList.remove('show');
+    });
+
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const sidebar = document.getElementById('accordionSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    document.querySelectorAll('#accordionSidebar .nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('show');
+                overlay.classList.remove('show');
+            }
+        });
+    });
+
+});
+</script>
 
 </body>
 </html>

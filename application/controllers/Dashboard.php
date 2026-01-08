@@ -7,41 +7,57 @@ use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
 class Dashboard extends CI_Controller {
 
-    public function __construct() {
-        parent::__construct();
-        $this->load->library('session');
-        $this->load->database();
+    public function __construct()
+{
+    parent::__construct();
+    $this->load->library('session');
+    $this->load->database();
 
-        // Ambil tahun ajaran dari session
-        $session_tahun = $this->session->userdata('tahun_id');
+    // Ambil tahun ajaran dari session (kalau ada)
+    $session_tahun = $this->session->userdata('tahun_id');
 
-        if ($session_tahun) {
-            $this->tahun_id = $session_tahun;
-        } else {
-            // Untuk publik (tanpa login) ambil tahun aktif
-            $t = $this->db->get_where('tahun_ajaran', ['aktif' => 1])->row();
-            $this->tahun_id = $t ? $t->id : null;
-        }
+    if ($session_tahun) {
+        $this->tahun_id = $session_tahun;
+    } else {
+        // Publik / belum login → ambil tahun aktif
+        $t = $this->db->get_where('tahun_ajaran', ['aktif' => 1])->row();
+        $this->tahun_id = $t ? $t->id : null;
     }
-
-
+}
     // ==========================================================
     //  DASHBOARD
     // ==========================================================
-    public function index() {
-        $data['title'] = 'Dashboard';
+    public function index()
+{
+    $data['title'] = 'Dashboard';
 
-        // Jumlah kelas per tingkat
-        $data['rombel']  = $this->get_kelas_by_tingkat();
+    // ===============================
+    //  JIKA SUDAH LOGIN
+    // ===============================
+    if ($this->session->userdata('logged_in')) {
 
-        // siswa_tahun → status = aktif
-        $data['aktif']   = $this->get_siswa_aktif_by_tingkat();
-        // mutasi siswa masuk
-        $data['masuk']   = $this->get_siswa_masuk_by_tingkat();
-        // mutasi → jenis: keluar
-        $data['keluar']  = $this->get_siswa_keluar_by_tingkat();
+        $role = $this->session->userdata('role_name');
 
-        // Lulus
+        // 🔒 GURU TIDAK BOLEH KE DASHBOARD ADMIN
+        if ($role === 'guru') {
+            redirect('guru_dashboard');
+        }
+
+        // 🔒 ROLE LAIN SELAIN ADMIN
+        if ($role !== 'admin') {
+            redirect('auth/logout');
+        }
+
+        // ===============================
+        //  DASHBOARD ADMIN
+        // ===============================
+        $data['active'] = 'dashboard';
+
+        $data['rombel'] = $this->get_kelas_by_tingkat();
+        $data['aktif']  = $this->get_siswa_aktif_by_tingkat();
+        $data['masuk']  = $this->get_siswa_masuk_by_tingkat();
+        $data['keluar'] = $this->get_siswa_keluar_by_tingkat();
+
         $q = $this->db
             ->select('tahun_ajaran.tahun, COUNT(siswa.id) AS jumlah')
             ->join('tahun_ajaran', 'tahun_ajaran.id = siswa.tahun_id', 'left')
@@ -51,21 +67,40 @@ class Dashboard extends CI_Controller {
             ->get('siswa');
 
         $data['lulus'] = $q ? $q->result() : [];
-
-        // siswa_tahun → tabel publik
         $data['per_rombel'] = $this->get_siswa_per_rombel();
 
-        // Jika login, tampilkan versi admin
-        if ($this->session->userdata('logged_in')) {
-            $data['active'] = 'dashboard';
-            $this->load->view('templates/header', $data);
-            $this->load->view('templates/sidebar', $data);
-            $this->load->view('dashboard/index', $data);
-            $this->load->view('templates/footer');
-        } else {
-            $this->load->view('dashboard/public', $data);
-        }
+        $this->load->view('templates/header', $data);
+        $this->load->view('templates/sidebar', $data);
+        $this->load->view('dashboard/index', $data);
+        $this->load->view('templates/footer');
+
+        return;
     }
+
+    // ===============================
+    //  JIKA BELUM LOGIN → PUBLIK
+    // ===============================
+   $data['rombel']     = $this->get_kelas_by_tingkat();
+$data['aktif']      = $this->get_siswa_aktif_by_tingkat();
+$data['masuk']      = $this->get_siswa_masuk_by_tingkat();
+$data['keluar']     = $this->get_siswa_keluar_by_tingkat();
+$data['per_rombel'] = $this->get_siswa_per_rombel();
+
+/* TAMBAHKAN INI */
+$q = $this->db
+    ->select('tahun_ajaran.tahun, COUNT(siswa.id) AS jumlah')
+    ->join('tahun_ajaran', 'tahun_ajaran.id = siswa.tahun_id', 'left')
+    ->where('siswa.status', 'lulus')
+    ->where('siswa.tahun_id', $this->tahun_id)
+    ->group_by('tahun_ajaran.tahun')
+    ->get('siswa');
+
+$data['lulus'] = $q ? $q->result() : [];
+
+/* BARU LOAD VIEW */
+$this->load->view('dashboard/public', $data);
+}
+
 
 
     // ==========================================================

@@ -8,7 +8,12 @@ class Jadwal_mengajar extends CI_Controller
         parent::__construct();
         is_logged_in();
         $this->load->model('Jadwal_mengajar_model');
+         if (!$this->session->userdata('logged_in')) {
+            redirect('dashboard');
+            exit;
+        }
     }
+    
 
     public function index()
     {

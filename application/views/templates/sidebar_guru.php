@@ -54,20 +54,12 @@ html, body {
 @media (max-width: 768px) {
 
     #accordionSidebar {
-        left: -224px;
+        transform: translateX(-100%);
+        transition: transform .3s ease;
     }
 
     #accordionSidebar.show {
-        left: 0;
-    }
-
-    #content-wrapper {
-        margin-left: 0 !important;
-        padding-top: 60px;
-    }
-
-    .topbar {
-        left: 0 !important;
+        transform: translateX(0);
     }
 
     .sidebar-overlay {
@@ -81,7 +73,48 @@ html, body {
     .sidebar-overlay.show {
         display: block;
     }
+    /* ===== FORCE SIDEBAR ABOVE OVERLAY (FIX FINAL) ===== */
+#accordionSidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 180px !important;
+    height: 100vh !important;
+    z-index: 9999 !important;
+    background: linear-gradient(180deg, #28a745, #1e7e34);
 }
+
+/* MOBILE */
+@media (max-width: 768px) {
+
+    #accordionSidebar {
+        transform: translateX(-100%);
+        transition: transform .3s ease;
+    }
+
+    #accordionSidebar.show {
+        transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+        z-index: 9000 !important;
+    }
+}
+/* ===== PREVENT TEXT WRAP SIDEBAR MENU ===== */
+#accordionSidebar .nav-link span {
+    white-space: nowrap;        /* ⛔ jangan wrap */
+    overflow: hidden;
+    text-overflow: ellipsis;    /* … kalau kepanjangan */
+    display: inline-block;
+    max-width: 130px;           /* sesuaikan lebar sidebar */
+}
+
+/* Rapatkan tinggi menu */
+#accordionSidebar .nav-link {
+    line-height: 1.2;
+}
+
+    }
 </style>
 
 <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -245,22 +278,5 @@ html, body {
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <div id="content-wrapper" class="d-flex flex-column">
 
-<script>
-const btnToggleSidebar = document.getElementById('btnToggleSidebar');
-const sidebar = document.getElementById('accordionSidebar');
-const overlay = document.getElementById('sidebarOverlay');
 
-if (btnToggleSidebar) {
-  btnToggleSidebar.addEventListener('click', () => {
-    sidebar.classList.toggle('show');
-    overlay.classList.toggle('show');
-  });
-}
 
-if (overlay) {
-  overlay.addEventListener('click', () => {
-    sidebar.classList.remove('show');
-    overlay.classList.remove('show');
-  });
-}
-</script>
