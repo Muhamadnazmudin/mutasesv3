@@ -17,12 +17,12 @@
   </div>
 </footer>
 
-</div> <!-- End of Content Wrapper -->
-</div> <!-- End of Page Wrapper -->
+</div>
+</div>
 
 <a class="scroll-to-top rounded" href="#page-top"><i class="fas fa-angle-up"></i></a>
 
-<!-- Scripts -->
+
 <script src="<?= base_url('assets/sbadmin2/vendor/jquery/jquery.min.js') ?>"></script>
 <script src="<?= base_url('assets/sbadmin2/vendor/bootstrap/js/bootstrap.bundle.min.js') ?>"></script>
 <script src="<?= base_url('assets/sbadmin2/vendor/jquery-easing/jquery.easing.min.js') ?>"></script>
@@ -33,12 +33,12 @@
 <script src="<?= base_url('assets/sbadmin2/vendor/datatables/dataTables.bootstrap4.min.js') ?>"></script>
 <script src="<?= base_url('assets/sbadmin2/vendor/sweetalert/sweetalert.min.js') ?>"></script>
 <script>
-  // --- Toggle Dark/Light Mode ---
+ 
   const toggleBtn = document.getElementById('toggleMode');
   const currentMode = localStorage.getItem('mode') || 'dark';
   const body = document.body;
 
-  // Fungsi ubah mode
+  // ubah mode didieu
   function setMode(mode) {
     if (mode === 'dark') {
         body.classList.add('dark-mode');
