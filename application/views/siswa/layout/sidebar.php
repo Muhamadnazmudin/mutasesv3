@@ -22,7 +22,13 @@
     </li>
 
     <hr class="sidebar-divider">
-
+<li class="nav-item <?= ($active=='jadwal'?'active':''); ?>">
+    <a class="nav-link" href="<?= site_url('SiswaJadwal'); ?>">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Jadwal Pelajaran</span>
+    </a>
+</li>
+<hr class="sidebar-divider">
     <!-- Biodata -->
     <li class="nav-item <?= ($active=='biodata'?'active':''); ?>">
         <a class="nav-link" href="<?= site_url('SiswaDashboard/biodata'); ?>">

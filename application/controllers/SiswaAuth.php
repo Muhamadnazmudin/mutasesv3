@@ -42,7 +42,8 @@ class SiswaAuth extends CI_Controller {
             'siswa_login' => TRUE,
             'siswa_id' => $siswa->id,
             'siswa_nama' => $siswa->nama,
-            'siswa_nisn' => $siswa->nisn
+            'siswa_nisn' => $siswa->nisn,
+            'kelas_id'    => $siswa->id_kelas
         ]);
 
         redirect('SiswaDashboard');
