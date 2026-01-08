@@ -95,7 +95,7 @@ $group_kurikulum = in_array($active, [
             </a> -->
 
             <a class="collapse-item <?= $active=='guru_mengajar'?'active':'' ?>"
-               href="<?= site_url('guru_mengajar') ?>">
+               href="<?= site_url('monitoring_mengajar') ?>">
                Data Mengajar
             </a>
 
