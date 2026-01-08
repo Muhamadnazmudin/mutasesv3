@@ -45,6 +45,13 @@ $group_guru = in_array($active, [
     'guru_karir'
 ]);
 $group_buku_tamu = in_array($active, ['buku_tamu']);
+$group_kurikulum = in_array($active, [
+    'jadwal_mengajar',
+    'laporan_mengajar',
+    'mapel',
+    // 'kurikulum_mapel',
+]);
+
 ?>
 
 <hr class="sidebar-divider">
@@ -125,6 +132,34 @@ $group_buku_tamu = in_array($active, ['buku_tamu']);
             <a class="collapse-item <?= $active=='guru_karir'?'active':'' ?>"
                href="<?= site_url('guru_karir') ?>">
                Riwayat Karir Guru
+            </a>
+
+        </div>
+    </div>
+</li>
+<!-- ==============================
+     KURIKULUM (ADMIN)
+================================= -->
+<li class="nav-item <?= $group_kurikulum ? 'active' : '' ?>">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mKurikulumAdmin">
+        <i class="fas fa-book-open"></i>
+        <span>Kurikulum</span>
+    </a>
+    <div id="mKurikulumAdmin" class="collapse <?= $group_kurikulum ? 'show' : '' ?>">
+        <div class="bg-white py-2 collapse-inner rounded">
+
+            <a class="collapse-item <?= $active=='jadwal_mengajar'?'active':'' ?>"
+               href="<?= site_url('jadwal_mengajar') ?>">
+               Jadwal Mengajar Guru
+            </a>
+
+            <a class="collapse-item <?= $active=='laporan_mengajar'?'active':'' ?>"
+               href="<?= site_url('laporan_mengajar') ?>">
+               Laporan Mengajar Guru
+            </a>
+            <a class="collapse-item <?= $active=='mapel'?'active':'' ?>"
+               href="<?= site_url('mapel') ?>">
+               Mata Pelajaran
             </a>
 
         </div>
