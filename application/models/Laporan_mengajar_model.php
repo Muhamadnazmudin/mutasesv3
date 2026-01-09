@@ -34,10 +34,10 @@ class Laporan_mengajar_model extends CI_Model {
             m.nama_mapel,
             k.nama AS nama_kelas,
 
-            js1.nama_jam   AS jam_awal,
-            js1.jam_mulai AS jam_mulai_jadwal,
+            js1.nama_jam AS jam_awal,
+            js2.nama_jam AS jam_akhir,
 
-            js2.nama_jam   AS jam_akhir,
+            js1.jam_mulai   AS jam_mulai_jadwal,
             js2.jam_selesai AS jam_selesai_jadwal
         ')
         ->from('log_mengajar lm')
@@ -46,10 +46,8 @@ class Laporan_mengajar_model extends CI_Model {
         ->join('mapel m', 'm.id_mapel = j.mapel_id')
         ->join('kelas k', 'k.id = j.rombel_id')
 
-        // ⬅️ JAM AWAL
+        // ⬇️ JAM AWAL & AKHIR (INI PENTING)
         ->join('jam_sekolah js1', 'js1.id_jam = j.jam_mulai_id')
-
-        // ⬅️ JAM AKHIR
         ->join('jam_sekolah js2', 'js2.id_jam = j.jam_selesai_id')
 
         ->order_by('lm.tanggal', 'DESC')
