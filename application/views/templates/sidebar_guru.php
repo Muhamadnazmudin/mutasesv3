@@ -102,19 +102,95 @@ html, body {
 }
 /* ===== PREVENT TEXT WRAP SIDEBAR MENU ===== */
 #accordionSidebar .nav-link span {
-    white-space: nowrap;        /* ⛔ jangan wrap */
+    white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;    /* … kalau kepanjangan */
+    text-overflow: ellipsis;
     display: inline-block;
-    max-width: 130px;           /* sesuaikan lebar sidebar */
+    max-width: 130px;
 }
 
 /* Rapatkan tinggi menu */
 #accordionSidebar .nav-link {
     line-height: 1.2;
 }
+/* ================= MENU LIST FIX ================= */
+
+/* Heading menu */
+#accordionSidebar .sidebar-heading {
+    margin-top: 12px;
+    margin-bottom: 8px;
+    padding-left: 18px;
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,.85);
+}
+
+/* Item wrapper */
+#accordionSidebar .nav-item {
+    margin: 4px 12px;
+}
+
+/* Link menu */
+#accordionSidebar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: .9rem;
+    font-weight: 500;
+    color: #f1fff1;
+    line-height: 1.4;
+    transition: all .2s ease;
+}
+
+/* Icon menu */
+#accordionSidebar .nav-link i {
+    width: 20px;
+    min-width: 20px;
+    text-align: center;
+    font-size: .95rem;
+    opacity: .95;
+}
+
+/* Hover */
+#accordionSidebar .nav-link:hover {
+    background: rgba(255,255,255,.15);
+}
+
+/* Active */
+#accordionSidebar .nav-item.active .nav-link {
+    background: rgba(255,255,255,.22);
+    font-weight: 600;
+}
+
+/* Divider dirapikan */
+#accordionSidebar .sidebar-divider {
+    margin: 10px 16px;
+    border-top: 1px solid rgba(255,255,255,.15);
+}
+
+/* Logout biar konsisten */
+#accordionSidebar .btn-danger {
+    margin-top: 8px;
+    border-radius: 12px;
+    font-size: .85rem;
+}
+/* ================= FIX TEKS MENU ================= */
+#accordionSidebar .nav-link span {
+    white-space: normal;        /* BOLEH TURUN BARIS */
+    overflow: visible;
+    text-overflow: unset;
+    max-width: none;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;      /* maksimal 2 baris */
+    -webkit-box-orient: vertical;
+}
 
     }
+
 </style>
 
 <ul class="navbar-nav bg-gradient-success sidebar sidebar-dark accordion" id="accordionSidebar">
