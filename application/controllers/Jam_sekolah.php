@@ -32,22 +32,67 @@ class Jam_sekolah extends CI_Controller
         $this->load->view('jam_sekolah/tambah', $data);
         $this->load->view('templates/footer');
   }
+public function store()
+{
+    $hariInput = $this->input->post('hari', TRUE);
 
-    public function store()
-    {
-        $this->Jam_sekolah_model->insert([
-            'hari'        => $this->input->post('hari', TRUE),
-            'nama_jam'    => $this->input->post('nama_jam', TRUE),
-            'jam_mulai'   => $this->input->post('jam_mulai', TRUE),
-            'jam_selesai' => $this->input->post('jam_selesai', TRUE),
-            'jenis'       => $this->input->post('jenis', TRUE),
-            'urutan'      => $this->input->post('urutan', TRUE),
-            'target'      => $this->input->post('target', TRUE),
-            'is_active'   => 1
-        ]);
+    $dataBase = [
+        'nama_jam'    => $this->input->post('nama_jam', TRUE),
+        'jam_mulai'   => $this->input->post('jam_mulai', TRUE),
+        'jam_selesai' => $this->input->post('jam_selesai', TRUE),
+        'jenis'       => $this->input->post('jenis', TRUE),
+        'urutan'      => $this->input->post('urutan', TRUE),
+        'target'      => $this->input->post('target', TRUE),
+        'is_active'   => 1
+    ];
 
-        redirect('jam_sekolah');
+    $hariValid = ['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+
+    // fungsi kecil untuk cek duplikat
+    $exists = function($hari) use ($dataBase) {
+        return $this->db
+            ->where('hari', $hari)
+            ->where('urutan', $dataBase['urutan'])
+            ->where('target', $dataBase['target'])
+            ->get('jam_sekolah')
+            ->num_rows() > 0;
+    };
+
+    // =====================
+    // SEMUA HARI
+    // =====================
+    if ($hariInput === 'ALL') {
+
+        foreach ($hariValid as $hari) {
+
+            if ($exists($hari)) {
+                continue; // ⬅️ LEWATI JIKA SUDAH ADA
+            }
+
+            $data = $dataBase;
+            $data['hari'] = $hari;
+            $this->Jam_sekolah_model->insert($data);
+        }
+
     }
+    // =====================
+    // SATU HARI
+    // =====================
+    elseif (in_array($hariInput, $hariValid)) {
+
+        if (!$exists($hariInput)) {
+            $dataBase['hari'] = $hariInput;
+            $this->Jam_sekolah_model->insert($dataBase);
+        }
+
+    } else {
+        $this->session->set_flashdata('error', 'Hari tidak valid');
+        redirect('jam_sekolah/tambah');
+        return;
+    }
+
+    redirect('jam_sekolah');
+}
 
     public function delete($id)
     {

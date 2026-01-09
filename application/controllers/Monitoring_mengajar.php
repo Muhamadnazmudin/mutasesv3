@@ -28,8 +28,7 @@ class Monitoring_mengajar extends CI_Controller {
         $this->load->view('templates/footer');
     }
 
-    // dipanggil via AJAX
-   public function load_data()
+    public function load_data()
 {
     $guru_id  = $this->input->get('guru_id');
     $kelas_id = $this->input->get('kelas_id');
@@ -41,31 +40,39 @@ class Monitoring_mengajar extends CI_Controller {
 
     foreach ($rows as $r) {
 
-        if ($r->jam_mulai && !$r->jam_selesai) {
+        // ===== STATUS DARI LOG =====
+        if ($r->log_mulai && !$r->log_selesai) {
             $status = 'sedang';
-        } elseif ($r->jam_selesai) {
+        } elseif ($r->log_selesai) {
             $status = 'selesai';
         } else {
             $status = 'belum';
         }
 
         $data[] = [
-            'guru'   => $r->nama_guru,
-            'kelas'  => $r->nama_kelas,
-            'mapel'  => $r->nama_mapel,
-            'jam'    => $r->nama_jam,
-            'mulai'  => $r->jam_mulai
-                ? date('H:i', strtotime($r->jam_mulai))
+            'guru'       => $r->nama_guru,
+            'kelas'      => $r->nama_kelas,
+            'mapel'      => $r->nama_mapel,
+
+            // ⬅️ JAM RANGE
+            'jam_awal'   => $r->jam_awal,
+            'jam_akhir'  => $r->jam_akhir,
+
+            // ⬅️ JAM SEKOLAH (jadwal)
+            'jam_mulai'  => $r->jam_mulai
+                ? substr($r->jam_mulai, 0, 5)
                 : '-',
-            'selesai'=> $r->jam_selesai
-                ? date('H:i', strtotime($r->jam_selesai))
+            'jam_selesai'=> $r->jam_selesai
+                ? substr($r->jam_selesai, 0, 5)
                 : '-',
-            'status' => $status
+
+            'status'     => $status
         ];
     }
 
     echo json_encode($data);
 }
+
 public function filter_data()
 {
     $data['guru']  = $this->db->order_by('nama','ASC')->get('guru')->result();

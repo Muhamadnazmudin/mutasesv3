@@ -28,11 +28,12 @@
                         <tr>
                             <td><?= $j->hari ?></td>
                             <td>
-                                <?= $j->nama_jam ?><br>
-                                <small class="text-muted">
-                                    <?= $j->jam_mulai ?> – <?= $j->jam_selesai ?>
-                                </small>
-                            </td>
+    <?= $j->jam_awal ?> – <?= $j->jam_akhir ?><br>
+    <small class="text-muted">
+        <?= substr($j->jam_mulai, 0, 5) ?> – <?= substr($j->jam_selesai, 0, 5) ?>
+    </small>
+</td>
+
                             <td><?= $j->nama_kelas ?></td>
                             <td><?= $j->nama_mapel ?></td>
                         </tr>

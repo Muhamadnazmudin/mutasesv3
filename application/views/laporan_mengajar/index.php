@@ -61,7 +61,16 @@
                         <td><?= $l->nama_guru ?></td>
                         <td><?= $l->nama_kelas ?></td>
                         <td><?= $l->nama_mapel ?></td>
-                        <td><?= $l->nama_jam ?></td>
+                        <td>
+    <strong>
+        <?= $l->jam_awal ?> – <?= $l->jam_akhir ?>
+    </strong>
+    <br>
+    <small class="text-muted">
+        <?= substr($l->jam_mulai_jadwal, 0, 5) ?> – <?= substr($l->jam_selesai_jadwal, 0, 5) ?>
+    </small>
+</td>
+
                         <td>
                             <?php if ($l->status == 'selesai'): ?>
                                 <span class="badge badge-success">Selesai</span>

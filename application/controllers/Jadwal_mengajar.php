@@ -43,30 +43,47 @@ class Jadwal_mengajar extends CI_Controller
     }
 
     public function store()
-    {
-        $guru  = $this->input->post('guru_id');
-        $kelas = $this->input->post('rombel_id');
-        $hari  = $this->input->post('hari');
-        $jam   = $this->input->post('jam_id');
+{
+    $jamAwal  = (int)$this->input->post('jam_mulai_id');
+    $jamAkhir = (int)$this->input->post('jam_selesai_id');
 
-        if ($this->Jadwal_mengajar_model->bentrok_guru($guru, $hari, $jam)) {
-    $this->session->set_flashdata('error', 'Guru sudah mengajar di jam tersebut.');
-    redirect('jadwal_mengajar/tambah');
-}
-
-if ($this->Jadwal_mengajar_model->bentrok_kelas($kelas, $hari, $jam)) {
-    $this->session->set_flashdata('error', 'Kelas sudah digunakan di jam tersebut.');
-    redirect('jadwal_mengajar/tambah');
-}
-
-        $this->Jadwal_mengajar_model->insert([
-            'guru_id'   => $guru,
-            'rombel_id' => $kelas,
-            'mapel_id'  => $this->input->post('mapel_id'),
-            'jam_id'    => $jam,
-            'hari'      => $hari
-        ]);
-
-        redirect('jadwal_mengajar');
+    if (!$jamAwal || !$jamAkhir || $jamAkhir < $jamAwal) {
+        $this->session->set_flashdata('error', 'Jam awal & akhir tidak valid');
+        redirect('jadwal_mengajar/tambah');
+        return;
     }
+
+    $data = [
+        'guru_id'        => $this->input->post('guru_id'),
+        'rombel_id'      => $this->input->post('rombel_id'),
+        'mapel_id'       => $this->input->post('mapel_id'),
+        'hari'           => $this->input->post('hari'),
+        'jam_mulai_id'   => $jamAwal,
+        'jam_selesai_id' => $jamAkhir,
+    ];
+
+    $this->db->insert('jadwal_mengajar', $data);
+
+    redirect('jadwal_mengajar');
+}
+
+    public function get_jam_by_hari()
+{
+    $hari = $this->input->get('hari', TRUE);
+
+    if (!$hari) {
+        echo json_encode([]);
+        return;
+    }
+
+    $jam = $this->db
+        ->where('hari', $hari)
+        ->where('is_active', 1)
+        ->order_by('urutan', 'ASC')
+        ->get('jam_sekolah')
+        ->result();
+
+    echo json_encode($jam);
+}
+
 }

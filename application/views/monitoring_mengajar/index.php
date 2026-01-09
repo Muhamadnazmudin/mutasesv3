@@ -24,9 +24,7 @@
                     <th>Guru</th>
                     <th>Kelas</th>
                     <th>Mapel</th>
-                    <th>Jam Ke</th>
-                    <th>Jam Mulai</th>
-                    <th>Jam Selesai</th>
+                    <th>Jam</th>
                     <th>Status</th>
                 </tr>
             </thead>
@@ -57,12 +55,16 @@ function loadMonitoring() {
                         <td>${row.guru}</td>
                         <td>${row.kelas}</td>
                         <td>${row.mapel}</td>
-                        <td>${row.jam}</td>
-                        <td>${row.mulai}</td>
-                        <td>${row.selesai}</td>
+                        <td>
+                            <strong>${row.jam_awal} – ${row.jam_akhir}</strong><br>
+                            <small class="text-muted">
+                                ${row.jam_mulai} – ${row.jam_selesai}
+                            </small>
+                        </td>
                         <td class="text-center">${badge}</td>
                     </tr>
                 `;
+
             });
 
             document.querySelector('#tblMonitoring tbody').innerHTML = tbody;

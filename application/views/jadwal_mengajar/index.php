@@ -25,7 +25,11 @@
                     <?php foreach ($jadwal as $j): ?>
                     <tr>
                         <td><?= $j->hari ?></td>
-                        <td><?= $j->nama_jam ?> (<?= $j->jam_mulai ?>–<?= $j->jam_selesai ?>)</td>
+                        <td>
+    <?= $j->jam_awal ?> – <?= $j->jam_akhir ?>
+    (<?= substr($j->jam_mulai,0,5) ?>–<?= substr($j->jam_selesai,0,5) ?>)
+</td>
+
                         <td><?= $j->nama_guru ?></td>
                         <td><?= $j->nama_kelas ?></td>
                         <td><?= $j->nama_mapel ?></td>

@@ -54,17 +54,26 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label>Jam ke-</label>
-                            <select name="jam_id" class="form-control" required>
-                                <option value="">-- Pilih Jam --</option>
-                                <?php foreach ($jam as $j): ?>
-                                    <option value="<?= $j->id_jam ?>">
-                                        <?= $j->nama_jam ?> (<?= $j->jam_mulai ?>–<?= $j->jam_selesai ?>)
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
+                        <div class="row">
+    <div class="col">
+        <div class="form-group">
+            <label>Jam Ke Awal</label>
+            <select name="jam_mulai_id" id="jamMulai" class="form-control" required>
+                <option value="">-- Pilih Jam Awal --</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="form-group">
+            <label>Jam Ke Akhir</label>
+            <select name="jam_selesai_id" id="jamSelesai" class="form-control" required>
+                <option value="">-- Pilih Jam Akhir --</option>
+            </select>
+        </div>
+    </div>
+</div>
+
 
                         <div class="form-group">
                             <label>Kelas / Rombel</label>
@@ -105,3 +114,56 @@
     </div>
 
 </div>
+<script>
+const hariSelect = document.querySelector('select[name="hari"]');
+const jamMulai   = document.getElementById('jamMulai');
+const jamSelesai = document.getElementById('jamSelesai');
+
+let jamData = [];
+
+hariSelect.addEventListener('change', function () {
+
+    const hari = this.value;
+
+    jamMulai.innerHTML   = '<option value="">-- Pilih Jam Awal --</option>';
+    jamSelesai.innerHTML = '<option value="">-- Pilih Jam Akhir --</option>';
+
+    if (!hari) return;
+
+    fetch(`<?= site_url('jadwal_mengajar/get_jam_by_hari') ?>?hari=${hari}`)
+        .then(res => res.json())
+        .then(data => {
+
+            jamData = data;
+
+            data.forEach(jam => {
+                const opt = document.createElement('option');
+                opt.value = jam.id_jam;
+                opt.textContent =
+                    `${jam.nama_jam} (${jam.jam_mulai}–${jam.jam_selesai})`;
+                jamMulai.appendChild(opt);
+            });
+
+        });
+});
+
+// jam akhir hanya boleh >= jam awal
+jamMulai.addEventListener('change', function () {
+
+    const mulaiId = parseInt(this.value);
+    jamSelesai.innerHTML = '<option value="">-- Pilih Jam Akhir --</option>';
+
+    if (!mulaiId) return;
+
+    jamData
+        .filter(j => j.id_jam >= mulaiId)
+        .forEach(jam => {
+            const opt = document.createElement('option');
+            opt.value = jam.id_jam;
+            opt.textContent =
+                `${jam.nama_jam} (${jam.jam_mulai}–${jam.jam_selesai})`;
+            jamSelesai.appendChild(opt);
+        });
+});
+</script>
+

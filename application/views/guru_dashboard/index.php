@@ -35,6 +35,35 @@
 .jadwal-hari-ini i {
     opacity: 0.9;
 }
+/* ===== JAM INFO RESPONSIVE ===== */
+.jam-info {
+    line-height: 1.3;
+}
+
+/* Desktop / Tablet */
+.jam-range {
+    font-weight: 600;
+    display: inline;
+}
+
+.jam-clock {
+    display: inline;
+    margin-left: 4px;
+}
+
+/* ===== MOBILE MODE ===== */
+@media (max-width: 576px) {
+    .jam-range {
+        display: block;
+        font-size: 0.95rem;
+    }
+
+    .jam-clock {
+        display: block;
+        font-size: 0.8rem;
+        margin-left: 0;
+    }
+}
 
   </style>
 <div class="card shadow mb-4 jadwal-hari-ini">
@@ -59,17 +88,23 @@
 
                 <!-- INFO JADWAL -->
                 <div>
-                    <strong><?= $j->nama_jam ?></strong>
-                    <span class="text-muted">
-                        (<?= $j->jam_mulai ?> – <?= $j->jam_selesai ?>)
-                    </span>
-                    <br>
-                    <i class="fas fa-book text-primary"></i>
-                    <?= $j->nama_mapel ?>
-                    <br>
-                    <i class="fas fa-school text-success"></i>
-                    <?= $j->nama_kelas ?>
-                </div>
+    <div class="jam-info">
+    <div class="jam-range">
+        <?= $j->jam_awal ?> – <?= $j->jam_akhir ?>
+    </div>
+    <div class="jam-clock text-muted">
+        (<?= substr($j->jam_mulai, 0, 5) ?> – <?= substr($j->jam_selesai, 0, 5) ?>)
+    </div>
+</div>
+
+    <br>
+    <i class="fas fa-book text-primary"></i>
+    <?= $j->nama_mapel ?>
+    <br>
+    <i class="fas fa-school text-success"></i>
+    <?= $j->nama_kelas ?>
+</div>
+
 
                 <!-- AKSI / STATUS -->
                 <div class="text-right">

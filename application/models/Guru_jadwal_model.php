@@ -8,19 +8,28 @@ class Guru_jadwal_model extends CI_Model
         return $this->db
             ->select('
                 j.hari,
-                js.nama_jam,
-                js.jam_mulai,
-                js.jam_selesai,
-                r.nama AS nama_kelas,
-                m.nama_mapel
+                k.nama AS nama_kelas,
+                m.nama_mapel,
+
+                js1.nama_jam AS jam_awal,
+                js1.jam_mulai AS jam_mulai,
+
+                js2.nama_jam AS jam_akhir,
+                js2.jam_selesai AS jam_selesai
             ')
             ->from('jadwal_mengajar j')
-            ->join('jam_sekolah js', 'js.id_jam = j.jam_id')
-            ->join('kelas r', 'r.id = j.rombel_id')
+            ->join('kelas k', 'k.id = j.rombel_id')
             ->join('mapel m', 'm.id_mapel = j.mapel_id')
+
+            // ⬅️ JOIN JAM AWAL
+            ->join('jam_sekolah js1', 'js1.id_jam = j.jam_mulai_id')
+
+            // ⬅️ JOIN JAM AKHIR
+            ->join('jam_sekolah js2', 'js2.id_jam = j.jam_selesai_id')
+
             ->where('j.guru_id', $guru_id)
-            ->order_by('FIELD(j.hari,"Senin","Selasa","Rabu","Kamis","Jumat","Sabtu")')
-            ->order_by('js.urutan', 'ASC')
+            ->order_by('j.hari', 'ASC')
+            ->order_by('js1.urutan', 'ASC')
             ->get()
             ->result();
     }
@@ -29,22 +38,32 @@ class Guru_jadwal_model extends CI_Model
     return $this->db
         ->select('
             j.id_jadwal AS jadwal_id,
-            js.nama_jam,
-            js.jam_mulai,
-            js.jam_selesai,
+            j.hari,
+
             k.nama AS nama_kelas,
-            m.nama_mapel
+            m.nama_mapel,
+
+            js1.nama_jam AS jam_awal,
+            js1.jam_mulai AS jam_mulai,
+
+            js2.nama_jam AS jam_akhir,
+            js2.jam_selesai AS jam_selesai
         ')
         ->from('jadwal_mengajar j')
-        ->join('jam_sekolah js', 'js.id_jam = j.jam_id')
         ->join('kelas k', 'k.id = j.rombel_id')
         ->join('mapel m', 'm.id_mapel = j.mapel_id')
+
+        // ⬅️ JOIN JAM AWAL
+        ->join('jam_sekolah js1', 'js1.id_jam = j.jam_mulai_id')
+
+        // ⬅️ JOIN JAM AKHIR
+        ->join('jam_sekolah js2', 'js2.id_jam = j.jam_selesai_id')
+
         ->where('j.guru_id', $guru_id)
         ->where('j.hari', $hari)
-        ->order_by('js.urutan', 'ASC')
+        ->order_by('js1.urutan', 'ASC')
         ->get()
         ->result();
 }
-
 
 }

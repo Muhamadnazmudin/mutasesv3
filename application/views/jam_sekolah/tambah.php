@@ -23,17 +23,18 @@
                                value="<?= $this->security->get_csrf_hash(); ?>">
 
                         <div class="form-group">
-                            <label>Hari</label>
-                            <select name="hari" class="form-control" required>
-                                <option value="">-- Pilih --</option>
-                                <option>Senin</option>
-                                <option>Selasa</option>
-                                <option>Rabu</option>
-                                <option>Kamis</option>
-                                <option>Jumat</option>
-                                <option>Sabtu</option>
-                            </select>
-                        </div>
+                                <label>Hari</label>
+                                <select name="hari" class="form-control" required>
+                                    <option value="">-- Pilih --</option>
+                                    <option value="ALL">Semua Hari</option>
+                                    <option>Senin</option>
+                                    <option>Selasa</option>
+                                    <option>Rabu</option>
+                                    <option>Kamis</option>
+                                    <option>Jumat</option>
+                                    <option>Sabtu</option>
+                                </select>
+                            </div>
 
                         <div class="form-group">
                             <label>Nama Jam</label>
