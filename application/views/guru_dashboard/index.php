@@ -158,60 +158,84 @@
 
         <ul class="list-group list-group-flush">
             <?php foreach ($jadwal_hari_ini as $j): ?>
+
+            <?php
+            // ⬅️ TAMBAHAN (LOGIKA WAKTU)
+            date_default_timezone_set('Asia/Jakarta');
+            $now = time();
+            $jam_masuk = strtotime(date('Y-m-d') . ' ' . $j->jam_mulai);
+            $selisih_menit = floor(($jam_masuk - $now) / 60);
+            $telat_menit   = floor(($now - $jam_masuk) / 60);
+            ?>
+
             <li class="list-group-item d-flex justify-content-between align-items-start">
 
                 <!-- INFO JADWAL -->
                 <div>
-    <div class="jam-info">
-    <div class="jam-range">
-        <?= $j->jam_awal ?> – <?= $j->jam_akhir ?>
-    </div>
-    <div class="jam-clock text-muted">
-        (<?= substr($j->jam_mulai, 0, 5) ?> – <?= substr($j->jam_selesai, 0, 5) ?>)
-    </div>
-</div>
+                    <div class="jam-info">
+                        <div class="jam-range">
+                            <?= $j->jam_awal ?> – <?= $j->jam_akhir ?>
+                        </div>
+                        <div class="jam-clock text-muted">
+                            (<?= substr($j->jam_mulai, 0, 5) ?> – <?= substr($j->jam_selesai, 0, 5) ?>)
+                        </div>
+                    </div>
 
-    <br>
-    <i class="fas fa-book text-primary"></i>
-    <?= $j->nama_mapel ?>
-    <br>
-    <i class="fas fa-school text-success"></i>
-    <?= $j->nama_kelas ?>
-</div>
-
+                    <br>
+                    <i class="fas fa-book text-primary"></i>
+                    <?= $j->nama_mapel ?>
+                    <br>
+                    <i class="fas fa-school text-success"></i>
+                    <?= $j->nama_kelas ?>
+                </div>
 
                 <!-- AKSI / STATUS -->
                 <div class="text-right">
+
                     <?php if (empty($j->log)): ?>
 
-    <a href="<?= site_url('mengajar/mulai/'.$j->jadwal_id) ?>"
-       class="btn btn-sm btn-success">
-        <i class="fas fa-door-open"></i> Masuk Kelas
-    </a>
+                        <!-- ⬅️ TAMBAHAN (PERINGATAN) -->
+                        <?php if ($selisih_menit <= 5 && $selisih_menit >= 1): ?>
+        <div class="alert alert-warning p-2 mb-2 small">
+            <i class="fas fa-exclamation-triangle"></i>
+            Segera masuk, sisa waktu
+            <strong><?= $selisih_menit ?> menit</strong> lagi
+        </div>
 
-<?php elseif ($j->log->status === 'mulai'): ?>
+    <?php elseif ($selisih_menit <= 0 && $telat_menit >= 0): ?>
+        <div class="alert alert-danger p-2 mb-2 small">
+            <i class="fas fa-clock"></i>
+            Segera masuk, Anda telat
+            <strong><?= $telat_menit ?> menit</strong>
+        </div>
+    <?php endif; ?>
 
-    <a href="<?= site_url('mengajar/selesai/'.$j->log->id) ?>"
-       class="btn btn-sm btn-danger">
-        <i class="fas fa-stop-circle"></i> Selesai
-    </a>
+                        <a href="<?= site_url('mengajar/mulai/'.$j->jadwal_id) ?>"
+                           class="btn btn-sm btn-success">
+                            <i class="fas fa-door-open"></i> Masuk Kelas
+                        </a>
 
-<?php elseif ($j->log && $j->log->status === 'menunggu_selfie'): ?>
+                    <?php elseif ($j->log->status === 'mulai'): ?>
 
+                        <a href="<?= site_url('mengajar/selesai/'.$j->log->id) ?>"
+                           class="btn btn-sm btn-danger">
+                            <i class="fas fa-stop-circle"></i> Selesai
+                        </a>
 
+                    <?php elseif ($j->log && $j->log->status === 'menunggu_selfie'): ?>
 
-    <a href="<?= site_url('mengajar/selfie/'.$j->log->id) ?>"
-       class="btn btn-sm btn-warning">
-        <i class="fas fa-camera"></i> Selfie
-    </a>
+                        <a href="<?= site_url('mengajar/selfie/'.$j->log->id) ?>"
+                           class="btn btn-sm btn-warning">
+                            <i class="fas fa-camera"></i> Selfie
+                        </a>
 
-<?php else: ?>
+                    <?php else: ?>
 
-    <span class="badge badge-success">
-        <i class="fas fa-check"></i> Selesai
-    </span>
+                        <span class="badge badge-success">
+                            <i class="fas fa-check"></i> Selesai
+                        </span>
 
-<?php endif; ?>
+                    <?php endif; ?>
 
                 </div>
 
@@ -223,3 +247,4 @@
 
     </div>
 </div>
+
