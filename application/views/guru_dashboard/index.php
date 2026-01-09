@@ -64,6 +64,80 @@
         margin-left: 0;
     }
 }
+/* ================= MOBILE CARD BASE ================= */
+@media (max-width: 576px) {
+
+    .jadwal-hari-ini .list-group {
+        gap: 14px;
+    }
+
+    .jadwal-hari-ini .list-group-item {
+        border-radius: 18px;
+        padding: 16px;
+        border: none;
+        box-shadow: 0 10px 25px rgba(0,0,0,.12);
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .jadwal-hari-ini .list-group-item > div:last-child {
+        margin-top: 12px;
+        text-align: center;
+    }
+
+    .jadwal-hari-ini .jam-range {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .jadwal-hari-ini .jam-clock {
+        font-size: 0.8rem;
+    }
+
+    .jadwal-hari-ini .btn {
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 8px 12px;
+    }
+
+    .jadwal-hari-ini .badge {
+        border-radius: 10px;
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+}
+@media (max-width: 576px) {
+
+    /* LIGHT MODE */
+    .jadwal-hari-ini .list-group-item {
+        background: #b7cfda;
+        color: #212529;
+    }
+
+    .jadwal-hari-ini .jam-clock {
+        color: #6c757d;
+    }
+}
+@media (max-width: 576px) {
+
+    .dark-mode .jadwal-hari-ini .list-group-item {
+        background: linear-gradient(145deg, #2f3248, #25283b);
+        color: #f1f1f1;
+        box-shadow: 0 12px 30px rgba(0,0,0,.35);
+    }
+
+    .dark-mode .jadwal-hari-ini .jam-clock {
+        color: #b9c0ff;
+    }
+
+    .dark-mode .jadwal-hari-ini .fa-book {
+        color: #ffd66b;
+    }
+
+    .dark-mode .jadwal-hari-ini .fa-school {
+        color: #7de2b8;
+    }
+}
 
   </style>
 <div class="card shadow mb-4 jadwal-hari-ini">
