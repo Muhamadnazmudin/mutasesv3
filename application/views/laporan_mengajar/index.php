@@ -6,24 +6,32 @@
 
     <!-- FILTER -->
     <form method="get" class="form-inline mb-3">
-        <input type="date" name="tanggal"
-               class="form-control mr-2"
-               value="<?= $this->input->get('tanggal') ?>">
 
-        <select name="guru_id" class="form-control mr-2">
-            <option value="">-- Semua Guru --</option>
-            <?php foreach ($guru as $g): ?>
-                <option value="<?= $g->id ?>"
-                    <?= $this->input->get('guru_id') == $g->id ? 'selected' : '' ?>>
-                    <?= $g->nama ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
+    <label class="mr-2">Dari</label>
+    <input type="date" name="tanggal_awal"
+           class="form-control mr-3"
+           value="<?= $this->input->get('tanggal_awal') ?>">
 
-        <button class="btn btn-primary">
-            <i class="fas fa-filter"></i> Filter
-        </button>
-    </form>
+    <label class="mr-2">Sampai</label>
+    <input type="date" name="tanggal_akhir"
+           class="form-control mr-3"
+           value="<?= $this->input->get('tanggal_akhir') ?>">
+
+    <select name="guru_id" class="form-control mr-3">
+        <option value="">-- Semua Guru --</option>
+        <?php foreach ($guru as $g): ?>
+            <option value="<?= $g->id ?>"
+                <?= $this->input->get('guru_id') == $g->id ? 'selected' : '' ?>>
+                <?= $g->nama ?>
+            </option>
+        <?php endforeach; ?>
+    </select>
+
+    <button class="btn btn-primary">
+        <i class="fas fa-filter"></i> Filter
+    </button>
+</form>
+
 
     <a href="<?= site_url('laporan_mengajar/export_pdf?'.http_build_query($_GET)) ?>"
        class="btn btn-danger mb-3">
@@ -77,12 +85,12 @@
 
                         <!-- STATUS -->
                         <td>
-                            <?php if ($l->status === 'selesai'): ?>
+                            <?php if ($l->status_laporan === 'selesai'): ?>
                                 <span class="badge badge-success">Selesai</span>
-                            <?php elseif ($l->status === 'mulai'): ?>
+                            <?php elseif ($l->status_laporan === 'mulai'): ?>
                                 <span class="badge badge-info">Sedang Mengajar</span>
                             <?php else: ?>
-                                <span class="badge badge-warning"><?= $l->status ?></span>
+                                <span class="badge badge-warning"><?= $l->status_laporan ?></span>
                             <?php endif; ?>
                         </td>
 
