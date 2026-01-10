@@ -29,6 +29,15 @@
     </a>
 </li>
 <hr class="sidebar-divider">
+
+<li class="nav-item <?= ($active=='bacaan'?'active':''); ?>">
+    <a class="nav-link" href="<?= site_url('SiswaBacaan'); ?>">
+        <i class="fas fa-book-reader"></i>
+        <span>Bacaan / E-Book</span>
+    </a>
+</li>
+
+<hr class="sidebar-divider">
     <!-- Biodata -->
     <li class="nav-item <?= ($active=='biodata'?'active':''); ?>">
         <a class="nav-link" href="<?= site_url('SiswaDashboard/biodata'); ?>">

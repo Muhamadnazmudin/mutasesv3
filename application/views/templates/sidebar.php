@@ -49,7 +49,8 @@ $group_kurikulum = in_array($active, [
     'jadwal_mengajar',
     'laporan_mengajar',
     'mapel',
-    'jam_sekolah'
+    'jam_sekolah',
+    'buku'
 ]);
 
 ?>
@@ -163,6 +164,10 @@ $group_kurikulum = in_array($active, [
             <a class="collapse-item <?= $active=='laporan_mengajar'?'active':'' ?>"
                href="<?= site_url('laporan_mengajar') ?>">
                Laporan Mengajar Guru
+            </a>
+            <a class="collapse-item <?= $active=='buku'?'active':'' ?>"
+               href="<?= site_url('AdminBacaan') ?>">
+               Daftar Buku
             </a>
         </div>
     </div>
