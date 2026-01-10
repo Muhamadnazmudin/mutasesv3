@@ -48,7 +48,7 @@ class Guru_dashboard extends CI_Controller {
         $this->load->view('templates/sidebar_guru', $data);
         $this->load->view('guru_dashboard/index', $data);
         $this->load->view('templates/footer');
-        return; // ⛔ STOP
+        return; 
     }
 
     // ===============================

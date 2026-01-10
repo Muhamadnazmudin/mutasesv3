@@ -97,7 +97,6 @@
 }
 
 </style>
-
 <?php if ($this->session->flashdata('success')): ?>
   <div class="alert alert-success alert-dismissible fade show">
     <i class="fas fa-check-circle"></i>
@@ -106,151 +105,137 @@
   </div>
 <?php endif; ?>
 
-<ul class="list-group list-group-flush jadwal-hari-ini">
 <div class="card shadow mb-4 jadwal-hari-ini">
 
+  <!-- HEADER CARD -->
   <div class="card-header bg-success text-white">
-  <i class="fas fa-calendar-day text-warning"></i>
-  <strong>Jadwal Mengajar Anda Hari Ini</strong>
-  <br>
-  <small class="text-light">
-    <?= $hari_ini ?>,
-    <?= tgl_indo_teks(date('Y-m-d')) ?>
-  </small>
-</div>
+      <i class="fas fa-calendar-day text-warning"></i>
+      <strong>Jadwal Mengajar Anda Hari Ini</strong><br>
+      <small class="text-light">
+          <?= $hari_ini ?>,
+          <?= tgl_indo_teks(date('Y-m-d')) ?>
+      </small>
+  </div>
 
-
+  <!-- BODY CARD -->
   <div class="card-body p-3">
 
-<?php foreach ($jadwal_hari_ini as $j): ?>
-<?php
-$is_libur_jadwal = !empty($j->is_libur);
+    <?php if (empty($jadwal_hari_ini)): ?>
 
-date_default_timezone_set('Asia/Jakarta');
-$now = time();
-$jam_masuk = strtotime(date('Y-m-d').' '.$j->jam_mulai);
-$selisih_menit = floor(($jam_masuk - $now)/60);
-$telat_menit   = floor(($now - $jam_masuk)/60);
-?>
-
-<li class="list-group-item d-flex justify-content-between align-items-start <?= $is_libur_jadwal ? 'jadwal-libur' : '' ?>">
-
-<!-- INFO -->
-<div>
-    <div class="jam-info">
-        <div class="jam-range">
-            <?= $j->jam_awal ?> – <?= $j->jam_akhir ?>
+        <!-- TIDAK ADA JADWAL -->
+        <div class="text-center text-muted py-4">
+            <i class="fas fa-calendar-times fa-2x mb-2"></i><br>
+            <strong>Tidak ada jadwal mengajar hari ini</strong>
         </div>
-        <div class="jam-clock text-muted">
-            (<?= substr($j->jam_mulai,0,5) ?> – <?= substr($j->jam_selesai,0,5) ?>)
-        </div>
-    </div>
-    <br>
-    <i class="fas fa-book text-primary"></i> <?= $j->nama_mapel ?><br>
-    <i class="fas fa-school text-success"></i> <?= $j->nama_kelas ?>
-</div>
 
-<!-- AKSI -->
-<div class="text-right">
+    <?php else: ?>
 
-<?php
-// ===================================================
-// 1. LIBUR SETENGAH HARI
-// ===================================================
-if ($is_libur_jadwal):
-?>
-    <span class="badge badge-secondary">
-        <i class="fas fa-home"></i> Siswa Pulang
-    </span>
+        <ul class="list-group list-group-flush">
 
-<?php
-// ===================================================
-// 2. BELUM ADA LOG (HARI AKTIF)
-// ===================================================
-elseif (empty($j->log)):
-?>
+        <?php foreach ($jadwal_hari_ini as $j): ?>
+        <?php
+            $is_libur_jadwal = !empty($j->is_libur);
 
-    <?php if ($selisih_menit <= 5 && $selisih_menit >= 1): ?>
-        <div class="alert alert-warning p-2 mb-2 small">
-            <i class="fas fa-exclamation-triangle"></i>
-            Segera masuk, sisa <b><?= $selisih_menit ?> menit</b>
-        </div>
-    <?php elseif ($selisih_menit <= 0 && $telat_menit >= 0): ?>
-        <div class="alert alert-danger p-2 mb-2 small">
-            <i class="fas fa-clock"></i>
-            Telat <b><?= $telat_menit ?> menit</b>
-        </div>
+            date_default_timezone_set('Asia/Jakarta');
+            $now = time();
+            $jam_masuk = strtotime(date('Y-m-d').' '.$j->jam_mulai);
+            $selisih_menit = floor(($jam_masuk - $now) / 60);
+            $telat_menit   = floor(($now - $jam_masuk) / 60);
+        ?>
+
+        <li class="list-group-item d-flex justify-content-between align-items-start <?= $is_libur_jadwal ? 'jadwal-libur' : '' ?>">
+
+            <!-- INFO -->
+            <div>
+                <div class="jam-info">
+                    <div class="jam-range">
+                        <?= $j->jam_awal ?> – <?= $j->jam_akhir ?>
+                    </div>
+                    <div class="jam-clock text-muted">
+                        (<?= substr($j->jam_mulai,0,5) ?> – <?= substr($j->jam_selesai,0,5) ?>)
+                    </div>
+                </div>
+                <br>
+                <i class="fas fa-book text-primary"></i> <?= $j->nama_mapel ?><br>
+                <i class="fas fa-school text-success"></i> <?= $j->nama_kelas ?>
+            </div>
+
+            <!-- AKSI -->
+            <div class="text-right">
+
+            <?php if ($is_libur_jadwal): ?>
+
+                <span class="badge badge-secondary">
+                    <i class="fas fa-home"></i> Siswa Pulang
+                </span>
+
+            <?php elseif (empty($j->log)): ?>
+
+                <?php if ($selisih_menit <= 5 && $selisih_menit >= 1): ?>
+                    <div class="alert alert-warning p-2 mb-2 small">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Segera masuk, sisa <b><?= $selisih_menit ?> menit</b>
+                    </div>
+                <?php elseif ($selisih_menit <= 0 && $telat_menit >= 0): ?>
+                    <div class="alert alert-danger p-2 mb-2 small">
+                        <i class="fas fa-clock"></i>
+                        Telat <b><?= $telat_menit ?> menit</b>
+                    </div>
+                <?php endif; ?>
+
+                <button type="button"
+                    class="btn btn-sm btn-danger mb-1"
+                    data-toggle="modal"
+                    data-target="#modalTidakMasuk<?= $j->jadwal_id ?>">
+                    <i class="fas fa-user-times"></i> Tidak Masuk
+                </button>
+
+                <a href="<?= site_url('mengajar/mulai/'.$j->jadwal_id) ?>"
+                   class="btn btn-sm btn-success btn-masuk">
+                   <i class="fas fa-door-open"></i> Masuk Kelas
+                </a>
+
+            <?php else: ?>
+
+                <?php
+                    $status = strtolower($j->log->status);
+                    $badgeClass = 'secondary';
+                    if ($status === 'izin')    $badgeClass = 'info';
+                    if ($status === 'sakit')   $badgeClass = 'warning';
+                    if ($status === 'dinas')   $badgeClass = 'primary';
+                    if ($status === 'selesai') $badgeClass = 'success';
+                ?>
+
+                <?php if ($status === 'mulai'): ?>
+                    <a href="<?= site_url('mengajar/selesai/'.$j->log->id) ?>"
+                       class="btn btn-sm btn-danger">
+                       <i class="fas fa-stop-circle"></i> Selesai
+                    </a>
+                <?php elseif ($status === 'menunggu_selfie'): ?>
+                    <a href="<?= site_url('mengajar/selfie/'.$j->log->id) ?>"
+                       class="btn btn-sm btn-warning">
+                       <i class="fas fa-camera"></i> Selfie
+                    </a>
+                <?php else: ?>
+                    <span class="badge badge-<?= $badgeClass ?>">
+                        <?= ucfirst($status) ?>
+                    </span>
+                <?php endif; ?>
+
+            <?php endif; ?>
+
+            </div>
+        </li>
+
+        <?php endforeach; ?>
+
+        </ul>
+
     <?php endif; ?>
 
-    <!-- TIDAK MASUK -->
-    <button type="button"
-        class="btn btn-sm btn-danger mb-1"
-        data-toggle="modal"
-        data-target="#modalTidakMasuk<?= $j->jadwal_id ?>">
-        <i class="fas fa-user-times"></i> Tidak Masuk
-    </button>
-
-    <!-- MASUK KELAS -->
-    <a href="<?= site_url('mengajar/mulai/'.$j->jadwal_id) ?>"
-       class="btn btn-sm btn-success btn-masuk">
-       <i class="fas fa-door-open"></i> Masuk Kelas
-    </a>
-
-<?php
-// ===================================================
-// 3. SUDAH ADA LOG
-// ===================================================
-else:
-    $status = strtolower($j->log->status);
-
-    // -------------------------------
-    // SEDANG MENGAJAR
-    // -------------------------------
-    if ($status === 'mulai'):
-?>
-        <a href="<?= site_url('mengajar/selesai/'.$j->log->id) ?>"
-           class="btn btn-sm btn-danger">
-           <i class="fas fa-stop-circle"></i> Selesai
-        </a>
-
-<?php
-    // -------------------------------
-    // MENUNGGU SELFIE
-    // -------------------------------
-    elseif ($status === 'menunggu_selfie'):
-?>
-        <a href="<?= site_url('mengajar/selfie/'.$j->log->id) ?>"
-           class="btn btn-sm btn-warning">
-           <i class="fas fa-camera"></i> Selfie
-        </a>
-
-<?php
-    // -------------------------------
-    // IZIN / SAKIT / DINAS / SELESAI
-    // -------------------------------
-    else:
-        $badgeClass = 'secondary';
-        if ($status === 'izin')  $badgeClass = 'info';
-        if ($status === 'sakit') $badgeClass = 'warning';
-        if ($status === 'dinas') $badgeClass = 'primary';
-        if ($status === 'selesai') $badgeClass = 'success';
-?>
-        <span class="badge badge-<?= $badgeClass ?>">
-            <?= ucfirst($status) ?>
-        </span>
-<?php
-    endif;
-endif;
-?>
-
+  </div>
 </div>
 
-
-</li>
-<?php endforeach; ?>
-
-</ul>
-</div>
 <?php foreach ($jadwal_hari_ini as $j): ?>
 <div class="modal fade" id="modalTidakMasuk<?= $j->jadwal_id ?>" tabindex="-1" role="dialog">
   <div class="modal-dialog modal-dialog-centered" role="document">

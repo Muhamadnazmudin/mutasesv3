@@ -200,6 +200,69 @@ html, body {
     }
 
 }
+/* =========================================================
+   OVERRIDE WARNA SIDEBAR GURU (LEBIH ADEM, MIRIP SISWA)
+   ========================================================= */
+
+/* Background sidebar */
+#accordionSidebar {
+    background: linear-gradient(180deg, #1f2d27, #16201c) !important;
+}
+
+/* Brand */
+#accordionSidebar .sidebar-brand {
+    background: transparent !important;
+}
+
+#accordionSidebar .sidebar-brand-text,
+#accordionSidebar .sidebar-brand-icon i {
+    color: #e6f4ec !important;
+}
+
+/* Menu text */
+#accordionSidebar .nav-link {
+    color: #d9efe4 !important;
+}
+
+/* Icon menu */
+#accordionSidebar .nav-link i {
+    color: #9fd5bb !important;
+}
+
+/* Hover */
+#accordionSidebar .nav-link:hover {
+    background: rgba(255,255,255,.08) !important;
+}
+
+/* Active menu */
+#accordionSidebar .nav-item.active .nav-link {
+    background: rgba(255,255,255,.12) !important;
+    box-shadow: inset 3px 0 0 #5fd19f;
+    font-weight: 600;
+}
+
+/* Heading */
+#accordionSidebar .sidebar-heading {
+    color: rgba(217,239,228,.7) !important;
+}
+
+/* Divider */
+#accordionSidebar .sidebar-divider {
+    border-top: 1px solid rgba(255,255,255,.08) !important;
+}
+
+/* Logout button tetap merah tapi lebih soft */
+#accordionSidebar .btn-danger {
+    background: #c0392b;
+    border: none;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+    #accordionSidebar {
+        background: linear-gradient(180deg, #1f2d27, #121a17) !important;
+    }
+}
 
 </style>
 
