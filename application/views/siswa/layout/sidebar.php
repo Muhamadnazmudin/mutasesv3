@@ -1,3 +1,184 @@
+<style>
+    /* ================= ROOT SISWA ================= */
+:root {
+    --siswa-bg-1: #1e88e5;
+    --siswa-bg-2: #1565c0;
+    --siswa-hover: rgba(255,255,255,.14);
+    --siswa-active: rgba(255,255,255,.22);
+    --siswa-text: #f1f6ff;
+    --siswa-muted: rgba(255,255,255,.7);
+}
+
+/* ================= SIDEBAR SISWA ================= */
+#accordionSidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 224px;
+    height: 100vh;
+    background: linear-gradient(180deg, var(--siswa-bg-1), var(--siswa-bg-2));
+    overflow-y: auto;
+    z-index: 1032;
+    transition: all .3s ease;
+    box-shadow: 4px 0 18px rgba(0,0,0,.12);
+}
+
+/* ================= BRAND ================= */
+.sidebar-brand {
+    height: 64px;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: .5px;
+}
+
+.sidebar-brand-icon {
+    font-size: 1.6rem;
+}
+
+.sidebar-brand-text {
+    color: #fff;
+}
+
+/* ================= MENU ================= */
+#accordionSidebar .nav-item {
+    margin: 4px 12px;
+}
+
+#accordionSidebar .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--siswa-text);
+    line-height: 1.35;
+    transition: all .25s ease;
+}
+
+/* ICON */
+#accordionSidebar .nav-link i {
+    width: 20px;
+    min-width: 20px;
+    text-align: center;
+    font-size: .95rem;
+    opacity: .95;
+}
+
+/* HOVER */
+#accordionSidebar .nav-link:hover {
+    background: var(--siswa-hover);
+    transform: translateX(3px);
+}
+
+/* ACTIVE */
+#accordionSidebar .nav-item.active .nav-link {
+    background: var(--siswa-active);
+    font-weight: 600;
+    box-shadow: inset 3px 0 0 #90caf9;
+}
+
+/* ================= TEKS MENU (FULL, 2 BARIS) ================= */
+#accordionSidebar .nav-link span {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+/* ================= DIVIDER ================= */
+.sidebar-divider {
+    margin: 10px 16px;
+    border-top: 1px solid rgba(255,255,255,.15);
+}
+
+/* ================= LOGOUT ================= */
+#accordionSidebar .btn-danger {
+    border-radius: 12px;
+    font-size: .85rem;
+}
+
+/* ================= CONTENT ================= */
+#content-wrapper {
+    margin-left: 224px;
+    min-height: 100vh;
+    transition: all .3s ease;
+}
+
+.sidebar-toggled #content-wrapper {
+    margin-left: 80px;
+}
+
+/* ================= SIDEBAR COLLAPSE ================= */
+.sidebar-toggled #accordionSidebar {
+    width: 80px;
+}
+
+.sidebar-toggled #accordionSidebar span,
+.sidebar-toggled #accordionSidebar .sidebar-brand-text {
+    display: none;
+}
+
+.sidebar-toggled #accordionSidebar .nav-link {
+    justify-content: center;
+}
+
+.sidebar-toggled #accordionSidebar .nav-link i {
+    font-size: 1.1rem;
+}
+
+/* ================= TOPBAR SISWA ================= */
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 224px;
+    right: 0;
+    z-index: 1031;
+    background: #ffffff;
+    transition: all .3s ease;
+}
+
+.sidebar-toggled .topbar {
+    left: 80px;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+
+    #accordionSidebar {
+        transform: translateX(-100%);
+        width: 200px;
+    }
+
+    #accordionSidebar.show {
+        transform: translateX(0);
+    }
+
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,.55);
+        z-index: 1030;
+    }
+
+    .sidebar-overlay.show {
+        display: block;
+    }
+
+    #content-wrapper,
+    .topbar {
+        margin-left: 0 !important;
+        left: 0 !important;
+    }
+}
+
+    </style>
+
 <?php $active = isset($active) ? $active : ''; ?>
 
 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
@@ -102,11 +283,21 @@
 
         <!-- Topbar -->
                 <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item dropdown no-arrow">
-                    <span class="nav-link text-gray-800">
-                        <?= $this->session->userdata('siswa_nama'); ?> | <strong>Siswa</strong>
-                    </span>
-                </li>
-            </ul>
-        </nav>
+    <ul class="navbar-nav ml-auto align-items-center">
+
+        <!-- DARK MODE TOGGLE -->
+        <li class="nav-item mr-3">
+            <button id="toggleDarkMode" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-moon"></i>
+            </button>
+        </li>
+
+        <li class="nav-item dropdown no-arrow">
+            <span class="nav-link text-gray-800">
+                <?= $this->session->userdata('siswa_nama'); ?> |
+                <strong>Siswa</strong>
+            </span>
+        </li>
+
+    </ul>
+</nav>
