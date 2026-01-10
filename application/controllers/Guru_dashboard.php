@@ -15,36 +15,96 @@ class Guru_dashboard extends CI_Controller {
     }
   }
 
-  public function index()
+ public function index()
 {
     $guru_id = $this->session->userdata('guru_id');
-    $hari    = $this->hari_ini();
 
+    // ===============================
+    // 1️⃣ LOAD MODEL YANG DIPERLUKAN
+    // ===============================
+    $this->load->model('Hari_libur_model');
     $this->load->model('Guru_jadwal_model');
     $this->load->model('Log_mengajar_model');
 
-    $data['jadwal_hari_ini'] = $this->Guru_jadwal_model
-        ->get_jadwal_hari_ini($guru_id, $hari);
+    // ===============================
+    // 2️⃣ CEK HARI LIBUR HARI INI
+    // ===============================
+    $libur = $this->Hari_libur_model->get_libur_hari_ini();
 
-    if (!empty($data['jadwal_hari_ini'])) {
-        foreach ($data['jadwal_hari_ini'] as &$j) {
-    $j->log = $this->Log_mengajar_model
-        ->get_log_hari_ini($j->jadwal_id, $guru_id);
-}
-unset($j);
+    // ===============================
+    // 🔴 JIKA LIBUR FULL (SEHARI PENUH)
+    // ===============================
+    if ($libur && empty($libur->jam_mulai)) {
 
+        $data = [
+            'is_libur'   => true,
+            'libur_half' => false,
+            'nama_libur' => $libur->nama,
+            'title'      => 'Dashboard Guru',
+            'active'     => 'guru_dashboard'
+        ];
+
+        $this->load->view('templates/header', $data);
+        $this->load->view('templates/sidebar_guru', $data);
+        $this->load->view('guru_dashboard/index', $data);
+        $this->load->view('templates/footer');
+        return; // ⛔ STOP
     }
 
-    $data['hari_ini'] = $hari;
-    $data['title']   = 'Dashboard Guru';
-    $data['active']  = 'guru_dashboard';
+    // ===============================
+    // 3️⃣ AMBIL JADWAL GURU HARI INI
+    // ===============================
+    $hari = $this->hari_ini();
+
+    $jadwal = $this->Guru_jadwal_model
+        ->get_jadwal_hari_ini($guru_id, $hari);
+
+    // ===============================
+    // 4️⃣ PROSES TIAP JADWAL
+    // ===============================
+    if (!empty($jadwal)) {
+        foreach ($jadwal as &$j) {
+
+            // default: bukan libur
+            $j->is_libur = false;
+
+            // 🟠 LIBUR SETENGAH HARI
+            if ($libur && !empty($libur->jam_mulai)) {
+                if (strtotime($j->jam_mulai) >= strtotime($libur->jam_mulai)) {
+                    $j->is_libur = true;
+                }
+            }
+
+            // ambil log HANYA kalau bukan libur
+            if (!$j->is_libur) {
+                $j->log = $this->Log_mengajar_model
+                    ->get_log_hari_ini($j->jadwal_id, $guru_id);
+            } else {
+                $j->log = null;
+            }
+        }
+        unset($j);
+    }
+
+    // ===============================
+    // 5️⃣ KIRIM KE VIEW
+    // ===============================
+    $data = [
+        'is_libur'        => false,
+        'libur_half'      => ($libur && !empty($libur->jam_mulai)),
+        'jam_libur'       => $libur->jam_mulai ?? null,
+        'nama_libur'      => $libur->nama ?? null,
+        'hari_ini'        => $hari,
+        'jadwal_hari_ini' => $jadwal,
+        'title'           => 'Dashboard Guru',
+        'active'          => 'guru_dashboard'
+    ];
 
     $this->load->view('templates/header', $data);
     $this->load->view('templates/sidebar_guru', $data);
     $this->load->view('guru_dashboard/index', $data);
     $this->load->view('templates/footer');
 }
-
 
   private function hari_ini()
 {

@@ -24,4 +24,27 @@ class Hari_libur_model extends CI_Model {
         }
         return $arr;
     }
+    public function is_hari_libur($tanggal = null)
+{
+    if (!$tanggal) {
+        $tanggal = date('Y-m-d');
+    }
+
+    return $this->db
+        ->where('start', $tanggal)
+        ->get('hari_libur')
+        ->row(); // object jika libur, null jika tidak
+}
+public function get_libur_hari_ini()
+{
+    return $this->db
+        ->where('start', date('Y-m-d'))
+        ->get('hari_libur')
+        ->row(); // bisa null
+}
+public function update($id, $data)
+{
+    return $this->db->where('id', $id)->update('hari_libur', $data);
+}
+
 }

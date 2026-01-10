@@ -1,5 +1,5 @@
 <style>
- /* ===== JADWAL HARI INI – LIGHT MODE ===== */
+/* ===== JADWAL HARI INI – LIGHT MODE ===== */
 .jadwal-hari-ini {
     background-color: #ffffff;
     color: #212529;
@@ -17,7 +17,7 @@
 
 /* ===== JADWAL HARI INI – DARK MODE ===== */
 .dark-mode .jadwal-hari-ini {
-    background-color: #2a2d3e;   /* dark soft */
+    background-color: #2a2d3e;
     color: #f1f1f1;
 }
 
@@ -31,115 +31,48 @@
     color: #b0b3c6;
 }
 
-/* Ikon tetap jelas */
-.jadwal-hari-ini i {
-    opacity: 0.9;
-}
-/* ===== JAM INFO RESPONSIVE ===== */
-.jam-info {
-    line-height: 1.3;
+/* ===== LIBUR SETENGAH HARI ===== */
+.jadwal-libur {
+    opacity: .6;
+    pointer-events: none;
 }
 
-/* Desktop / Tablet */
-.jam-range {
-    font-weight: 600;
-    display: inline;
-}
+/* ===== JAM INFO ===== */
+.jam-info { line-height: 1.3; }
+.jam-range { font-weight: 600; }
+.jam-clock { font-size: .85rem; }
 
-.jam-clock {
-    display: inline;
-    margin-left: 4px;
-}
-
-/* ===== MOBILE MODE ===== */
+/* ===== MOBILE ===== */
 @media (max-width: 576px) {
-    .jam-range {
-        display: block;
-        font-size: 0.95rem;
-    }
-
-    .jam-clock {
-        display: block;
-        font-size: 0.8rem;
-        margin-left: 0;
-    }
-}
-/* ================= MOBILE CARD BASE ================= */
-@media (max-width: 576px) {
-
     .jadwal-hari-ini .list-group {
         gap: 14px;
     }
-
     .jadwal-hari-ini .list-group-item {
         border-radius: 18px;
         padding: 16px;
-        border: none;
         box-shadow: 0 10px 25px rgba(0,0,0,.12);
         flex-direction: column;
-        align-items: stretch;
     }
-
     .jadwal-hari-ini .list-group-item > div:last-child {
         margin-top: 12px;
         text-align: center;
     }
-
-    .jadwal-hari-ini .jam-range {
-        font-size: 1rem;
-        font-weight: 600;
-    }
-
-    .jadwal-hari-ini .jam-clock {
-        font-size: 0.8rem;
-    }
-
-    .jadwal-hari-ini .btn {
-        border-radius: 12px;
-        font-weight: 600;
-        padding: 8px 12px;
-    }
-
-    .jadwal-hari-ini .badge {
-        border-radius: 10px;
-        padding: 6px 10px;
-        font-size: 0.85rem;
-    }
 }
-@media (max-width: 576px) {
+</style>
 
-    /* LIGHT MODE */
-    .jadwal-hari-ini .list-group-item {
-        background: #b7cfda;
-        color: #212529;
-    }
+<?php if (!empty($is_libur) && $is_libur): ?>
+<div class="alert alert-success text-center mt-4">
+    <h4 class="mb-1">🎉 Hari Ini Libur</h4>
+    <small><?= $nama_libur ?></small>
+</div>
+<?php return; endif; ?>
 
-    .jadwal-hari-ini .jam-clock {
-        color: #6c757d;
-    }
-}
-@media (max-width: 576px) {
+<?php if (!empty($libur_half) && $libur_half): ?>
+<div class="alert alert-warning text-center">
+    <strong>⚠️ Libur Mulai Jam <?= substr($jam_libur, 0, 5) ?></strong>
+</div>
+<?php endif; ?>
 
-    .dark-mode .jadwal-hari-ini .list-group-item {
-        background: linear-gradient(145deg, #2f3248, #25283b);
-        color: #f1f1f1;
-        box-shadow: 0 12px 30px rgba(0,0,0,.35);
-    }
-
-    .dark-mode .jadwal-hari-ini .jam-clock {
-        color: #b9c0ff;
-    }
-
-    .dark-mode .jadwal-hari-ini .fa-book {
-        color: #ffd66b;
-    }
-
-    .dark-mode .jadwal-hari-ini .fa-school {
-        color: #7de2b8;
-    }
-}
-
-  </style>
 <div class="card shadow mb-4 jadwal-hari-ini">
     <div class="card-header bg-success text-white">
         <i class="fas fa-calendar-day"></i>
@@ -153,14 +86,14 @@
                 <i class="fas fa-coffee"></i>
                 Tidak ada jadwal mengajar hari ini.
             </div>
-
         <?php else: ?>
 
         <ul class="list-group list-group-flush">
-            <?php foreach ($jadwal_hari_ini as $j): ?>
+        <?php foreach ($jadwal_hari_ini as $j): ?>
 
             <?php
-            // ⬅️ TAMBAHAN (LOGIKA WAKTU)
+            $is_libur_jadwal = !empty($j->is_libur) && $j->is_libur === true;
+
             date_default_timezone_set('Asia/Jakarta');
             $now = time();
             $jam_masuk = strtotime(date('Y-m-d') . ' ' . $j->jam_mulai);
@@ -168,65 +101,65 @@
             $telat_menit   = floor(($now - $jam_masuk) / 60);
             ?>
 
-            <li class="list-group-item d-flex justify-content-between align-items-start">
+            <li class="list-group-item d-flex justify-content-between align-items-start <?= $is_libur_jadwal ? 'jadwal-libur' : '' ?>">
 
-                <!-- INFO JADWAL -->
+                <!-- INFO -->
                 <div>
                     <div class="jam-info">
                         <div class="jam-range">
                             <?= $j->jam_awal ?> – <?= $j->jam_akhir ?>
                         </div>
                         <div class="jam-clock text-muted">
-                            (<?= substr($j->jam_mulai, 0, 5) ?> – <?= substr($j->jam_selesai, 0, 5) ?>)
+                            (<?= substr($j->jam_mulai,0,5) ?> – <?= substr($j->jam_selesai,0,5) ?>)
                         </div>
                     </div>
-
                     <br>
-                    <i class="fas fa-book text-primary"></i>
-                    <?= $j->nama_mapel ?>
-                    <br>
-                    <i class="fas fa-school text-success"></i>
-                    <?= $j->nama_kelas ?>
+                    <i class="fas fa-book text-primary"></i> <?= $j->nama_mapel ?><br>
+                    <i class="fas fa-school text-success"></i> <?= $j->nama_kelas ?>
                 </div>
 
-                <!-- AKSI / STATUS -->
+                <!-- AKSI -->
                 <div class="text-right">
+
+                <?php if ($is_libur_jadwal): ?>
+
+                    <span class="badge badge-secondary">
+                        🎉 Libur (Setengah Hari)
+                    </span>
+
+                <?php else: ?>
 
                     <?php if (empty($j->log)): ?>
 
-                        <!-- ⬅️ TAMBAHAN (PERINGATAN) -->
                         <?php if ($selisih_menit <= 5 && $selisih_menit >= 1): ?>
-        <div class="alert alert-warning p-2 mb-2 small">
-            <i class="fas fa-exclamation-triangle"></i>
-            Segera masuk, sisa waktu
-            <strong><?= $selisih_menit ?> menit</strong> lagi
-        </div>
-
-    <?php elseif ($selisih_menit <= 0 && $telat_menit >= 0): ?>
-        <div class="alert alert-danger p-2 mb-2 small">
-            <i class="fas fa-clock"></i>
-            Segera masuk, Anda telat
-            <strong><?= $telat_menit ?> menit</strong>
-        </div>
-    <?php endif; ?>
+                            <div class="alert alert-warning p-2 mb-2 small">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Segera masuk, sisa <strong><?= $selisih_menit ?> menit</strong>
+                            </div>
+                        <?php elseif ($selisih_menit <= 0 && $telat_menit >= 0): ?>
+                            <div class="alert alert-danger p-2 mb-2 small">
+                                <i class="fas fa-clock"></i>
+                                Telat <strong><?= $telat_menit ?> menit</strong>
+                            </div>
+                        <?php endif; ?>
 
                         <a href="<?= site_url('mengajar/mulai/'.$j->jadwal_id) ?>"
                            class="btn btn-sm btn-success">
-                            <i class="fas fa-door-open"></i> Masuk Kelas
+                           <i class="fas fa-door-open"></i> Masuk Kelas
                         </a>
 
                     <?php elseif ($j->log->status === 'mulai'): ?>
 
                         <a href="<?= site_url('mengajar/selesai/'.$j->log->id) ?>"
                            class="btn btn-sm btn-danger">
-                            <i class="fas fa-stop-circle"></i> Selesai
+                           <i class="fas fa-stop-circle"></i> Selesai
                         </a>
 
-                    <?php elseif ($j->log && $j->log->status === 'menunggu_selfie'): ?>
+                    <?php elseif ($j->log->status === 'menunggu_selfie'): ?>
 
                         <a href="<?= site_url('mengajar/selfie/'.$j->log->id) ?>"
                            class="btn btn-sm btn-warning">
-                            <i class="fas fa-camera"></i> Selfie
+                           <i class="fas fa-camera"></i> Selfie
                         </a>
 
                     <?php else: ?>
@@ -237,14 +170,15 @@
 
                     <?php endif; ?>
 
-                </div>
+                <?php endif; ?>
 
+                </div>
             </li>
-            <?php endforeach; ?>
+
+        <?php endforeach; ?>
         </ul>
 
         <?php endif; ?>
 
     </div>
 </div>
-

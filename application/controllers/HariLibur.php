@@ -27,13 +27,16 @@ class HariLibur extends CI_Controller {
 
     public function tambah()
     {
-        $nama  = $this->input->post('nama');
-        $start = $this->input->post('start');
+        $nama      = $this->input->post('nama');
+        $start     = $this->input->post('start');
+        $jam_mulai = $this->input->post('jam_mulai');
 
         $this->Hari_libur_model->insert([
-            'nama'  => $nama,
-            'start' => $start
+            'nama'      => $nama,
+            'start'     => $start,
+            'jam_mulai' => $jam_mulai ?: null
         ]);
+
 
         $this->session->set_flashdata('success', "Hari libur berhasil ditambahkan.");
         redirect('HariLibur');
@@ -45,4 +48,18 @@ class HariLibur extends CI_Controller {
         $this->session->set_flashdata('success', "Hari libur berhasil dihapus.");
         redirect('HariLibur');
     }
+    public function update($id)
+{
+    $data = [
+        'nama'      => $this->input->post('nama'),
+        'start'     => $this->input->post('start'),
+        'jam_mulai' => $this->input->post('jam_mulai') ?: null
+    ];
+
+    $this->Hari_libur_model->update($id, $data);
+
+    $this->session->set_flashdata('success', 'Hari libur berhasil diperbarui.');
+    redirect('HariLibur');
+}
+
 }
