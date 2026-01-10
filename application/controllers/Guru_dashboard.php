@@ -6,7 +6,7 @@ class Guru_dashboard extends CI_Controller {
   public function __construct()
   {
     parent::__construct();
-
+    $this->load->helper('tanggal');
     if (
       !$this->session->userdata('logged_in') ||
       $this->session->userdata('role_id') != 3

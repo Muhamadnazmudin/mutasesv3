@@ -16,6 +16,10 @@ class Log_mengajar_model extends CI_Model
         ->get('log_mengajar')
         ->row();
 }
+public function insert($data)
+{
+    return $this->db->insert('log_mengajar', $data);
+}
 
 
 }

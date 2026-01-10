@@ -46,5 +46,12 @@ public function update($id, $data)
 {
     return $this->db->where('id', $id)->update('hari_libur', $data);
 }
+public function get_by_date($tanggal)
+{
+    return $this->db
+        ->where('start', $tanggal)
+        ->get('hari_libur')
+        ->row();
+}
 
 }

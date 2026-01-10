@@ -16,317 +16,199 @@
   <!-- Custom CSS -->
   <link href="<?= base_url('assets/css/custom-style.css') ?>" rel="stylesheet">
   <style>
+/* =====================================================
+   FINAL CSS HEADER — SAFE MOBILE & DESKTOP
+   FIX MODAL, SIDEBAR, TOPBAR (SB ADMIN 2)
+   ===================================================== */
 
 /* ===============================
-   LIGHT MODE — SOFT BLUE THEME
+   BASE
    =============================== */
-
-/* Warna dasar agak kebiruan lembut */
-body.light-mode {
-    background-color: #f0f4ff !important; /* soft blue-white */
-    color: #1a1a1a !important;
+html, body {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	font-family: "Nunito", sans-serif;
 }
 
-/* Wrapper & Content lebih redup (soft white-blue) */
+/* ===============================
+   LIGHT MODE
+   =============================== */
+body.light-mode {
+	background-color: #f0f4ff;
+	color: #1a1a1a;
+}
+
 body.light-mode #wrapper,
 body.light-mode #content-wrapper,
 body.light-mode #content,
 body.light-mode .container-fluid {
-    background-color: #fafcffff !important; /* very soft blue white */
-    color: #000 !important;
+	background-color: #fafcff;
+	color: #000;
 }
 
-/* Card tema terang lembut */
 body.light-mode .card,
 body.light-mode .card-body,
 body.light-mode .card-header {
-    background-color: #ffffff !important;
-    border: 1px solid #e3e7ff !important; /* border sedikit biru */
-    box-shadow: 0 2px 6px rgba(0, 50, 150, 0.05) !important;
-    color: #000 !important;
+	background-color: #ffffff;
+	border: 1px solid #e3e7ff;
+	color: #000;
 }
 
-/* Tabel header biru muda */
 body.light-mode .table thead th {
-    background-color: #e4ebff !important;
-    color: #000 !important;
+	background-color: #e4ebff;
+	color: #000;
 }
 
-/* Baris tabel tetap putih */
-body.light-mode .table tbody tr {
-    background-color: #ffffff !important;
-}
-
-/* Hover tabel sedikit kebiruan */
-body.light-mode .table tbody tr:hover {
-    background-color: #eef3ff !important;
-}
-
-/* Topbar putih kebiruan */
 body.light-mode .topbar {
-    background-color: #f9fbff !important;
-    border-bottom: 1px solid #dce4ff !important;
+	background-color: #f9fbff;
+	border-bottom: 1px solid #dce4ff;
 }
 
-/* Sidebar tetap gradient biru */
-body.light-mode .sidebar {
-    background: linear-gradient(180deg, #ffffffff 10%, #f4f7ffff 100%) !important;
-}
-
-/* Warna teks umum */
-body.light-mode h1,
-body.light-mode h2,
-body.light-mode h3,
-body.light-mode h4,
-body.light-mode p,
-body.light-mode span,
-body.light-mode label,
-body.light-mode td,
-body.light-mode th {
-    color: #1a1a1a !important;
-}
-/* ==== FIX SIDEBAR SCROLL BARENG CONTENT ==== */
-html, body {
-    height: 100%;
-    overflow: hidden; /* kunci body agar tidak scroll */
-}
-
-/* Sidebar SB Admin 2 */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh !important;   /* full tinggi layar */
-    overflow-y: auto;           /* sidebar scroll sendiri */
-    z-index: 1000;
-}
-
-/* Geser content-wrapper agar tidak ketutup sidebar */
-#content-wrapper {
-    margin-left: 224px; /* lebar default sidebar SB Admin 2 */
-    height: 100vh;
-    overflow-y: auto;   /* hanya konten yang scroll */
-}
-
-/* Ketika sidebar collapsed */
-.sidebar.toggled {
-    width: 80px !important;
-}
-
-.sidebar.toggled + #content-wrapper {
-    margin-left: 80px !important;
-}
-/* ==== KUNCI BODY ==== */
-html, body {
-    height: 100%;
-    overflow: hidden; /* jangan scroll body */
-}
-
-/* ==== SIDEBAR FIX ==== */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    overflow-y: auto;
-    z-index: 1030;
-}
-
-/* ==== TOPBAR FIX ==== */
-.topbar {
-    position: fixed;
-    top: 0;
-    left: 224px; /* lebar default sidebar */
-    right: 0;
-    z-index: 1031;
-}
-
-/* ==== KONTEN YANG SCROLL ==== */
-#content-wrapper {
-    margin-left: 224px; /* ikut lebar sidebar */
-    padding-top: 72px;  /* beri ruang untuk topbar */
-    height: 100vh;
-    overflow-y: auto;   /* hanya konten yang scroll */
-}
-
-/* ==== MODE SIDEBAR TOGGLE ==== */
-.sidebar.toggled {
-    width: 80px !important;
-}
-
-.sidebar.toggled + #content-wrapper,
-.sidebar.toggled ~ #content-wrapper {
-    margin-left: 80px !important;
-}
-
-.topbar.sidebar-toggled {
-    left: 80px !important;
-}
-/* ==== SIDEBAR FIX ==== */
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 224px;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Bagian brand SIDEBAR (MUTASES) dibikin fix di atas */
-.sidebar .sidebar-brand {
-    position: sticky;
-    top: 0;
-    z-index: 1040;
-    background: inherit;   /* ikuti warna sidebar */
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-}
-
-/* Isi sidebar yang scroll */
-.sidebar .nav-item,
-.sidebar .sidebar-heading,
-.sidebar hr {
-    flex-shrink: 0;
-}
-
-#accordionSidebar {
-    overflow-y: auto;
-    overflow-x: hidden;
-    flex-grow: 1; /* area menu yang bisa scroll */
-}
 /* ===============================
-   FIX RESPONSIVE KHUSUS HP
+   SIDEBAR & TOPBAR — DESKTOP
+   =============================== */
+@media (min-width: 768px) {
+
+	html, body {
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.sidebar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 224px;
+		height: 100vh;
+		overflow-y: auto;
+		z-index: 1030;
+	}
+
+	.topbar {
+		position: fixed;
+		top: 0;
+		left: 224px;
+		right: 0;
+		height: 72px;
+		z-index: 1040;
+	}
+
+	#content-wrapper {
+		margin-left: 224px;
+		padding-top: 72px;
+		height: 100vh;
+		overflow-y: auto;
+	}
+
+	/* Sidebar collapse */
+	.sidebar.toggled {
+		width: 80px !important;
+	}
+
+	.sidebar.toggled ~ #content-wrapper {
+		margin-left: 80px !important;
+	}
+
+	.sidebar.toggled ~ .topbar {
+		left: 80px !important;
+	}
+}
+
+/* ===============================
+   MOBILE — SAFE MODE (PORTRAIT & LANDSCAPE)
    =============================== */
 @media (max-width: 767px) {
 
-    /* Body boleh scroll */
-    html, body {
-        overflow: auto !important;
-        height: auto !important;
-    }
+	/* MOBILE HARUS BOLEH SCROLL */
+	html, body {
+		height: auto !important;
+		overflow: auto !important;
+	}
 
-    /* Sidebar mode overlay */
-    .sidebar {
-        position: fixed !important;
-        left: -260px !important;
-        width: 260px !important;
-        height: 100vh !important;
-        transition: all 0.3s ease !important;
-        z-index: 2000 !important;
-    }
+	/* Sidebar overlay */
+	.sidebar {
+		position: fixed !important;
+		top: 0;
+		left: -260px;
+		width: 260px;
+		height: 100vh;
+		overflow-y: auto;
+		transition: all 0.3s ease;
+		z-index: 3000;
+	}
 
-    /* Sidebar ketika toggle */
-    .sidebar.toggled {
-        left: 0 !important;
-    }
+	.sidebar.toggled {
+		left: 0;
+	}
 
-    /* Topbar normal */
-    .topbar {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 2500 !important;
-    }
+	/* Topbar */
+	.topbar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		height: 70px;
+		z-index: 3500;
+	}
 
-    /* Konten turun karena ada topbar */
-    #content-wrapper {
-        margin-left: 0 !important;
-        padding-top: 70px !important;
-        height: auto !important;
-        overflow: auto !important;
-    }
+	/* Content */
+	#content-wrapper {
+		margin-left: 0 !important;
+		padding-top: 70px;
+		height: auto !important;
+		overflow: visible !important;
+	}
 
-    /* Tampilkan tombol toggle HP */
-    #sidebarToggleTop {
-        display: inline-block !important;
-    }
+	/* Modal FIX TOTAL */
+	.modal {
+		position: fixed !important;
+		z-index: 5000 !important;
+	}
+
+	.modal-backdrop {
+		z-index: 4900 !important;
+	}
+
+	.modal,
+	.modal * {
+		pointer-events: auto !important;
+		touch-action: manipulation !important;
+	}
+
+	/* Sidebar & topbar jangan blok modal */
+	body.modal-open .sidebar,
+	body.modal-open .topbar {
+		pointer-events: none !important;
+	}
 }
+
 /* ===============================
-   FIX RESPONSIVE KHUSUS HP
+   SUBMENU FIX
    =============================== */
-@media (max-width: 767px) {
-
-    /* Body boleh scroll */
-    html, body {
-        overflow: auto !important;
-        height: auto !important;
-    }
-
-    /* Sidebar mode overlay */
-    .sidebar {
-        position: fixed !important;
-        left: -260px !important;
-        width: 260px !important;
-        height: 100vh !important;
-        transition: all 0.3s ease !important;
-        z-index: 2000 !important;
-    }
-
-    /* Sidebar ketika toggle */
-    .sidebar.toggled {
-        left: 0 !important;
-    }
-
-    /* Topbar normal */
-    .topbar {
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 2500 !important;
-    }
-
-    /* Konten turun karena ada topbar */
-    #content-wrapper {
-        margin-left: 0 !important;
-        padding-top: 70px !important;
-        height: auto !important;
-        overflow: auto !important;
-    }
-
-    /* Tampilkan tombol toggle HP */
-    #sidebarToggleTop {
-        display: inline-block !important;
-    }
+.sidebar .collapse-inner {
+	background-color: #2c2f48;
 }
+
+.sidebar .collapse-inner .collapse-item {
+	color: #d1d1d1;
+}
+
+.sidebar .collapse-inner .collapse-item:hover {
+	background-color: #3a3d5c;
+	color: #fff;
+}
+
+.sidebar .collapse-inner .collapse-item.active {
+	background-color: #4c5177;
+	color: #fff;
+}
+
 /* ===============================
-   FIX SUBMENU TERTUTUP DI HP
+   SAFETY — NO BODY LOCK
    =============================== */
-@media (max-width: 767px) {
-
-    /* Sidebar harus paling depan */
-    .sidebar {
-        z-index: 3000 !important;
-        overflow-y: visible !important;
-    }
-
-    /* Container accordion (SBAdmin2) harus tampil penuh */
-    #accordionSidebar {
-        overflow-y: visible !important;
-    }
-
-    /* Dropdown submenu muncul di depan */
-    .collapse,
-    .collapse.show,
-    .sidebar .collapse-inner {
-        position: relative;
-        z-index: 3500 !important;
-        background-color: #002fffff !important; /* biar kelihatan */
-    }
-
-    /* Biar sub-menu tidak terpotong */
-    .sidebar .nav-item {
-        overflow: visible !important;
-    }
-
-    /* Konten pindah ke belakang sidebar */
-    #content-wrapper,
-    #content {
-        position: relative;
-        z-index: 1 !important;
-    }
+body.modal-open {
+	overflow: visible !important;
 }
 
 </style>

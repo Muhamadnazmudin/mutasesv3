@@ -65,5 +65,20 @@ class Guru_jadwal_model extends CI_Model
         ->get()
         ->result();
 }
+public function get_by_id($jadwal_id)
+{
+    return $this->db
+        ->select('
+            j.*,
+            js1.jam_mulai,
+            js2.jam_selesai
+        ')
+        ->from('jadwal_mengajar j')
+        ->join('jam_sekolah js1', 'js1.id_jam = j.jam_mulai_id')
+        ->join('jam_sekolah js2', 'js2.id_jam = j.jam_selesai_id')
+        ->where('j.id_jadwal', $jadwal_id)
+        ->get()
+        ->row();
+}
 
 }

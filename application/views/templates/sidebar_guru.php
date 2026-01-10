@@ -190,6 +190,16 @@ html, body {
 }
 
     }
+/* ================= FIX TOPBAR MOBILE ================= */
+@media (max-width: 768px) {
+
+    .topbar {
+        left: 0 !important;   /* ⬅️ INI KUNCI UTAMA */
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+}
 
 </style>
 
@@ -325,12 +335,22 @@ html, body {
 </ul>
 
 <!-- ========== TOPBAR ========== -->
+<!-- ========== TOPBAR ========== -->
 <nav class="navbar navbar-expand navbar-dark topbar mb-4 static-top shadow">
-  <button class="btn btn-sm btn-outline-light me-2 d-md-none" id="btnToggleSidebar">
-    <i class="fas fa-bars"></i>
-</button>
 
-  <ul class="navbar-nav ml-auto align-items-center">
+    <!-- LEFT : HAMBURGER -->
+    <ul class="navbar-nav mr-auto">
+        <li class="nav-item d-md-none">
+            <button class="btn btn-sm btn-outline-light"
+                    id="btnToggleSidebar"
+                    type="button">
+                <i class="fas fa-bars"></i>
+            </button>
+        </li>
+    </ul>
+
+    <!-- RIGHT -->
+    <ul class="navbar-nav ml-auto align-items-center">
 
         <li class="nav-item mr-3">
             <button id="toggleMode" class="btn btn-sm btn-outline-light">
@@ -338,18 +358,19 @@ html, body {
             </button>
         </li>
 
-    <li class="nav-item dropdown no-arrow">
-      <span class="nav-link text-white">
-        <?= $this->session->userdata('nama'); ?> |
-        <strong>Guru</strong>
-        <?php if ($this->session->userdata('is_walikelas')): ?>
-          <span class="badge badge-warning ml-1">Wali Kelas</span>
-        <?php endif; ?>
-      </span>
-    </li>
+        <li class="nav-item dropdown no-arrow">
+            <span class="nav-link text-white">
+                <?= $this->session->userdata('nama'); ?> |
+                <strong>Guru</strong>
+                <?php if ($this->session->userdata('is_walikelas')): ?>
+                    <span class="badge badge-warning ml-1">Wali Kelas</span>
+                <?php endif; ?>
+            </span>
+        </li>
 
-  </ul>
+    </ul>
 </nav>
+
 
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 <div id="content-wrapper" class="d-flex flex-column">

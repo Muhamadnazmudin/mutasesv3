@@ -132,6 +132,70 @@ public function simpan_selfie()
 
     echo json_encode(['status'=>'ok']);
 }
+public function tidak_masuk()
+{
+    $jadwal_id = $this->input->post('jadwal_id');
+    $status    = $this->input->post('status');     // izin | sakit | dinas
+    $ket       = $this->input->post('keterangan');
+    $guru_id   = $this->session->userdata('guru_id');
 
+    $this->load->model([
+        'Hari_libur_model',
+        'Guru_jadwal_model',
+        'Log_mengajar_model'
+    ]);
+
+    /* ===============================
+       AMBIL DATA JADWAL
+    =============================== */
+    $jadwal = $this->Guru_jadwal_model->get_by_id($jadwal_id);
+    if (!$jadwal) {
+        show_error('Jadwal tidak ditemukan');
+    }
+
+    /* ===============================
+       CEK HARI LIBUR
+    =============================== */
+    $libur = $this->Hari_libur_model->get_by_date(date('Y-m-d'));
+
+    // 🔴 LIBUR FULL
+    if ($libur && empty($libur->jam_mulai)) {
+        $this->session->set_flashdata('error', 'Hari ini libur');
+        redirect('guru_dashboard');
+        return;
+    }
+
+    // 🟡 LIBUR SETENGAH HARI
+    if ($libur && !empty($libur->jam_mulai)) {
+        $jam_libur  = strtotime(date('Y-m-d').' '.$libur->jam_mulai);
+        $jam_jadwal = strtotime(date('Y-m-d').' '.$jadwal->jam_mulai);
+
+        if ($jam_jadwal >= $jam_libur) {
+            $this->session->set_flashdata(
+                'error',
+                'Jam ini sudah libur (setengah hari)'
+            );
+            redirect('guru_dashboard');
+            return;
+        }
+    }
+
+    /* ===============================
+       SIMPAN LOG TIDAK MASUK (LENGKAP)
+    =============================== */
+    $this->Log_mengajar_model->insert([
+        'guru_id'    => $guru_id,
+        'jadwal_id'  => $jadwal_id,
+        'rombel_id'  => $jadwal->rombel_id,
+        'mapel_id'   => $jadwal->mapel_id,
+        'tanggal'    => date('Y-m-d'),
+        'status'     => $status,       // izin | sakit | dinas
+        'keterangan' => $ket,
+        'created_at' => date('Y-m-d H:i:s')
+    ]);
+
+    $this->session->set_flashdata('success', 'Tidak masuk berhasil disimpan');
+    redirect('guru_dashboard');
+}
 
 }
