@@ -210,6 +210,14 @@
     </a>
 </li>
 <hr class="sidebar-divider">
+<li class="nav-item <?= ($active=='nilai_rapor'?'active':''); ?>">
+    <a class="nav-link" href="<?= site_url('Nilairapor_siswa'); ?>">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Nilai Rapor</span>
+    </a>
+</li>
+
+<hr class="sidebar-divider">
 
 <li class="nav-item <?= ($active=='bacaan'?'active':''); ?>">
     <a class="nav-link" href="<?= site_url('SiswaBacaan'); ?>">

@@ -31,9 +31,7 @@ class Guru_dashboard extends CI_Controller {
     // ===============================
     $libur = $this->Hari_libur_model->get_libur_hari_ini();
 
-    // ===============================
-    // 🔴 JIKA LIBUR FULL (SEHARI PENUH)
-    // ===============================
+   
     if ($libur && empty($libur->jam_mulai)) {
 
         $data = [

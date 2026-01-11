@@ -52,6 +52,11 @@ $group_kurikulum = in_array($active, [
     'jam_sekolah',
     'buku'
 ]);
+$group_rapor = in_array($active, [
+    'nilai_input',
+    'nilai_import',
+    'nilai_daftar'
+]);
 
 ?>
 
@@ -168,6 +173,32 @@ $group_kurikulum = in_array($active, [
             <a class="collapse-item <?= $active=='buku'?'active':'' ?>"
                href="<?= site_url('AdminBacaan') ?>">
                Daftar Buku
+            </a>
+        </div>
+    </div>
+</li>
+<!-- ==============================
+     NILAI RAPOR (ADMIN)
+================================= -->
+<li class="nav-item <?= $group_rapor ? 'active' : '' ?>">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mNilaiRapor">
+        <i class="fas fa-clipboard-list"></i>
+        <span>Nilai Rapor</span>
+    </a>
+    <div id="mNilaiRapor" class="collapse <?= $group_rapor ? 'show' : '' ?>">
+        <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item <?= $active=='nilai_input'?'active':'' ?>"
+               href="<?= site_url('Nilairapor_admin') ?>">
+               Input Nilai
+            </a>
+            <a class="collapse-item <?= $active=='nilai_import'?'active':'' ?>"
+   href="<?= site_url('Nilairapor_admin/import') ?>">
+   Import Nilai (Excel)
+</a>
+
+            <a class="collapse-item <?= $active=='nilai_daftar'?'active':'' ?>"
+               href="<?= site_url('Nilairapor_admin/rekap') ?>">
+               Daftar Nilai
             </a>
         </div>
     </div>
