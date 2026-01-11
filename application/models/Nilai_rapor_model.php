@@ -138,5 +138,73 @@ public function insert_or_update($data)
 {
     return $this->db->replace('nilai_rapor', $data);
 }
+public function rekap_nilai_paginated($kelas_id, $mapel_id, $limit, $offset)
+{
+    // SUBQUERY: pasangan siswa-mapel (INILAH YANG DIPAGINATE)
+    $this->db->distinct();
+    $this->db->select('s.id AS siswa_id, m.id_mapel');
+    $this->db->from('nilai_rapor nr');
+    $this->db->join('siswa s', 's.id = nr.siswa_id');
+    $this->db->join('mapel m', 'm.id_mapel = nr.mapel_id');
+
+    if ($kelas_id) {
+        $this->db->where('s.id_kelas', $kelas_id);
+    }
+
+    if ($mapel_id) {
+        $this->db->where('m.id_mapel', $mapel_id);
+    }
+
+    $subquery_sql = $this->db->get_compiled_select();
+
+    // QUERY UTAMA
+    return $this->db
+        ->select('
+            s.nama AS nama_siswa,
+            k.nama AS nama_kelas,
+            m.nama_mapel,
+
+            MAX(CASE WHEN nr.semester = 1 THEN nr.nilai_angka END) AS smt1,
+            MAX(CASE WHEN nr.semester = 2 THEN nr.nilai_angka END) AS smt2,
+            MAX(CASE WHEN nr.semester = 3 THEN nr.nilai_angka END) AS smt3,
+            MAX(CASE WHEN nr.semester = 4 THEN nr.nilai_angka END) AS smt4,
+            MAX(CASE WHEN nr.semester = 5 THEN nr.nilai_angka END) AS smt5,
+            MAX(CASE WHEN nr.semester = 6 THEN nr.nilai_angka END) AS smt6
+        ', false)
+        ->from("($subquery_sql) AS base")
+        ->join('siswa s', 's.id = base.siswa_id')
+        ->join('kelas k', 'k.id = s.id_kelas')
+        ->join('mapel m', 'm.id_mapel = base.id_mapel')
+        ->join(
+            'nilai_rapor nr',
+            'nr.siswa_id = base.siswa_id AND nr.mapel_id = base.id_mapel',
+            'left'
+        )
+        ->group_by(['base.siswa_id', 'base.id_mapel'])
+        ->order_by('s.nama', 'ASC')
+        ->limit($limit, $offset)
+        ->get()
+        ->result();
+}
+
+
+public function count_rekap_nilai($kelas_id, $mapel_id)
+{
+    $this->db->select('COUNT(DISTINCT CONCAT(s.id,"-",m.id_mapel)) AS total');
+    $this->db->from('nilai_rapor nr');
+    $this->db->join('siswa s', 's.id = nr.siswa_id');
+    $this->db->join('mapel m', 'm.id_mapel = nr.mapel_id');
+
+    if ($kelas_id) {
+        $this->db->where('s.id_kelas', $kelas_id);
+    }
+
+    if ($mapel_id) {
+        $this->db->where('m.id_mapel', $mapel_id);
+    }
+
+    return (int) $this->db->get()->row()->total;
+}
+
 
 }

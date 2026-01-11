@@ -55,22 +55,58 @@ class Nilairapor_admin extends CI_Controller {
      * REKAP NILAI (ADMIN)
      * ========================= */
     public function rekap()
-    {
-        $data['active'] = 'nilai_daftar';
+{
+    $this->load->library('pagination');
 
-        $kelas_id = $this->input->get('kelas');
-        $mapel_id = $this->input->get('mapel');
+    $data['active'] = 'nilai_daftar';
 
-        $data['kelas'] = $this->db->get('kelas')->result();
-        $data['mapel'] = $this->db->get('mapel')->result();
-        $data['rekap'] = $this->Nilai_rapor_model
-            ->rekap_nilai($kelas_id, $mapel_id);
+    $kelas_id = $this->input->get('kelas');
+    $mapel_id = $this->input->get('mapel');
 
-        $this->load->view('templates/header', $data);
-        $this->load->view('templates/sidebar', $data);
-        $this->load->view('admin/nilai_rapor/rekap', $data);
-        $this->load->view('templates/footer');
-    }
+    $per_page = 100;
+    $page     = (int) $this->input->get('page');
+    if ($page < 1) $page = 1;
+
+    $offset = ($page - 1) * $per_page;
+
+    // TOTAL DATA (WAJIB SESUAI GROUP BY)
+    $total_rows = $this->Nilai_rapor_model
+        ->count_rekap_nilai($kelas_id, $mapel_id);
+
+    // CONFIG PAGINATION (QUERY STRING AMAN)
+    $config['base_url'] = site_url('Nilairapor_admin/rekap');
+    $config['total_rows'] = $total_rows;
+    $config['per_page'] = $per_page;
+    $config['page_query_string'] = true;
+    $config['query_string_segment'] = 'page';
+    $config['use_page_numbers'] = true;
+
+    // styling bootstrap
+    $config['full_tag_open'] = '<ul class="pagination justify-content-center">';
+    $config['full_tag_close'] = '</ul>';
+    $config['num_tag_open'] = '<li class="page-item">';
+    $config['num_tag_close'] = '</li>';
+    $config['cur_tag_open'] = '<li class="page-item active"><span class="page-link">';
+    $config['cur_tag_close'] = '</span></li>';
+    $config['attributes'] = ['class' => 'page-link'];
+
+    $this->pagination->initialize($config);
+
+    // DATA
+    $data['kelas'] = $this->db->get('kelas')->result();
+    $data['mapel'] = $this->db->get('mapel')->result();
+
+    $data['rekap'] = $this->Nilai_rapor_model
+        ->rekap_nilai_paginated($kelas_id, $mapel_id, $per_page, $offset);
+
+    $data['pagination'] = $this->pagination->create_links();
+    $data['page'] = $page;
+
+    $this->load->view('templates/header', $data);
+    $this->load->view('templates/sidebar', $data);
+    $this->load->view('admin/nilai_rapor/rekap', $data);
+    $this->load->view('templates/footer');
+}
 
     /* =========================
      * IMPORT EXCEL (LEBAR)

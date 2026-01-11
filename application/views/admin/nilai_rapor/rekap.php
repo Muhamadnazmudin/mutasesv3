@@ -58,7 +58,7 @@
 
             <tbody>
                 <?php if (!empty($rekap)): ?>
-                    <?php $no = 1; foreach ($rekap as $r): 
+                    <?php $no = (($page - 1) * 100) + 1; foreach ($rekap as $r):
                         $smt1 = (int) $r->smt1;
                         $smt2 = (int) $r->smt2;
                         $smt3 = (int) $r->smt3;
@@ -91,6 +91,12 @@
             </tbody>
         </table>
     </div>
+    <?php if (!empty($pagination)): ?>
+    <div class="mt-3">
+        <?= $pagination ?>
+    </div>
+<?php endif; ?>
+
 
     <a href="<?= site_url('Nilairapor_admin') ?>" class="btn btn-secondary mt-3">
         <i class="fas fa-arrow-left"></i> Kembali ke Input Nilai
