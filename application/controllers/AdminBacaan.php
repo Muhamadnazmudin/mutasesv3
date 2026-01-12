@@ -96,4 +96,48 @@ class AdminBacaan extends CI_Controller {
         $this->session->set_flashdata('success','Buku berhasil dihapus');
         redirect('AdminBacaan');
     }
+
+    public function import()
+    {
+        $data['active'] = 'bacaan_import';
+        
+        $this->load->view('templates/header', $data);
+        $this->load->view('templates/sidebar', $data);
+        $this->load->view('admin/bacaan/import', $data);
+        $this->load->view('templates/footer');
+    }
+
+    public function import_proses()
+    {
+        if (!isset($_FILES['file_csv']['tmp_name'])) {
+            redirect('AdminBacaan/import');
+        }
+
+        $handle = fopen($_FILES['file_csv']['tmp_name'], "r");
+        fgetcsv($handle); // skip header
+
+        while (($row = fgetcsv($handle, 1000, ",")) !== FALSE) {
+
+            // extract FILE_ID dari link Drive
+            preg_match('/\/d\/(.*?)\//', $row[3], $match);
+            $file_id = $match[1] ?? null;
+
+            if (!$file_id) continue;
+
+            $data = [
+                'judul'         => trim($row[0]),
+                'kelas'         => trim($row[1]),
+                'mapel'         => trim($row[2]),
+                'drive_file_id' => $file_id,
+                'status'        => trim($row[4]),
+            ];
+
+            $this->db->insert('tbl_bacaan', $data);
+        }
+
+        fclose($handle);
+
+        $this->session->set_flashdata('success', 'Import bacaan berhasil');
+        redirect('AdminBacaan/import');
+    }
 }

@@ -50,6 +50,7 @@ $group_kurikulum = in_array($active, [
     'laporan_mengajar',
     'mapel',
     'jam_sekolah',
+    'bacaan_import',
     'buku'
 ]);
 $group_rapor = in_array($active, [
@@ -94,11 +95,10 @@ $group_rapor = in_array($active, [
     </a>
     <div id="mGuruAdmin" class="collapse <?= $group_guru ? 'show' : '' ?>">
         <div class="bg-white py-2 collapse-inner rounded">
-<!-- 
             <a class="collapse-item <?= $active=='guru'?'active':'' ?>"
                href="<?= site_url('guru') ?>">
                Data Guru
-            </a> -->
+            </a>
 
             <a class="collapse-item <?= $active=='guru_mengajar'?'active':'' ?>"
                href="<?= site_url('monitoring_mengajar') ?>">
@@ -169,6 +169,10 @@ $group_rapor = in_array($active, [
             <a class="collapse-item <?= $active=='laporan_mengajar'?'active':'' ?>"
                href="<?= site_url('laporan_mengajar') ?>">
                Laporan Mengajar Guru
+            </a>
+            <a class="collapse-item <?= $active=='bacaan_import'?'active':'' ?>"
+               href="<?= site_url('AdminBacaan/import') ?>">
+               Import Buku
             </a>
             <a class="collapse-item <?= $active=='buku'?'active':'' ?>"
                href="<?= site_url('AdminBacaan') ?>">
