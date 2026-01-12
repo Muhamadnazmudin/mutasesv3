@@ -314,6 +314,12 @@ html, body {
   </a>
 </li>
 
+<li class="nav-item <?= ($active=='laporan_guru') ? 'active' : '' ?>">
+    <a class="nav-link" href="<?= site_url('laporan_guru') ?>">
+        <i class="fas fa-file-pdf"></i>
+        <span>Laporan Mengajar</span>
+    </a>
+</li>
 
 <li class="nav-item <?= ($active=='guru_sertifikasi')?'active':'' ?>">
   <a class="nav-link" href="<?= site_url('guru_sertifikasi_guru') ?>">
@@ -397,8 +403,6 @@ html, body {
 
 </ul>
 
-<!-- ========== TOPBAR ========== -->
-<!-- ========== TOPBAR ========== -->
 <nav class="navbar navbar-expand navbar-dark topbar mb-4 static-top shadow">
 
     <!-- LEFT : HAMBURGER -->

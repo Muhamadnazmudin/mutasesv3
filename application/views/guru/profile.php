@@ -94,5 +94,102 @@ if (!empty($user->foto) && file_exists($fotoPath)) {
       </p>
     </div>
   </div>
+<!-- ================= DATA KEPEGAWAIAN ================= -->
+<div class="card shadow-sm mt-4">
+  <div class="card-header bg-primary text-white">
+    <strong>Data Kepegawaian</strong>
+  </div>
+
+  <div class="card-body">
+
+    <table class="table table-sm table-borderless mb-0">
+      <tr>
+        <td width="260">Kewarganegaraan</td>
+        <td>: <?= $guru->kewarganegaraan ?: '-' ?></td>
+      </tr>
+
+      <tr>
+        <td>NPWP</td>
+        <td>: <?= $guru->npwp ?: '-' ?></td>
+      </tr>
+
+      <tr>
+        <td>Nama Wajib Pajak</td>
+        <td>: <?= $guru->nama_wajib_pajak ?: '-' ?></td>
+      </tr>
+
+      <tr>
+        <td>Status Kepegawaian</td>
+        <td>: <?= $guru->status_kepegawaian ?: '-' ?></td>
+      </tr>
+
+      <tr>
+        <td>SK Pengangkatan</td>
+        <td>: <?= $guru->sk_pengangkatan ?: '-' ?></td>
+      </tr>
+
+      <tr>
+        <td>TMT Pengangkatan</td>
+        <td>
+          :
+          <?= $guru->tmt_pengangkatan
+              ? date('d-m-Y', strtotime($guru->tmt_pengangkatan))
+              : '-' ?>
+        </td>
+      </tr>
+
+      <tr>
+        <td>Lembaga Pengangkat</td>
+        <td>: <?= $guru->lembaga_pengangkat ?: '-' ?></td>
+      </tr>
+
+      <tr>
+        <td>SK CPNS</td>
+        <td>: <?= $guru->sk_cpns ?: '-' ?></td>
+      </tr>
+
+      <tr>
+  <td>TMT CPNS</td>
+  <td>
+    :
+    <?php
+      if (
+          !empty($guru->tmt_cpns) &&
+          $guru->tmt_cpns != '0000-00-00'
+      ) {
+          echo date('d-m-Y', strtotime($guru->tmt_cpns));
+      } else {
+          echo '-';
+      }
+    ?>
+  </td>
+</tr>
+
+<tr>
+  <td>TMT Pengangkatan CPNS</td>
+  <td>
+    :
+    <?php
+      if (
+          !empty($guru->tmt_pengangkatan_cpns) &&
+          $guru->tmt_pengangkatan_cpns != '0000-00-00'
+      ) {
+          echo date('d-m-Y', strtotime($guru->tmt_pengangkatan_cpns));
+      } else {
+          echo '-';
+      }
+    ?>
+  </td>
+</tr>
+
+
+      <tr>
+        <td>Pangkat / Golongan</td>
+        <td>: <?= $guru->pangkat_golongan ?: '-' ?></td>
+      </tr>
+    </table>
+
+  </div>
+</div>
 
 </div>

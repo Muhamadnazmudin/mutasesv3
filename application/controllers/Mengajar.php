@@ -197,5 +197,21 @@ public function tidak_masuk()
     $this->session->set_flashdata('success', 'Tidak masuk berhasil disimpan');
     redirect('guru_dashboard');
 }
+public function simpan_materi()
+{
+    $guru_id = $this->session->userdata('guru_id');
+    $log_id  = $this->input->post('log_id');
+    $materi  = $this->input->post('materi');
+
+    $this->db
+        ->where('id', $log_id)
+        ->where('guru_id', $guru_id)
+        ->update('log_mengajar', [
+            'materi' => $materi
+        ]);
+
+    $this->session->set_flashdata('success', 'Materi berhasil disimpan');
+    redirect('guru_dashboard');
+}
 
 }

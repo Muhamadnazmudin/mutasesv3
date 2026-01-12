@@ -207,16 +207,29 @@
                 ?>
 
                 <?php if ($status === 'mulai'): ?>
-                    <a href="<?= site_url('mengajar/selesai/'.$j->log->id) ?>"
-                       class="btn btn-sm btn-danger">
-                       <i class="fas fa-stop-circle"></i> Selesai
-                    </a>
-                <?php elseif ($status === 'menunggu_selfie'): ?>
-                    <a href="<?= site_url('mengajar/selfie/'.$j->log->id) ?>"
-                       class="btn btn-sm btn-warning">
-                       <i class="fas fa-camera"></i> Selfie
-                    </a>
-                <?php else: ?>
+
+    <a href="<?= site_url('mengajar/selesai/'.$j->log->id) ?>"
+       class="btn btn-sm btn-danger mb-1">
+       <i class="fas fa-stop-circle"></i> Selesai
+    </a>
+
+<?php elseif ($status === 'menunggu_selfie'): ?>
+
+    <!-- TOMBOL INPUT MATERI -->
+    <button class="btn btn-sm btn-info mb-1"
+            data-toggle="modal"
+            data-target="#modalMateri<?= $j->log->id ?>">
+        <i class="fas fa-book"></i> Input Materi
+    </button>
+
+    <!-- TOMBOL SELFIE -->
+    <a href="<?= site_url('mengajar/selfie/'.$j->log->id) ?>"
+       class="btn btn-sm btn-warning">
+       <i class="fas fa-camera"></i> Selfie
+    </a>
+
+<?php else: ?>
+
                     <span class="badge badge-<?= $badgeClass ?>">
                         <?= ucfirst($status) ?>
                     </span>
@@ -285,4 +298,51 @@
     </div>
   </div>
 </div>
+<?php endforeach; ?>
+<?php foreach ($jadwal_hari_ini as $j): ?>
+<?php if (!empty($j->log) && $j->log->status === 'menunggu_selfie'): ?>
+<div class="modal fade" id="modalMateri<?= $j->log->id ?>" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <form method="post" action="<?= site_url('mengajar/simpan_materi') ?>">
+
+        <input type="hidden"
+               name="<?= $this->security->get_csrf_token_name(); ?>"
+               value="<?= $this->security->get_csrf_hash(); ?>">
+
+        <input type="hidden" name="log_id" value="<?= $j->log->id ?>">
+
+        <div class="modal-header bg-info text-white">
+          <h5 class="modal-title">
+            <i class="fas fa-book"></i> Materi Mengajar
+          </h5>
+          <button type="button" class="close text-white" data-dismiss="modal">
+            &times;
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Materi yang diajarkan</label>
+            <textarea name="materi"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Contoh: Persamaan Linear Dua Variabel"
+                      required><?= $j->log->materi ?? '' ?></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-info btn-block">
+            Simpan Materi
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+<?php endif; ?>
 <?php endforeach; ?>
