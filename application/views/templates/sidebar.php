@@ -306,6 +306,7 @@ $group_rapor = in_array($active, [
     </a>
     <div id="mSettingAdmin" class="collapse <?= $group_setting ? 'show' : '' ?>">
         <div class="bg-white py-2 collapse-inner rounded">
+            <a class="collapse-item" href="<?= base_url('index.php/Sekolah') ?>">Profil sekolah</a>
             <a class="collapse-item" href="<?= base_url('index.php/HariLibur') ?>">Hari Libur</a>
             <a class="collapse-item" href="<?= site_url('tahun') ?>">Tahun Ajaran</a>
             <a class="collapse-item" href="<?= base_url('index.php/jadwalabsensi') ?>">Setting Jam Absen</a>
