@@ -47,7 +47,11 @@ private function hari_indo($hari)
     $bulan   = (int)$this->input->get('bulan');
     $tahun   = (int)$this->input->get('tahun');
     $guru_id = $this->session->userdata('guru_id');
-
+ $namaBulan = [
+        1=>'Januari',2=>'Februari',3=>'Maret',4=>'April',
+        5=>'Mei',6=>'Juni',7=>'Juli',8=>'Agustus',
+        9=>'September',10=>'Oktober',11=>'November',12=>'Desember'
+    ];
     $this->load->helper('tanggal');
 
     $data = $this->Laporan_guru_model
@@ -55,13 +59,161 @@ private function hari_indo($hari)
 
     $guru = $this->db->where('id', $guru_id)->get('guru')->row();
     if (!$guru) show_error('Data guru tidak ditemukan');
+    $sekolah = $this->db->get('sekolah')->row();
+        // ambil mapel guru (unik)
+// ambil mapel dari data laporan (unik)
+$namaMapel = '-';
+if (!empty($data['rekap'])) {
+    $mapelUnik = [];
+
+    foreach ($data['rekap'] as $r) {
+        if (!empty($r->nama_mapel)) {
+            $mapelUnik[$r->nama_mapel] = true;
+        }
+    }
+
+    $namaMapel = implode(' dan ', array_keys($mapelUnik));
+}
 
     /* ================= PDF ================= */
     $this->load->library('pdf');
     $pdf = new TCPDF('P','mm','A4',true,'UTF-8',false);
+    $pdf->setPrintHeader(false);
+    $pdf->setPrintFooter(false);
     $pdf->SetMargins(15,15,15);
     $pdf->SetAutoPageBreak(true,20);
     $pdf->AddPage();
+    /* ================= COVER ================= */
+$pdf->SetAutoPageBreak(false);
+
+// ===== JUDUL ATAS =====
+$pdf->SetFont('helvetica','B',16);
+$pdf->Cell(
+    0,
+    10,
+    'LAPORAN JURNAL KEGIATAN MENGAJAR GURU',
+    0,
+    1,
+    'C'
+);
+
+$pdf->Ln(15);
+
+// ===== LOGO =====
+if (!empty($sekolah->logo) && file_exists(FCPATH.'uploads/logo/'.$sekolah->logo)) {
+    $pdf->Image(
+        FCPATH.'uploads/logo/'.$sekolah->logo,
+        85, // tengah
+        $pdf->GetY(),
+        40
+    );
+}
+
+$pdf->Ln(55);
+
+// ===== NAMA SEKOLAH =====
+$pdf->SetFont('helvetica','B',14);
+$pdf->Cell(
+    0,
+    8,
+    strtoupper($sekolah->nama_sekolah ?? 'NAMA SEKOLAH'),
+    0,
+    1,
+    'C'
+);
+
+$pdf->Ln(10);
+
+// ===== MAPEL =====
+$pdf->SetFont('helvetica','',12);
+$pdf->Cell(
+    0,
+    8,
+    'Mata Pelajaran : '.$namaMapel,
+    0,
+    1,
+    'C'
+);
+
+$pdf->Ln(8);
+
+// ===== NAMA GURU =====
+$pdf->Cell(
+    0,
+    8,
+    'Nama Guru : '.$guru->nama,
+    0,
+    1,
+    'C'
+);
+
+// ===== NIP =====
+$pdf->Cell(
+    0,
+    8,
+    'NIP : '.(!empty($guru->nip) ? $guru->nip : '-'),
+    0,
+    1,
+    'C'
+);
+
+// ===== PERIODE =====
+$pdf->Ln(8);
+$pdf->Cell(
+    0,
+    8,
+    'Periode : '.$namaBulan[$bulan].' '.$tahun,
+    0,
+    1,
+    'C'
+);
+/* ===== INFORMASI INSTANSI (BAGIAN BAWAH COVER) ===== */
+
+// geser ke bawah halaman
+$pdf->SetY(-95);
+
+// garis pemisah
+// $pdf->SetLineWidth(0.6);
+// $pdf->Line(15, $pdf->GetY(), 195, $pdf->GetY());
+$pdf->Ln(6);
+
+// ===== INSTANSI ATAS =====
+$pdf->SetFont('helvetica','',12);
+$pdf->Cell(0,7,'PEMERINTAH DAERAH PROVINSI JAWA BARAT',0,1,'C');
+$pdf->Cell(0,7,'DINAS PENDIDIKAN',0,1,'C');
+$pdf->Cell(0,7,'CABANG DINAS PENDIDIKAN WILAYAH X',0,1,'C');
+
+$pdf->Ln(6);
+
+// ===== NAMA SEKOLAH =====
+$pdf->SetFont('helvetica','B',14);
+$pdf->Cell(
+    0,
+    8,
+    strtoupper($sekolah->nama_sekolah ?? 'NAMA SEKOLAH'),
+    0,
+    1,
+    'C'
+);
+
+// ===== ALAMAT & KONTAK =====
+$pdf->Ln(3);
+$pdf->SetFont('helvetica','',11);
+
+$pdf->MultiCell(
+    0,
+    6,
+    ($sekolah->alamat ?? 'Alamat sekolah')
+    ."\nEmail : smkn_1cilimus@yahoo.com"
+    ."\nWebsite : smkn1cilimus.sch.id"
+    ."\nKab. Kuningan 45556",
+    0,
+    'C'
+);
+
+// ===== RESET =====
+$pdf->SetAutoPageBreak(true,20);
+$pdf->AddPage(); // halaman isi
 
     /* ================= JUDUL ================= */
     $pdf->SetFont('helvetica','B',13);
@@ -95,56 +247,138 @@ $pdf->Cell(
     $pdf->Ln();
 
     /* ================= ISI ================= */
-    $pdf->SetFont('helvetica','',9);
-    $no = 1;
+$pdf->SetFont('helvetica','',9);
+$no = 1;
 
-    foreach ($data['rekap'] as $r) {
+foreach ($data['rekap'] as $r) {
 
-        $hariTanggal =
-    $this->hari_indo($r->hari).', '.tgl_indo_teks($r->tanggal);
+    $hariTanggal =
+        $this->hari_indo($r->hari).', '.tgl_indo_teks($r->tanggal);
 
-        $jam =
-            substr($r->jam_mulai,0,5).' – '.substr($r->jam_selesai,0,5);
+    $jam =
+        substr($r->jam_mulai,0,5).' – '.substr($r->jam_selesai,0,5);
 
-        $cells = [
-            $no++,
-            $hariTanggal,
-            $r->nama_kelas,
-            $r->nama_mapel,
-            $jam,
-            $r->materi ?: '-'
-        ];
+    $cells = [
+        $no++,
+        $hariTanggal,
+        $r->nama_kelas,
+        $r->nama_mapel,
+        $jam,
+        $r->materi ?: '-'
+    ];
 
-        // hitung tinggi baris
-        $h = 8;
-        foreach ($cells as $i => $txt) {
-            $h = max($h, $pdf->getStringHeight($w[$i], $txt));
-        }
-
-        $x = $pdf->GetX();
-        $y = $pdf->GetY();
-
-        foreach ($cells as $i => $txt) {
-            $pdf->MultiCell($w[$i], $h, $txt, 1, 'L', false, 0, $x, $y);
-            $x += $w[$i];
-        }
-
-        $pdf->Ln($h);
+    /* ===== HITUNG TINGGI BARIS ===== */
+    $rowHeight = 8;
+    foreach ($cells as $i => $txt) {
+        $rowHeight = max(
+            $rowHeight,
+            $pdf->getStringHeight($w[$i], $txt)
+        );
     }
 
-    /* ================= TTD ================= */
-    $pdf->Ln(15);
+    $x = $pdf->GetX();
+    $y = $pdf->GetY();
 
-    $pdf->SetFont('helvetica','',10);
+    /* ===== GAMBAR BORDER ===== */
+    foreach ($w as $i => $width) {
+        $pdf->Rect($x, $y, $width, $rowHeight);
+        $x += $width;
+    }
 
-    $pdf->Cell(90,6,'Mengetahui,',0,0,'C');
-    $pdf->Cell(90,6,'Guru Yang Bersangkutan,',0,1,'C');
+    /* ===== ISI TEKS ===== */
+    $x = $pdf->GetX();
+    foreach ($cells as $i => $txt) {
+        $pdf->MultiCell(
+            $w[$i],
+            $rowHeight,
+            $txt,
+            0,          // ⬅️ TANPA BORDER
+            'L',
+            false,
+            0,
+            $x,
+            $y
+        );
+        $x += $w[$i];
+    }
 
-    $pdf->Ln(20);
+    /* ===== PINDAH BARIS ===== */
+    $pdf->Ln($rowHeight);
+}
 
-    $pdf->SetFont('helvetica','B',10);
-    $pdf->Cell(90,6,'KEPALA SEKOLAH',0,0,'C');
-    $pdf->Cell(90,6,strtoupper($guru->nama),0,1,'C');
+ /* ================= TTD ================= */
+
+// posisi awal
+$pdf->Ln(15);
+
+// ===== MENGETAHUI (TENGAH) =====
+$pdf->SetFont('helvetica','',10);
+$pdf->Cell(0,6,'Mengetahui,',0,1,'C');
+
+$pdf->Ln(8);
+
+// koordinat kolom
+$xLeft  = 25;   // kolom kiri
+$xRight = 115;  // kolom kanan
+$yStart = $pdf->GetY();
+
+// ===== JABATAN =====
+$pdf->SetXY($xLeft, $yStart);
+$pdf->Cell(70,6,'Kepala Sekolah',0,0,'L');
+
+$pdf->SetXY($xRight, $yStart);
+$pdf->Cell(67,6,'Guru yang bersangkutan',0,1,'R');
+
+$pdf->Ln(20);
+
+// ===== NAMA =====
+$yName = $pdf->GetY();
+
+$pdf->SetFont('helvetica','B',10);
+
+$pdf->SetXY($xLeft, $yName);
+$pdf->Cell(
+    70,
+    6,
+    strtoupper($sekolah->nama_kepala_sekolah ?? '-'),
+    0,
+    0,
+    'L'
+);
+
+$pdf->SetXY($xRight, $yName);
+$pdf->Cell(
+    58,
+    6,
+    strtoupper($guru->nama),
+    0,
+    1,
+    'R'
+);
+
+// ===== NIP =====
+$pdf->SetFont('helvetica','',10);
+
+$pdf->SetXY($xLeft, $yName + 6);
+$pdf->Cell(
+    70,
+    6,
+    'NIP. '.(!empty($sekolah->nip_kepala_sekolah) ? $sekolah->nip_kepala_sekolah : '-'),
+    0,
+    0,
+    'L'
+);
+
+$pdf->SetXY($xRight, $yName + 6);
+$pdf->Cell(
+    70,
+    6,
+    'NIP. '.(!empty($guru->nip) ? $guru->nip : '-'),
+    0,
+    1,
+    'R'
+);
+
 
     $pdf->Ln(15);
 /* ================= HALAMAN FOTO ================= */
