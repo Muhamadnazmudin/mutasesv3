@@ -171,7 +171,7 @@
           </div>
         </div>
         <div class="footer-text">
-          © <?= date('Y') ?> <a href="#">SimSGTK </a> — Sistem Informasi Siswa dan GTK
+          © <?= date('Y') ?> <a href="https://www.profilsaya.my.id">SimSGTK </a> — Sistem Informasi Siswa dan GTK-V.3
         </div>
       </div>
     </div>

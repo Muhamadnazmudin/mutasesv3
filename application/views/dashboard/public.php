@@ -461,6 +461,44 @@ body:not(.dark-mode) .bot-anim {
 body.dark-mode .bot-anim {
   color: #f7f7f7ff; /* biru terang */
 }
+/* ================= LOGIN DROPDOWN MOBILE FIX ================= */
+@media (max-width: 576px) {
+
+  /* Tombol login lebih nyaman disentuh */
+  .btn-login {
+    width: 100%;
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 10px;
+  }
+
+  /* Dropdown full-width & tidak kepotong */
+  .dropdown-menu {
+    width: 100%;
+    min-width: unset;
+    margin-top: 8px;
+    border-radius: 12px;
+    box-shadow: 0 12px 25px rgba(0,0,0,.25);
+  }
+
+  /* Item dropdown lebih tinggi */
+  .dropdown-item {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+  }
+
+  /* Icon & teks sejajar */
+  .dropdown-item i {
+    width: 24px;
+    text-align: center;
+    margin-right: 8px;
+  }
+
+  /* Pastikan dropdown tidak keluar layar */
+  .navbar .dropdown {
+    width: 100%;
+  }
+}
 
   </style>
 </head>
