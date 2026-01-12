@@ -154,7 +154,7 @@ public function cek_bentrok_edit(
         ->join('guru g', 'g.id = j.guru_id')
         ->join('kelas k', 'k.id = j.rombel_id')
         ->where('j.hari', $hari)
-        ->where('j.id !=', $exclude_id)
+        ->where('j.id_jadwal !=', $exclude_id)
         ->group_start()
             ->where('j.guru_id', $guru_id)
             ->or_where('j.rombel_id', $rombel_id)
@@ -164,11 +164,18 @@ public function cek_bentrok_edit(
         ->get()
         ->row();
 }
+
 public function delete($id)
 {
-    return $this->db
-        ->where('id_jadwal', $id)
-        ->delete('jadwal_mengajar');
+    // pastikan pakai primary key yang benar
+    $this->db->where('id_jadwal', $id);
+
+    // 🔥 HARD DELETE
+    $this->db->delete('jadwal_mengajar');
+
+    // optional: cek hasil
+    return $this->db->affected_rows() > 0;
 }
+
 
 }

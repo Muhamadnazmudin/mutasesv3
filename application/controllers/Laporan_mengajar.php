@@ -106,6 +106,8 @@ class Laporan_mengajar extends CI_Controller {
     $no = 1;
 
     $rekapTelatMenit = [];
+    $toleransi_masuk  = 10; // menit
+    $toleransi_keluar = 5;  // menit
 
     foreach ($laporan as $row) {
 
@@ -125,19 +127,24 @@ class Laporan_mengajar extends CI_Controller {
 
         /* ===== TELAT ===== */
         $telatMenit = 0;
-        $ketMasuk   = 'Tepat waktu';
+$ketMasuk   = 'Tepat waktu';
 
-        if (!empty($row->jam_mulai) && !empty($row->jam_mulai_jadwal)) {
+if (!empty($row->jam_mulai) && !empty($row->jam_mulai_jadwal)) {
 
-            $jadwalMasuk = strtotime($row->tanggal.' '.$row->jam_mulai_jadwal);
-            $realMasuk   = strtotime($row->jam_mulai);
+    $jadwalMasuk = strtotime($row->tanggal.' '.$row->jam_mulai_jadwal);
+    $realMasuk   = strtotime($row->jam_mulai);
 
-            if ($realMasuk > $jadwalMasuk) {
-                $telatMenit = floor(($realMasuk - $jadwalMasuk) / 60);
-                $ketMasuk   = 'Telat '.$telatMenit.' menit';
-            }
-        }
+    // selisih real
+    $selisihReal = floor(($realMasuk - $jadwalMasuk) / 60);
 
+    // setelah toleransi
+    $telat = $selisihReal - $toleransi_masuk;
+
+    if ($telat > 0) {
+        $telatMenit = $telat;
+        $ketMasuk   = 'Telat '.$telatMenit.' menit';
+    }
+}
         $rekapTelatMenit[$guru] =
             ($rekapTelatMenit[$guru] ?? 0) + $telatMenit;
 
@@ -181,6 +188,58 @@ class Laporan_mengajar extends CI_Controller {
 
     ob_end_clean();
     $pdf->Output('laporan_mengajar_'.date('Ymd').'.pdf','I');
+}
+public function reset()
+{
+    if ($this->session->userdata('role_name') !== 'admin') {
+        show_error('Akses ditolak');
+    }
+
+    $tanggal = $this->input->get('tanggal');
+    $guru    = $this->input->get('guru');
+    $mulai   = $this->input->get('mulai');
+    $selesai = $this->input->get('selesai');
+
+    // ambil id guru
+    $guruRow = $this->db->get_where('guru', ['nama' => $guru])->row();
+    if (!$guruRow) {
+        show_error('Guru tidak ditemukan');
+    }
+
+    /**
+     * STEP 1: cari jadwal_id yang cocok
+     */
+    $jadwalIds = $this->db
+        ->select('j.id_jadwal')
+        ->from('jadwal_mengajar j')
+        ->join('jam_sekolah js1', 'js1.id_jam = j.jam_mulai_id')
+        ->join('jam_sekolah js2', 'js2.id_jam = j.jam_selesai_id')
+        ->where('j.guru_id', $guruRow->id)
+        ->where('js1.jam_mulai', $mulai)
+        ->where('js2.jam_selesai', $selesai)
+        ->get()
+        ->result_array();
+
+    if (empty($jadwalIds)) {
+        show_error('Jadwal tidak ditemukan');
+    }
+
+    $jadwalIds = array_column($jadwalIds, 'id_jadwal');
+
+    /**
+     * STEP 2: DELETE log_mengajar
+     */
+    $this->db
+        ->where_in('jadwal_id', $jadwalIds)
+        ->where('DATE(tanggal)', $tanggal)
+        ->delete('log_mengajar');
+
+    $this->session->set_flashdata(
+        'success',
+        'Laporan mengajar berhasil dihapus'
+    );
+
+    redirect('laporan_mengajar');
 }
 
 }

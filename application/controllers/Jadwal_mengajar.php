@@ -454,6 +454,20 @@ public function import_proses()
 public function edit($id)
 {
     $jadwal = $this->Jadwal_mengajar_model->get_by_id($id);
+
+// 🔥 AMBIL DATA RAW LANGSUNG DARI TABEL (TANPA JOIN)
+$jadwal_raw = $this->db
+    ->where('id_jadwal', $id)
+    ->get('jadwal_mengajar')
+    ->row();
+
+if (!$jadwal || !$jadwal_raw) {
+    show_404();
+}
+
+$data['jadwal']     = $jadwal;       // untuk label (opsional)
+$data['jadwal_raw'] = $jadwal_raw;   // 🔥 INI YANG DIPAKAI FORM
+
     if (!$jadwal) {
         show_404();
     }
@@ -465,6 +479,7 @@ public function edit($id)
     $data['guru']  = $this->db->get('guru')->result();
     $data['kelas'] = $this->db->get('kelas')->result();
     $data['mapel'] = $this->db->get('mapel')->result();
+    $data['jam'] = $this->Jadwal_mengajar_model->jam_mengajar();
 
     $this->load->view('templates/header', $data);
     $this->load->view('templates/sidebar', $data);
@@ -515,7 +530,7 @@ public function update($id)
     }
 
     // === UPDATE ===
-    $this->db->where('id', $id)->update('jadwal_mengajar', [
+    $this->db->where('id_jadwal', $id)->update('jadwal_mengajar', [
         'hari'           => $hari,
         'guru_id'        => $guru_id,
         'rombel_id'      => $rombel_id,

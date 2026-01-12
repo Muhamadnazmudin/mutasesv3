@@ -96,7 +96,39 @@ class Laporan_mengajar_model extends CI_Model {
     foreach ($data as &$d) {
 
         // default
-        $d->status_laporan = 'Tidak Mengajar';
+$d->status_laporan = 'Tidak Mengajar';
+
+// ✅ ADA LOG
+if (!empty($d->status)) {
+
+    switch ($d->status) {
+        case 'mulai':
+            $d->status_laporan = 'Sedang Mengajar';
+            break;
+
+        case 'selesai':
+            $d->status_laporan = 'Selesai';
+            break;
+
+        case 'izin':
+            $d->status_laporan = 'Izin';
+            break;
+
+        case 'sakit':
+            $d->status_laporan = 'Sakit';
+            break;
+
+        case 'dinas':
+            $d->status_laporan = 'Dinas';
+            break;
+
+        default:
+            $d->status_laporan = ucfirst($d->status);
+            break;
+    }
+
+    continue;
+}
 
         // 🔴 LIBUR FULL
         if ($this->is_libur_full($tanggal)) {
