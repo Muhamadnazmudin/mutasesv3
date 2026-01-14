@@ -90,7 +90,7 @@ body.light-mode .row > [class^="col-"] {
   </p>
 </div>
 <?php endif; ?>
-
+<?php if ($this->session->userdata('logged_in')): ?>
 <div class="row mb-4">
 
   <!-- JUMLAH GURU -->
@@ -127,7 +127,7 @@ body.light-mode .row > [class^="col-"] {
   </div>
 
 </div>
-
+<?php endif; ?>
 
 <div class="row g-4 mb-4">
 
