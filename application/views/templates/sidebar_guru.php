@@ -307,7 +307,7 @@ html, body {
   </a>
 </li>
 
-<li class="nav-item <?= ($active=='guru_jadwal')?'active':'' ?>">
+<!-- <li class="nav-item <?= ($active=='guru_jadwal')?'active':'' ?>">
   <a class="nav-link" href="<?= site_url('guru_jadwal') ?>">
     <i class="fas fa-calendar-alt"></i>
     <span>Jadwal Mengajar</span>
@@ -326,11 +326,11 @@ html, body {
     <i class="fas fa-certificate"></i>
     <span>Riwayat Sertifikasi</span>
   </a>
-</li>
+</li> -->
 
 
 
-  <li class="nav-item">
+  <!-- <li class="nav-item">
     <a class="nav-link" href="#">
       <i class="fas fa-graduation-cap"></i>
       <span>Riwayat Pendidikan Formal</span>
@@ -370,7 +370,7 @@ html, body {
       <i class="fas fa-briefcase"></i>
       <span>Riwayat Karir Guru</span>
     </a>
-  </li>
+  </li> -->
 
   <?php if ($this->session->userdata('is_walikelas')): ?>
     <hr class="sidebar-divider">

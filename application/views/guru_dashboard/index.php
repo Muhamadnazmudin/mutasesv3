@@ -139,6 +139,7 @@
             date_default_timezone_set('Asia/Jakarta');
             $now = time();
             $jam_masuk = strtotime(date('Y-m-d').' '.$j->jam_mulai);
+            $is_waktu_aktif = $now >= $jam_masuk;
             $selisih_menit = floor(($jam_masuk - $now) / 60);
             $telat_menit   = floor(($now - $jam_masuk) / 60);
         ?>
@@ -190,10 +191,21 @@
                     <i class="fas fa-user-times"></i> Tidak Masuk
                 </button>
 
-                <a href="<?= site_url('mengajar/mulai/'.$j->jadwal_id) ?>"
-                   class="btn btn-sm btn-success btn-masuk">
-                   <i class="fas fa-door-open"></i> Masuk Kelas
-                </a>
+                <?php if ($is_waktu_aktif): ?>
+
+    <a href="<?= site_url('mengajar/mulai/'.$j->jadwal_id) ?>"
+       class="btn btn-sm btn-success btn-masuk">
+       <i class="fas fa-door-open"></i> Masuk Kelas
+    </a>
+
+<?php else: ?>
+
+    <button class="btn btn-sm btn-secondary" disabled>
+        <i class="fas fa-lock"></i> Belum Waktunya
+    </button>
+
+<?php endif; ?>
+
 
             <?php else: ?>
 
@@ -207,11 +219,41 @@
                 ?>
 
                 <?php if ($status === 'mulai'): ?>
+<?php
+$jam_selesai_jadwal = strtotime(date('Y-m-d').' '.$j->jam_selesai);
+$selisih_selesai = floor(($jam_selesai_jadwal - time()) / 60);
+$perlu_catatan = $selisih_selesai >= 30;
+?>
 
-    <a href="<?= site_url('mengajar/selesai/'.$j->log->id) ?>"
-       class="btn btn-sm btn-danger mb-1">
-       <i class="fas fa-stop-circle"></i> Selesai
-    </a>
+    <?php if ($perlu_catatan): ?>
+
+    <!-- 🔴 KELUAR LEBIH AWAL → MODAL -->
+    <button class="btn btn-sm btn-danger"
+        data-toggle="modal"
+        data-target="#modalSelesai<?= $j->log->id ?>">
+        <i class="fas fa-stop-circle"></i> Selesai
+    </button>
+
+<?php else: ?>
+
+    <!-- 🟢 WAKTU NORMAL → LANGSUNG SELESAI -->
+    <form method="post"
+          action="<?= site_url('mengajar/selesai') ?>"
+          style="display:inline">
+
+        <input type="hidden"
+               name="<?= $this->security->get_csrf_token_name(); ?>"
+               value="<?= $this->security->get_csrf_hash(); ?>">
+
+        <input type="hidden" name="log_id" value="<?= $j->log->id ?>">
+
+        <button type="submit" class="btn btn-sm btn-success">
+            <i class="fas fa-check-circle"></i> Selesai
+        </button>
+    </form>
+
+<?php endif; ?>
+
 
 <?php elseif ($status === 'menunggu_selfie'): ?>
 
@@ -292,12 +334,57 @@
             Simpan
           </button>
         </div>
+      </form>
+    </div>
+  </div>
+</div>
+<?php if (!empty($j->log) && $j->log->status === 'mulai'): ?>
+<div class="modal fade" id="modalSelesai<?= $j->log->id ?>" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+
+      <form method="post" action="<?= site_url('mengajar/selesai') ?>">
+
+        <input type="hidden"
+               name="<?= $this->security->get_csrf_token_name(); ?>"
+               value="<?= $this->security->get_csrf_hash(); ?>">
+
+        <input type="hidden" name="log_id" value="<?= $j->log->id ?>">
+
+        <div class="modal-header bg-danger text-white">
+          <h5 class="modal-title">Selesai Mengajar</h5>
+          <button type="button" class="close text-white" data-dismiss="modal">
+            &times;
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <p class="text-muted mb-2">
+            Jika keluar lebih awal (≥ 30 menit), wajib mengisi catatan.
+          </p>
+
+          <div class="form-group">
+            <label>Catatan Keluar</label>
+            <textarea name="catatan_keluar"
+                      class="form-control"
+                      rows="3"
+                      placeholder="Contoh: ada panggilan dinas / keluarga"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-danger btn-block">
+            Simpan & Selesai
+          </button>
+        </div>
 
       </form>
 
     </div>
   </div>
 </div>
+<?php endif; ?>
+
 <?php endforeach; ?>
 <?php foreach ($jadwal_hari_ini as $j): ?>
 <?php if (!empty($j->log) && $j->log->status === 'menunggu_selfie'): ?>

@@ -58,6 +58,7 @@
                         <th>Status</th>
                         <th>Masuk</th>
                         <th>Keluar</th>
+                        <th>Catatan</th>
                         <th>Selfie</th>
                         <?php if (is_admin()): ?>
                             <th>Aksi</th>
@@ -68,7 +69,7 @@
 
                 <?php if (empty($laporan)): ?>
                     <tr>
-                        <td colspan="<?= is_admin() ? 11 : 10 ?>"
+                        <td colspan="<?= is_admin() ? 12 : 11 ?>"
                             class="text-center text-muted">
                             Belum ada data
                         </td>
@@ -164,6 +165,22 @@ $toleransi_keluar = 5;  // menit
         <span class="text-muted">-</span>
     <?php endif; ?>
 </td>
+<!-- CATATAN KELUAR -->
+<td>
+    <?php if (!empty($l->catatan_keluar)): ?>
+        <span class="badge badge-danger d-block mb-1">
+            Keluar Lebih Awal
+        </span>
+
+        <div class="small text-muted">
+            <strong>Alasan:</strong><br>
+            <?= nl2br(htmlspecialchars($l->catatan_keluar)) ?>
+        </div>
+    <?php else: ?>
+        <span class="text-muted">-</span>
+    <?php endif; ?>
+</td>
+
 
                         <!-- SELFIE -->
                         <td class="text-center">

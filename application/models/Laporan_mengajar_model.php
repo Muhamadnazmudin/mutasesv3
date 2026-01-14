@@ -36,25 +36,27 @@ class Laporan_mengajar_model extends CI_Model {
     // QUERY UTAMA (BERBASIS JADWAL)
     // ===============================
     $this->db->select('
-        "'.$tanggal.'" AS tanggal,
+    "'.$tanggal.'" AS tanggal,
 
-        g.nama AS nama_guru,
-        m.nama_mapel,
-        k.nama AS nama_kelas,
+    g.nama AS nama_guru,
+    m.nama_mapel,
+    k.nama AS nama_kelas,
 
-        js1.nama_jam AS jam_awal,
-        js2.nama_jam AS jam_akhir,
+    js1.nama_jam AS jam_awal,
+    js2.nama_jam AS jam_akhir,
 
-        js1.jam_mulai   AS jam_mulai_jadwal,
-        js2.jam_selesai AS jam_selesai_jadwal,
+    js1.jam_mulai   AS jam_mulai_jadwal,
+    js2.jam_selesai AS jam_selesai_jadwal,
 
-        lm.status,
-        lm.jam_mulai,
-        lm.jam_selesai,
-        lm.selfie,
+    lm.status,
+    lm.jam_mulai,
+    lm.jam_selesai,
+    lm.selfie,
+    lm.catatan_keluar,
 
-        hl.jam_mulai AS jam_libur
-    ');
+    hl.jam_mulai AS jam_libur
+');
+
 
     $this->db->from('jadwal_mengajar j');
     $this->db->join('guru g', 'g.id = j.guru_id');

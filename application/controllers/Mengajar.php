@@ -56,20 +56,61 @@ class Mengajar extends CI_Controller {
     redirect('guru_dashboard');
 }
 
-    public function selesai($log_id)
+    public function selesai()
 {
     $guru_id = $this->session->userdata('guru_id');
+    $log_id  = $this->input->post('log_id');
+    $catatan = trim($this->input->post('catatan_keluar'));
 
-    $this->db
+    $log = $this->db
         ->where('id', $log_id)
         ->where('guru_id', $guru_id)
+        ->get('log_mengajar')
+        ->row();
+
+    if (!$log) {
+        redirect('guru_dashboard');
+    }
+
+    // ambil jam selesai jadwal
+    $jadwal = $this->db
+        ->select('js.jam_selesai')
+        ->from('jadwal_mengajar j')
+        ->join('jam_sekolah js', 'js.id_jam = j.jam_selesai_id')
+        ->where('j.id_jadwal', $log->jadwal_id)
+        ->get()
+        ->row();
+
+    if (!$jadwal) {
+        redirect('guru_dashboard');
+    }
+
+    $now          = time();
+    $jamSelesai   = strtotime(date('Y-m-d').' '.$jadwal->jam_selesai);
+    $selisihMenit = floor(($jamSelesai - $now) / 60);
+
+    // 🔴 KELUAR ≥ 30 MENIT LEBIH AWAL → WAJIB CATATAN
+    if ($selisihMenit >= 30 && empty($catatan)) {
+        $this->session->set_flashdata(
+            'error',
+            'Keluar lebih awal (≥ 30 menit) wajib mengisi catatan'
+        );
+        redirect('guru_dashboard');
+        return;
+    }
+
+    // === SIMPAN SELESAI ===
+    $this->db
+        ->where('id', $log_id)
         ->update('log_mengajar', [
-            'jam_selesai' => date('Y-m-d H:i:s'),
-            'status'      => 'menunggu_selfie'
+            'jam_selesai'    => date('Y-m-d H:i:s'),
+            'status'         => 'menunggu_selfie',
+            'catatan_keluar' => $catatan ?: null
         ]);
 
     redirect('guru_dashboard');
 }
+
 
 public function selfie($log_id)
 {
