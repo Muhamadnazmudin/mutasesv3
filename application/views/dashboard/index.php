@@ -22,6 +22,58 @@ body.light-mode .row > [class^="col-"] {
 	border: none !important;
 }
 </style>
+<style>
+/* ================= DASHBOARD TOP CARDS ================= */
+.dashboard-card {
+  border-radius: 14px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+  transition: all .25s ease;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px rgba(0,0,0,.18);
+}
+
+.dashboard-card .card-body {
+  padding: 1.6rem;
+}
+
+.dashboard-card .card-title {
+  font-size: .85rem;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  opacity: .9;
+  margin-bottom: .25rem;
+}
+
+.dashboard-card .card-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.dashboard-card .card-icon {
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  font-size: 3.8rem;
+  opacity: .18;
+}
+
+/* Gradients */
+.bg-guru {
+  background: linear-gradient(135deg,#1cc88a,#13855c);
+}
+.bg-siswa {
+  background: linear-gradient(135deg,#36b9cc,#258391);
+}
+.bg-rombel {
+  background: linear-gradient(135deg,#f6c23e,#c69500);
+}
+</style>
 
 <?php if ($this->session->userdata('logged_in')): ?>
 <div class="text-center mt-4 mb-5">
@@ -38,6 +90,43 @@ body.light-mode .row > [class^="col-"] {
   </p>
 </div>
 <?php endif; ?>
+
+<div class="row mb-4">
+
+  <!-- JUMLAH GURU -->
+  <div class="col-xl-4 col-md-6 mb-3">
+    <div class="card dashboard-card bg-guru h-100">
+      <div class="card-body">
+        <div class="card-title">Jumlah Guru</div>
+        <div class="card-value"><?= $jumlah_guru ?></div>
+        <i class="fas fa-chalkboard-teacher card-icon"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- SISWA AKTIF -->
+  <div class="col-xl-4 col-md-6 mb-3">
+    <div class="card dashboard-card bg-siswa h-100">
+      <div class="card-body">
+        <div class="card-title">Peserta Didik Aktif</div>
+        <div class="card-value"><?= number_format($jumlah_siswa_aktif,0,',','.') ?></div>
+        <i class="fas fa-user-graduate card-icon"></i>
+      </div>
+    </div>
+  </div>
+
+  <!-- JUMLAH ROMBEL -->
+  <div class="col-xl-4 col-md-6 mb-3">
+    <div class="card dashboard-card bg-rombel h-100">
+      <div class="card-body">
+        <div class="card-title">Jumlah Rombel</div>
+        <div class="card-value"><?= $jumlah_rombel ?></div>
+        <i class="fas fa-school card-icon"></i>
+      </div>
+    </div>
+  </div>
+
+</div>
 
 
 <div class="row g-4 mb-4">

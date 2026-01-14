@@ -55,6 +55,23 @@ class Dashboard extends CI_Controller {
         $data['aktif']  = $this->get_siswa_aktif_by_tingkat();
         $data['masuk']  = $this->get_siswa_masuk_by_tingkat();
         $data['keluar'] = $this->get_siswa_keluar_by_tingkat();
+        $data['rombel'] = $this->get_kelas_by_tingkat();
+        $data['aktif']  = $this->get_siswa_aktif_by_tingkat();
+        $data['masuk']  = $this->get_siswa_masuk_by_tingkat();
+        $data['keluar'] = $this->get_siswa_keluar_by_tingkat();
+
+        // ===============================
+//  KARTU RINGKAS DASHBOARD (TOP)
+// ===============================
+$data['jumlah_guru'] = $this->db->count_all('guru');
+
+$data['jumlah_siswa_aktif'] = $this->db
+    ->where('status', 'aktif')
+    ->count_all_results('siswa');
+
+$data['jumlah_rombel'] = $this->db->count_all('kelas');
+
+
 
         $q = $this->db
             ->select('tahun_ajaran.tahun, COUNT(siswa.id) AS jumlah')
