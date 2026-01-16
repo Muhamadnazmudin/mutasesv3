@@ -35,7 +35,8 @@ $group_qr      = in_array($active, ['absensiqr_siswa','laporan_absensiqr']);
 $group_verval = in_array($active, ['verval_siswa','laporan_verval']);
 $group_guru = in_array($active, [
     'guru',
-    'guru_mengajar',
+    'monitoring_mengajar',
+    'rekap_jjm',
     'guru_sertifikasi',
     'guru_pendidikan',
     'guru_anak',
@@ -100,9 +101,13 @@ $group_rapor = in_array($active, [
                Data Guru
             </a>
 
-            <a class="collapse-item <?= $active=='guru_mengajar'?'active':'' ?>"
+            <a class="collapse-item <?= $active=='monitoring_mengajar'?'active':'' ?>"
                href="<?= site_url('monitoring_mengajar') ?>">
                Data Mengajar
+            </a>
+            <a class="collapse-item <?= $active=='rekap_jjm'?'active':'' ?>"
+               href="<?= site_url('rekap_jjm') ?>">
+               Rekap JJM Guru
             </a>
 
             <a class="collapse-item <?= $active=='guru_sertifikasi'?'active':'' ?>"

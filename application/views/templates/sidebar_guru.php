@@ -307,7 +307,14 @@ html, body {
   </a>
 </li>
 
-<!-- <li class="nav-item <?= ($active=='guru_jadwal')?'active':'' ?>">
+<li class="nav-item <?= ($active=='cek_jjm')?'active':'' ?>">
+    <a class="nav-link" href="<?= site_url('cek_jjm') ?>">
+        <i class="fas fa-file-pdf"></i>
+        <span>Cek JJM</span>
+    </a>
+</li>
+
+<li class="nav-item <?= ($active=='guru_jadwal')?'active':'' ?>">
   <a class="nav-link" href="<?= site_url('guru_jadwal') ?>">
     <i class="fas fa-calendar-alt"></i>
     <span>Jadwal Mengajar</span>
@@ -326,7 +333,7 @@ html, body {
     <i class="fas fa-certificate"></i>
     <span>Riwayat Sertifikasi</span>
   </a>
-</li> -->
+</li>
 
 
 
