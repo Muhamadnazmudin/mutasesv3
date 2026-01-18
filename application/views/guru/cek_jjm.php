@@ -24,7 +24,7 @@
                 </p>
             </div>
 
-            <!-- TOMBOL AKSI -->
+           
             <div class="mt-2 mt-md-0">
 
                 <a href="https://ptk.datadik.kemendikdasmen.go.id/"

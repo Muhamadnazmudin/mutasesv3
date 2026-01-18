@@ -59,6 +59,11 @@ $group_rapor = in_array($active, [
     'nilai_import',
     'nilai_daftar'
 ]);
+$group_belajarid = in_array($active, [
+    'akun_belajar'
+]);
+
+
 
 ?>
 
@@ -212,6 +217,27 @@ $group_rapor = in_array($active, [
         </div>
     </div>
 </li>
+<!-- ==============================
+     AKUN BELAJAR / BELAJARID
+================================= -->
+<li class="nav-item <?= $group_belajarid ? 'active' : '' ?>">
+    <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#mBelajarID">
+        <i class="fas fa-envelope-open-text"></i>
+        <span>Akun Belajar</span>
+    </a>
+    <div id="mBelajarID" class="collapse <?= $group_belajarid ? 'show' : '' ?>">
+        <div class="bg-white py-2 collapse-inner rounded">
+
+            <a class="collapse-item <?= $active=='akun_belajar'?'active':'' ?>"
+               href="<?= site_url('akun_belajar') ?>">
+               Distribusi Akun Belajar
+            </a>
+
+        </div>
+    </div>
+</li>
+
+
 
 <!-- Mutasi -->
 <li class="nav-item <?= $group_mutasi ? 'active' : '' ?>">
