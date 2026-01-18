@@ -7,6 +7,10 @@ class Akun_belajar extends CI_Controller
     public function __construct()
     {
         parent::__construct();
+        if (!$this->session->userdata('logged_in')) {
+            redirect('dashboard');
+            exit;
+    }
         $this->load->model('Akun_belajar_model', 'akun');
     }
 
