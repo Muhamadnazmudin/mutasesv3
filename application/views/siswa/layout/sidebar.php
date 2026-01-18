@@ -241,6 +241,14 @@
             <span>Edit Biodata</span>
         </a>
     </li>
+    <hr class="sidebar-divider">
+
+<li class="nav-item <?= ($active=='akun_belajar'?'active':''); ?>">
+    <a class="nav-link" href="<?= site_url('SiswaAkunBelajar'); ?>">
+        <i class="fas fa-envelope-open-text"></i>
+        <span>Akun BelajarID</span>
+    </a>
+</li>
 
     <!-- <li class="nav-item <?= ($active=='cetak'?'active':''); ?>">
         <a class="nav-link" href="<?= site_url('SiswaDashboard/cetak'); ?>">
