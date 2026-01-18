@@ -141,4 +141,32 @@ public function import_process()
         $this->akun->delete($nisn);
         redirect('akun_belajar');
     }
+    public function reset_subscribe()
+{
+    // proteksi admin
+    if (!$this->session->userdata('logged_in')) {
+        show_error('Unauthorized', 403);
+    }
+
+    // ambil dari POST
+    $nisn = $this->input->post('nisn', true);
+
+    if (!$nisn) {
+        show_error('NISN tidak ditemukan', 400);
+    }
+
+    $this->db->where('nisn', $nisn)
+             ->update('akun_belajar_siswa', [
+                 'sudah_subscribe' => 0
+             ]);
+
+    $this->session->set_flashdata(
+        'success',
+        'Status subscribe berhasil direset.'
+    );
+
+    redirect('akun_belajar');
+}
+
+
 }

@@ -48,70 +48,121 @@
 
 <?php if (!$akun): ?>
 
-<div class="alert alert-warning">
-    Akun BelajarID Anda belum didaftarkan oleh sekolah.
+    <div class="alert alert-warning">
+        Akun BelajarID Anda belum/sudah pernah diberikan tahun sebelumnya.
+    </div>
+
+<?php elseif ($akun->sudah_subscribe == 0):
+ ?>
+
+    <!-- 🔒 CARD SUBSCRIBE (MUNCUL SEKALI) -->
+    <div class="card shadow-sm text-center">
+    <div class="card-body">
+        <h5 class="mb-3">🔒 Akses Akun Belajar</h5>
+        <p>
+            Untuk melihat email & password akun belajar,<br>
+            silakan subscribe channel YouTube dibawah terlebih dahulu.
+        </p>
+
+        <!-- TOMBOL SUBSCRIBE YOUTUBE -->
+        <a href="https://www.youtube.com/@opesmk/playlists"
+           target="_blank"
+           class="btn btn-danger mb-3"
+           id="btnSubscribeYoutube">
+            ▶️ Subscribe YouTube
+        </a>
+
+        <!-- TOMBOL KONFIRMASI -->
+        <form method="post">
+    <input type="hidden"
+           name="<?= $this->security->get_csrf_token_name(); ?>"
+           value="<?= $this->security->get_csrf_hash(); ?>">
+
+    <!-- FLAG YANG DIKIRIM KE SERVER -->
+    <input type="hidden"
+           name="confirm_subscribe"
+           id="confirm_subscribe"
+           value="0">
+
+    <button type="submit"
+            id="btnConfirmSubscribe"
+            class="btn btn-success"
+            disabled>
+        ✅ Saya Sudah Subscribe
+    </button>
+</form>
+
+
+
+        <small class="text-muted d-block mt-2">
+            Tombol akan aktif setelah Anda klik Subscribe YouTube
+        </small>
+    </div>
 </div>
+
 
 <?php else: ?>
 
-<div class="card shadow-sm">
-<div class="card-body">
+    <!-- ✅ EMAIL & PASSWORD (SETELAH SUBSCRIBE) -->
+    <div class="card shadow-sm">
+    <div class="card-body">
 
-<!-- EMAIL -->
-<div class="akun-item mb-3">
-    <label class="font-weight-bold mb-1">Email BelajarID</label>
+        <!-- EMAIL -->
+        <div class="akun-item mb-3">
+            <label class="font-weight-bold mb-1">Email BelajarID</label>
 
-    <div class="akun-field">
-        <input type="text"
-               id="emailBelajar"
-               class="form-control"
-               value="<?= $akun->email_belajar ?>"
-               readonly>
+            <div class="akun-field">
+                <input type="text"
+                       id="emailBelajar"
+                       class="form-control"
+                       value="<?= $akun->email_belajar ?>"
+                       readonly>
 
-        <button class="btn btn-primary btn-copy"
-                onclick="copyText('emailBelajar')">
-            <i class="fas fa-copy"></i>
-            <span>Salin</span>
-        </button>
+                <button class="btn btn-primary btn-copy"
+                        onclick="copyText('emailBelajar')">
+                    <i class="fas fa-copy"></i>
+                    <span>Salin</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- PASSWORD -->
+        <div class="akun-item mb-3">
+            <label class="font-weight-bold mb-1">Password Default</label>
+
+            <div class="akun-field">
+                <input type="text"
+                       id="passwordBelajar"
+                       class="form-control"
+                       value="<?= $akun->password_default ?>"
+                       readonly>
+
+                <button class="btn btn-primary btn-copy"
+                        onclick="copyText('passwordBelajar')">
+                    <i class="fas fa-copy"></i>
+                    <span>Salin</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- STATUS -->
+        <div class="mb-3">
+            <span class="badge badge-success px-3 py-2">Tersimpan</span>
+        </div>
+
+        <div class="alert alert-info mb-0">
+            <strong>Catatan:</strong><br>
+            Password ini hanya digunakan saat login pertama.<br>
+            Silakan ganti password setelah berhasil login.
+        </div>
+
     </div>
-</div>
-
-<!-- PASSWORD -->
-<div class="akun-item mb-3">
-    <label class="font-weight-bold mb-1">Password Default</label>
-
-    <div class="akun-field">
-        <input type="text"
-               id="passwordBelajar"
-               class="form-control"
-               value="<?= $akun->password_default ?>"
-               readonly>
-
-        <button class="btn btn-primary btn-copy"
-                onclick="copyText('passwordBelajar')">
-            <i class="fas fa-copy"></i>
-            <span>Salin</span>
-        </button>
     </div>
-</div>
-
-<!-- STATUS -->
-<div class="mb-3">
-    <span class="badge badge-success px-3 py-2">Tersimpan</span>
-</div>
-
-<div class="alert alert-info mb-0">
-    <strong>Catatan:</strong><br>
-    Password ini hanya digunakan saat login pertama.<br>
-    Silakan ganti password setelah berhasil login.
-</div>
-
-</div>
-</div>
 
 <?php endif; ?>
 
 </div>
+
 <script>
 function copyText(elementId) {
     const input = document.getElementById(elementId);
@@ -143,3 +194,21 @@ function showToast(message) {
     setTimeout(() => toast.remove(), 2000);
 }
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const btnYoutube = document.getElementById('btnSubscribeYoutube');
+    const btnConfirm = document.getElementById('btnConfirmSubscribe');
+    const inputFlag = document.getElementById('confirm_subscribe');
+
+    if (btnYoutube && btnConfirm && inputFlag) {
+        btnYoutube.addEventListener('click', function () {
+            // aktifkan tombol
+            btnConfirm.disabled = false;
+
+            // set flag ke server
+            inputFlag.value = "1";
+        });
+    }
+});
+</script>
+
