@@ -49,7 +49,7 @@
 <?php if (!$akun): ?>
 
     <div class="alert alert-warning">
-        Akun BelajarID Anda belum/sudah pernah diberikan tahun sebelumnya.
+       Jika anda kelas XI dan XII Akun BelajarID Anda sudah pernah diberikan tahun sebelumnya. Jika anda kelas X Akun BelajarID anda Masih dalam Proses Pengajuan Ke kemendikdasmen
     </div>
 
 <?php elseif ($akun->sudah_subscribe == 0):
